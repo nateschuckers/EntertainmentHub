@@ -311,7 +311,6 @@ const firebaseConfig = {
                         initAppUI();
                     });
                 } else {
-                    // This case should ideally not be hit if anonymous sign-in is always on.
                     signInAnonymously(auth).catch(console.error);
                 }
             });
