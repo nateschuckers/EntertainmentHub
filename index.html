@@ -384,10 +384,12 @@
                 try {
                     const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
                     
-                    // Use Promise.allSettled to prevent one failed promise from stopping the entire process
                     const showDetailResults = await Promise.allSettled(showDetailPromises);
                     const showDetailsList = showDetailResults
-                        .filter(result => result.status === 'fulfilled')
+                        .filter(result => {
+                            if (result.status === 'rejected') console.error("Failed to fetch show details:", result.reason);
+                            return result.status === 'fulfilled';
+                        })
                         .map(result => result.value);
 
                     const seasonPromises = [];
@@ -400,7 +402,10 @@
                     
                     const seasonDetailResults = await Promise.allSettled(seasonPromises);
                     const seasonDetailsList = seasonDetailResults
-                        .filter(result => result.status === 'fulfilled')
+                        .filter(result => {
+                            if (result.status === 'rejected') console.error("Failed to fetch season details:", result.reason);
+                            return result.status === 'fulfilled';
+                        })
                         .map(result => result.value);
 
                     const allEpisodes = [];
@@ -416,7 +421,7 @@
                     state.scheduledEpisodes = allEpisodes;
 
                 } catch (error) {
-                    console.error("Error fetching schedule data:", error);
+                    console.error("Error during schedule data processing:", error);
                     if (!isDashboard) {
                         scheduleMessage.textContent = "Could not load schedule data. " + error.message;
                         scheduleMessage.classList.remove('hidden');
