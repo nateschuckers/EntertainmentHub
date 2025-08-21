@@ -195,18 +195,21 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Firebase Initialization ---
-            // NOTE: Replace this with your actual Firebase config object
-				const firebaseConfig = {
-				apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
-				authDomain: "entertainment-hub-12e9c.firebaseapp.com",
-				projectId: "entertainment-hub-12e9c",
-				storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
-				messagingSenderId: "851340832325",
-				appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
-				};
+        // =================================================================================
+        // --- PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE ---
+        // =================================================================================
+			const firebaseConfig = {
+			apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
+			authDomain: "entertainment-hub-12e9c.firebaseapp.com",
+			projectId: "entertainment-hub-12e9c",
+			storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
+			messagingSenderId: "851340832325",
+			appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
+			};
+        // =================================================================================
 
+        document.addEventListener('DOMContentLoaded', () => {
+            
             // --- Configuration Check ---
             function isConfigPlaceholder(config) {
                 return !config || config.apiKey === "YOUR_API_KEY";
@@ -231,6 +234,7 @@
                 return; // Stop further execution
             }
 
+            // --- Firebase Initialization ---
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
@@ -394,9 +398,11 @@
 
                     const seasonPromises = [];
                     for (const showDetail of showDetailsList) {
-                        const latestSeason = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
-                        if (latestSeason) {
-                            seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${latestSeason.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
+                        if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
+                            const latestSeason = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
+                            if (latestSeason) {
+                                seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${latestSeason.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
+                            }
                         }
                     }
                     
