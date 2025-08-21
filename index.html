@@ -487,7 +487,6 @@ const firebaseConfig = {
             function hideLoading() { loadingSpinner.classList.add('hidden'); }
             function initAppUI() { renderSubscriptions(); renderDashboardHeader(); switchTab(state.activeTab); }
             function initEventListeners() {
-                signInWithGoogleButton.addEventListener('click', handleGoogleSignIn);
                 searchButton.addEventListener('click', handleFullSearch); 
                 searchInput.addEventListener('input', handleLiveSearch); 
                 searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { handleFullSearch(); } }); 
@@ -508,6 +507,7 @@ const firebaseConfig = {
             
             // --- App Entry Point ---
             initEventListeners();
+            signInAnonymously(auth).catch(console.error);
         });
     </script>
 </body>
