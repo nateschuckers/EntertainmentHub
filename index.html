@@ -325,14 +325,15 @@ const firebaseConfig = {
                         if (currentUser.isAnonymous) {
                             return linkWithCredential(currentUser, credential);
                         }
-                        console.log("User already signed in with a permanent account.");
-                    })
-                    .then(() => {
-                        console.log("Account linking successful or user was already signed in.");
                     })
                     .catch((error) => {
                         if (error.code === 'auth/credential-already-in-use') {
-                            alert("This Google account is already associated with another user. Please sign out and sign back in with Google directly.");
+                            // This error means the Google account is already linked to another user.
+                            // The best user experience is to sign them out of the anonymous account
+                            // and sign them in directly with Google.
+                            signOut(auth).then(() => {
+                                signInWithPopup(auth, googleProvider);
+                            });
                         } else {
                             console.error("Error during sign-in or account linking", error);
                         }
