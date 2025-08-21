@@ -192,20 +192,20 @@
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, linkWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =================================================================================
         // --- PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE ---
         // =================================================================================
-			const firebaseConfig = {
-			apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
-			authDomain: "entertainment-hub-12e9c.firebaseapp.com",
-			projectId: "entertainment-hub-12e9c",
-			storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
-			messagingSenderId: "851340832325",
-			appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
-			};
+const firebaseConfig = {
+  apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
+  authDomain: "entertainment-hub-12e9c.firebaseapp.com",
+  projectId: "entertainment-hub-12e9c",
+  storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
+  messagingSenderId: "851340832325",
+  appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
+};
         // =================================================================================
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -318,6 +318,24 @@
                 }
             });
 
+            function handleGoogleSignIn() {
+                signInWithPopup(auth, googleProvider)
+                    .then((result) => {
+                        const credential = GoogleAuthProvider.credentialFromResult(result);
+                        // Link the anonymous account with the Google account.
+                        if (auth.currentUser && auth.currentUser.isAnonymous) {
+                            linkWithCredential(auth.currentUser, credential)
+                                .then((usercred) => {
+                                    console.log("Anonymous account successfully upgraded", usercred.user);
+                                }).catch((error) => {
+                                    console.error("Error upgrading anonymous account", error);
+                                });
+                        }
+                    }).catch((error) => {
+                        console.error("Error during sign-in with Google", error);
+                    });
+            }
+
             function updateAccountSection(user) {
                 if (user && !user.isAnonymous) {
                     accountSection.innerHTML = `
@@ -335,7 +353,7 @@
                             Sign in with Google
                         </button>
                     `;
-                    $('signInWithGoogleButton').addEventListener('click', () => signInWithPopup(auth, googleProvider).catch(console.error));
+                    $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
                 }
             }
 
