@@ -134,7 +134,7 @@
             transform: translate(-50%, -50%);
             width: 100%;
             height: 200%;
-            z-index: 0;
+            z-index: -1;
             opacity: 0.3;
             pointer-events: none;
         }
@@ -143,11 +143,9 @@
         }
         @media (min-width: 768px) {
             #horror-animation-container {
-                left: auto;
-                right: 2rem;
-                width: 300px;
-                height: 300px;
-                transform: translateY(-50%);
+                left: calc(50% + 300px);
+                width: 200px;
+                height: 200px;
             }
         }
 
@@ -219,7 +217,7 @@
             transform: translate(-50%, -50%);
             width: 100%;
             max-width: 500px;
-            z-index: 0;
+            z-index: -1;
             opacity: 0.5;
             pointer-events: none;
         }
@@ -228,12 +226,10 @@
         }
         @media (min-width: 768px) {
             #scifi-animation-container {
-                left: auto;
-                right: 2rem;
-                width: 300px;
-                height: 300px;
+                left: calc(50% + 300px);
+                width: 200px;
+                height: 200px;
                 max-width: none;
-                transform: translateY(-50%);
             }
         }
 
@@ -287,7 +283,7 @@
             transform: translate(-50%, -50%);
             width: 100%;
             max-width: 500px;
-            z-index: 0;
+            z-index: -1;
             opacity: 0.8;
             pointer-events: none;
         }
@@ -296,12 +292,10 @@
         }
         @media (min-width: 768px) {
             #clean-animation-container {
-                left: auto;
-                right: 2rem;
-                width: 300px;
-                height: 300px;
+                left: calc(50% + 300px);
+                width: 200px;
+                height: 200px;
                 max-width: none;
-                transform: translateY(-50%);
             }
         }
 
@@ -368,7 +362,7 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
-        <header class="text-center md:text-left mb-8 relative md:px-8">
+        <header class="text-center mb-8 relative md:px-8">
             <div id="horror-animation-container">
                  <dotlottie-wc src="https://lottie.host/ffe5b7bd-7e2c-48a0-abd5-a0e069bb5f86/255wXmv06r.lottie" style="width: 100%; height: 100%;" speed="1" autoplay loop></dotlottie-wc>
             </div>
