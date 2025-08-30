@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div id="app" class="container mx-auto p-4 md:p-8 hidden">
+    <div id="app" class="container mx-auto p-4 md:p-8">
         
         <!-- Header -->
         <header class="text-center mb-8">
@@ -205,41 +205,23 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =================================================================================
-        // --- PASTE YOUR FIREBASE CONFIGURATION OBJECT HERE ---
-        // =================================================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
-  authDomain: "entertainment-hub-12e9c.firebaseapp.com",
-  projectId: "entertainment-hub-12e9c",
-  storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
-  messagingSenderId: "851340832325",
-  appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
-};
-        // =================================================================================
+        // Use environment variables for Firebase config
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
 
         document.addEventListener('DOMContentLoaded', () => {
             
             // --- Configuration Check ---
-            function isConfigPlaceholder(config) {
-                return !config || config.apiKey === "YOUR_API_KEY";
-            }
-
-            if (isConfigPlaceholder(firebaseConfig)) {
+            if (!firebaseConfig) {
                 document.body.innerHTML = `
                     <div class="flex items-center justify-center h-screen bg-gray-900 text-white">
                         <div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4">
                             <h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1>
-                            <p class="text-gray-300 mb-6">
-                                To save your data, this application needs to connect to a Firebase project.
-                                Please replace the placeholder <code class="bg-gray-700 text-yellow-400 p-1 rounded text-sm">firebaseConfig</code>
-                                object in the HTML file with your own project's configuration from the Firebase Console.
-                            </p>
-                            <a href="https://console.firebase.google.com/" target="_blank" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300">
-                                Go to Firebase Console
-                            </a>
+                            <p class="text-gray-300">This application requires a Firebase configuration to function.</p>
                         </div>
                     </div>
                 `;
@@ -256,6 +238,7 @@ const firebaseConfig = {
 
             // --- App State ---
             const state = {
+                userId: null,
                 userName: null,
                 activeTab: 'dashboard',
                 favoritesView: 'grid',
@@ -307,17 +290,34 @@ const firebaseConfig = {
             const userIdDisplay = $('userIdDisplay');
             const accountSection = $('accountSection');
 
+            // --- Helper Functions ---
+            function promptLogin(reason = 'Please sign in to continue') {
+                // Find the paragraph in the login screen and update its text
+                const loginMessage = loginScreen.querySelector('p');
+                if (loginMessage) {
+                    loginMessage.textContent = reason;
+                }
+                loginScreen.classList.remove('hidden');
+            }
+
             // --- Firebase Auth & Data Handling ---
+            
+            // Listen for authentication state changes
             onAuthStateChanged(auth, (user) => {
-                if (unsubscribeUserDoc) unsubscribeUserDoc();
+                if (unsubscribeUserDoc) {
+                    unsubscribeUserDoc();
+                    unsubscribeUserDoc = null;
+                }
 
                 if (user) {
-                    loginScreen.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-
-                    userDocRef = doc(db, "users", user.uid);
-                    updateAccountSection(user);
+                    // User is signed in.
+                    loginScreen.classList.add('hidden'); // Hide the login modal if it's open.
+                    state.userId = user.uid;
+                    userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/data/appData`);
                     
+                    updateAccountSection(user); // Show user info and sign out button.
+                    
+                    // Listen for user data from Firestore.
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
@@ -325,11 +325,22 @@ const firebaseConfig = {
                             console.log("Creating document for new user.");
                             saveDataToFirestore(); 
                         }
+                        // Update the parts of the UI that depend on user data.
                         initAppUI();
+                    }, (error) => {
+                        console.error("Error with Firestore snapshot listener:", error);
                     });
                 } else {
-                    loginScreen.classList.remove('hidden');
-                    mainApp.classList.add('hidden');
+                    // No user is signed in.
+                    state.userId = null;
+                    userDocRef = null;
+                    // Reset app state to default/logged-out
+                    loadDataFromFirestore({});
+                    
+                    updateAccountSection(null); // Update UI to show a "Sign In" button in settings.
+                    
+                    // Re-render components to reflect logged-out state.
+                    initAppUI();
                 }
             });
 
@@ -341,12 +352,24 @@ const firebaseConfig = {
 
             function updateAccountSection(user) {
                 if (user) {
-                    accountSection.innerHTML = `
+                     accountSection.innerHTML = `
                         <h2 class="text-2xl font-bold mb-4">Account</h2>
                         <p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p>
+                        <p class="text-xs text-gray-500 mb-4">User ID: ${user.uid}</p>
                         <button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">Sign Out</button>
                     `;
                     $('signOutButton').addEventListener('click', () => signOut(auth));
+                } else {
+                    // Logged-out user view
+                    accountSection.innerHTML = `
+                        <h2 class="text-2xl font-bold mb-4">Account</h2>
+                        <p class="text-gray-400 mb-4">Sign in with your Google account to save your favorites and preferences across devices.</p>
+                        <button id="settingsSignInButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center">
+                            <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+                            Sign in with Google
+                        </button>
+                    `;
+                    $('settingsSignInButton').addEventListener('click', handleGoogleSignIn);
                 }
             }
 
@@ -449,7 +472,7 @@ const firebaseConfig = {
                 }
             }
 
-            async function fetchDashboardData() { renderDashboardHeader(); showLoading(); try { const trendingPromise = apiFetch(`trending/all/day?`); const upcomingPromise = apiFetch(`movie/upcoming?`); const schedulePromise = fetchScheduleData(true); const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, schedulePromise]); renderDashboardUpcoming(); renderDashboardTrending(trendingData.results); renderDashboardUpcomingMovies(upcomingData.results); } catch (error) { console.error("Failed to load dashboard:", error); dashboardUpcomingContainer.innerHTML = `<p class="text-gray-500 text-sm">Could not load data. Ensure your TMDB API Key is set correctly in your Netlify environment variables.</p>`; dashboardTrendingContainer.innerHTML = ''; upcomingMoviesContainer.innerHTML = ''; } finally { hideLoading(); } }
+            async function fetchDashboardData() { renderDashboardHeader(); showLoading(); try { const trendingPromise = apiFetch(`trending/all/day`); const upcomingPromise = apiFetch(`movie/upcoming`); const schedulePromise = fetchScheduleData(true); const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, schedulePromise]); renderDashboardUpcoming(); renderDashboardTrending(trendingData.results); renderDashboardUpcomingMovies(upcomingData.results); } catch (error) { console.error("Failed to load dashboard:", error); dashboardUpcomingContainer.innerHTML = `<p class="text-gray-500 text-sm">Could not load data. Ensure your TMDB API Key is set correctly in your Netlify environment variables.</p>`; dashboardTrendingContainer.innerHTML = ''; upcomingMoviesContainer.innerHTML = ''; } finally { hideLoading(); } }
             function renderSearchResults(mediaResults = []) { const validMedia = mediaResults.filter(item => item.media_type !== 'person' && item.poster_path); searchResultsContainer.innerHTML = ''; searchResultsMessage.classList.add('hidden'); if (validMedia.length === 0) { searchResultsMessage.textContent = 'No results found.'; searchResultsMessage.classList.remove('hidden'); return; } validMedia.forEach(item => searchResultsContainer.appendChild(createMediaCard(item))); }
             function renderLiveSearchResults(results = []) { liveSearchResults.innerHTML = ''; const validResults = results.filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5); if (validResults.length === 0) { liveSearchResults.classList.add('hidden'); return; } validResults.forEach(item => { const title = item.title || item.name; const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://placehold.co/40x60/374151/FFFFFF?text=N/A'; const el = document.createElement('div'); el.className = 'flex items-center space-x-3 p-3 hover:bg-gray-700 cursor-pointer'; el.innerHTML = `<img src="${posterUrl}" class="w-10 h-auto rounded-md" onerror="this.style.display='none'"><span>${title}</span>`; el.addEventListener('click', () => { getMediaDetails(item.id, item.media_type); liveSearchResults.classList.add('hidden'); searchInput.value = ''; }); liveSearchResults.appendChild(el); }); const seeMore = document.createElement('div'); seeMore.className = 'text-center p-3 bg-gray-900 hover:bg-gray-700 cursor-pointer font-semibold text-indigo-400'; seeMore.textContent = 'See all results'; seeMore.addEventListener('click', handleFullSearch); liveSearchResults.appendChild(seeMore); liveSearchResults.classList.remove('hidden'); }
             async function renderFavorites() { favoritesMessage.classList.toggle('hidden', state.favorites.length > 0); if (state.favorites.length === 0) { favoritesContainer.innerHTML = ''; favoritesListContainer.innerHTML = ''; return; } const sortedFavorites = [...state.favorites].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name)); if (state.favoritesView === 'grid') { favoritesContainer.classList.remove('hidden'); favoritesListContainer.classList.add('hidden'); favoritesContainer.innerHTML = ''; sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item))); } else { favoritesContainer.classList.add('hidden'); favoritesListContainer.classList.remove('hidden'); await renderFavoritesList(sortedFavorites); } }
@@ -466,10 +489,44 @@ const firebaseConfig = {
             function renderDashboardUpcomingMovies(items = []) { const container = upcomingMoviesContainer; container.innerHTML = ''; if(items.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">Could not load upcoming movies.</p>'; return; } items.filter(item => item.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'flex-shrink-0 w-32 cursor-pointer relative'; const posterUrl = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); card.innerHTML = `<img src="${posterUrl}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><p class="text-sm mt-2 truncate font-semibold">${item.title}</p><p class="text-xs text-indigo-300">${releaseDate}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, 'movie')); container.appendChild(card); }); }
             function handleFullSearch() { const query = searchInput.value.trim(); liveSearchResults.classList.add('hidden'); switchTab('search-results'); searchMedia(query, false); }
             let debounceTimer; function handleLiveSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { searchMedia(searchInput.value.trim(), true); }, 300); }
-            async function switchTab(tabName) { state.activeTab = tabName; document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if ($(tabName)) $(tabName).classList.remove('hidden'); tabs.forEach(tab => { const isCurrentTab = tab.dataset.tab === tabName; tab.classList.toggle('text-indigo-400', isCurrentTab); tab.classList.toggle('border-indigo-400', isCurrentTab); tab.classList.toggle('font-medium', isCurrentTab); tab.classList.toggle('text-gray-500', !isCurrentTab); tab.classList.toggle('border-transparent', !isCurrentTab); }); if (tabName === 'dashboard') fetchDashboardData(); if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); } }
-            function toggleSubscription(serviceId) { const index = state.subscriptions.indexOf(serviceId); if (index > -1) state.subscriptions.splice(index, 1); else state.subscriptions.push(serviceId); saveDataToFirestore(); }
-            function toggleFavorite(mediaItem) { const index = state.favorites.findIndex(fav => fav.id === mediaItem.id); if (index > -1) { state.favorites.splice(index, 1); } else { state.favorites.push({ id: mediaItem.id, name: mediaItem.name, title: mediaItem.title, poster_path: mediaItem.poster_path, first_air_date: mediaItem.first_air_date, release_date: mediaItem.release_date, media_type: mediaItem.title ? 'movie' : 'tv', manualTime: null }); } saveDataToFirestore(); renderModal(mediaItem); }
-            function editManualTime(details) { const favorite = state.favorites.find(f => f.id === details.id); if (!favorite) return; const container = $('manualTimeContainer'); container.innerHTML = `<div class="flex-grow"><input type="text" id="timeInput" class="w-full bg-gray-700 border border-gray-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST"></div><div class="flex space-x-2"><button id="saveTimeButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-sm">Save</button><button id="cancelTimeButton" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button></div>`; $('saveTimeButton').addEventListener('click', () => { const newTime = $('timeInput').value.trim(); favorite.manualTime = newTime; saveDataToFirestore(); renderModal(details); }); $('cancelTimeButton').addEventListener('click', () => renderModal(details)); }
+            async function switchTab(tabName) { state.activeTab = tabName; document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if ($(tabName)) $(tabName).classList.remove('hidden'); tabs.forEach(tab => { const isCurrentTab = tab.dataset.tab === tabName; tab.classList.toggle('text-indigo-400', isCurrentTab); tab.classList.toggle('border-indigo-400', isCurrentTab); tab.classList.toggle('font-medium', isCurrentTab); tab.classList.toggle('text-gray-500', !isCurrentTab); tab.classList.toggle('border-transparent', !isCurrentTab); }); if (tabName === 'dashboard') fetchDashboardData(); if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') { await fetchScheduleData().then(renderSchedule); } }
+            
+            function toggleSubscription(serviceId) {
+                if (!auth.currentUser) {
+                    promptLogin('Please sign in to manage your subscriptions.');
+                    return;
+                }
+                const index = state.subscriptions.indexOf(serviceId);
+                if (index > -1) state.subscriptions.splice(index, 1);
+                else state.subscriptions.push(serviceId);
+                saveDataToFirestore();
+                renderSubscriptions();
+            }
+
+            function toggleFavorite(mediaItem) {
+                if (!auth.currentUser) {
+                    promptLogin('Please sign in to save favorites.');
+                    return;
+                }
+                const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
+                if (index > -1) {
+                    state.favorites.splice(index, 1);
+                } else {
+                    state.favorites.push({ id: mediaItem.id, name: mediaItem.name, title: mediaItem.title, poster_path: mediaItem.poster_path, first_air_date: mediaItem.first_air_date, release_date: mediaItem.release_date, media_type: mediaItem.title ? 'movie' : 'tv', manualTime: null });
+                }
+                saveDataToFirestore();
+                renderModal(mediaItem);
+                if (state.activeTab === 'favorites') {
+                    renderFavorites();
+                }
+            }
+            function editManualTime(details) { 
+                if (!auth.currentUser) {
+                    promptLogin('Please sign in to edit air times.');
+                    closeModal();
+                    return;
+                }
+                const favorite = state.favorites.find(f => f.id === details.id); if (!favorite) return; const container = $('manualTimeContainer'); container.innerHTML = `<div class="flex-grow"><input type="text" id="timeInput" class="w-full bg-gray-700 border border-gray-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST"></div><div class="flex space-x-2"><button id="saveTimeButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-sm">Save</button><button id="cancelTimeButton" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button></div>`; $('saveTimeButton').addEventListener('click', () => { const newTime = $('timeInput').value.trim(); favorite.manualTime = newTime; saveDataToFirestore(); renderModal(details); }); $('cancelTimeButton').addEventListener('click', () => renderModal(details)); }
             function closeModal() { modal.classList.add('hidden'); }
             function showLoading() { loadingSpinner.classList.remove('hidden'); }
             function hideLoading() { loadingSpinner.classList.add('hidden'); }
@@ -482,7 +539,13 @@ const firebaseConfig = {
                 document.addEventListener('click', (e) => { if (!$('searchWrapper').contains(e.target)) { liveSearchResults.classList.add('hidden'); } }); 
                 tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab))); 
                 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }); 
-                saveUserNameButton.addEventListener('click', () => { const name = userNameInput.value.trim(); state.userName = name; saveDataToFirestore(); userNameMessage.textContent = 'Name saved!'; userNameMessage.classList.remove('hidden'); setTimeout(() => userNameMessage.classList.add('hidden'), 3000); }); 
+                loginScreen.addEventListener('click', (e) => { if (e.target === loginScreen) loginScreen.classList.add('hidden'); });
+                saveUserNameButton.addEventListener('click', () => { 
+                    if (!auth.currentUser) {
+                        promptLogin('Please sign in to save your name.');
+                        return;
+                    }
+                    const name = userNameInput.value.trim(); state.userName = name; saveDataToFirestore(); userNameMessage.textContent = 'Name saved!'; userNameMessage.classList.remove('hidden'); setTimeout(() => userNameMessage.classList.add('hidden'), 3000); }); 
                 calendarViewBtn.addEventListener('click', () => { state.scheduleView = 'calendar'; calendarViewBtn.classList.add('bg-indigo-600', 'text-white'); agendaViewBtn.classList.remove('bg-indigo-600', 'text-white'); agendaViewBtn.classList.add('text-gray-300'); renderSchedule(); }); 
                 agendaViewBtn.addEventListener('click', () => { state.scheduleView = 'agenda'; agendaViewBtn.classList.add('bg-indigo-600', 'text-white'); calendarViewBtn.classList.remove('bg-indigo-600', 'text-white'); calendarViewBtn.classList.add('text-gray-300'); renderSchedule(); }); 
                 gridViewBtn.addEventListener('click', () => { if (state.favoritesView === 'grid') return; state.favoritesView = 'grid'; gridViewBtn.classList.add('bg-indigo-600', 'text-white'); listViewBtn.classList.remove('bg-indigo-600', 'text-white'); listViewBtn.classList.add('text-gray-300'); renderFavorites(); }); 
@@ -496,7 +559,11 @@ const firebaseConfig = {
             
             // --- App Entry Point ---
             initEventListeners();
+            // Load public data on initial start
+            fetchDashboardData();
+
         });
     </script>
 </body>
 </html>
+
