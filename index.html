@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&family=Orbitron:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -307,10 +307,8 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
-        <header class="text-center mb-8 relative overflow-hidden">
-             <div id="horror-animation-container">
-                <lottie-player src="https://lottie.host/ffe5b7bd-7e2c-48a0-abd5-a0e069bb5f86/255wXmv06r.lottie" background="transparent" speed="1" loop autoplay></lottie-player>
-            </div>
+        <header class="text-center mb-8 relative">
+            <div id="horror-animation-container"></div>
             <h1 class="text-5xl sm:text-6xl font-script text-zinc-400 relative">Entertainment Hub</h1>
             <p class="text-zinc-400 mt-2 relative">Find where to watch your favorite shows and movies.</p>
         </header>
@@ -521,6 +519,7 @@
             let unsubscribeUserDoc = null;
             let isDataLoaded = false;
             let userId = null;
+            let horrorAnimation = null;
 
             const state = {
                 userName: null,
@@ -685,10 +684,29 @@
                 if(theme === 'horror' || theme === 'scifi' || theme === 'clean') {
                     document.body.classList.add(`theme-${theme}`);
                 }
+
+                if (theme === 'horror') {
+                    if (!horrorAnimation) { // Only load it once
+                        const lottieData = {"v":"5.9.6","fr":30,"ip":0,"op":60,"w":512,"h":512,"nm":"Layer 1","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Shape Layer 1","sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":0,"k":[256,256,0],"ix":2},"a":{"a":0,"k":[0,0,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"v":[[-149,-256],[149,-256]],"c":false},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[1,1,1,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":2,"ix":5},"lc":1,"lj":1,"ml":4,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Shape 1","np":3,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false}],"ip":0,"op":60,"st":0,"bm":0}],"markers":[]};
+                        horrorAnimation = lottie.loadAnimation({
+                            container: document.getElementById('horror-animation-container'),
+                            renderer: 'svg',
+                            loop: true,
+                            autoplay: true,
+                            animationData: lottieData
+                        });
+                    }
+                } else {
+                    if (horrorAnimation) {
+                        horrorAnimation.destroy();
+                        horrorAnimation = null;
+                        document.getElementById('horror-animation-container').innerHTML = '';
+                    }
+                }
+
                 themeBtns.forEach(btn => {
-                    // This logic is now mostly handled by CSS for consistency
                     const isSelected = btn.dataset.theme === theme;
-                    btn.classList.toggle('bg-zinc-900', isSelected); // Used as a "selected" marker by CSS
+                    btn.classList.toggle('bg-zinc-900', isSelected);
                     btn.classList.toggle('text-white', isSelected);
                     btn.classList.toggle('bg-zinc-700', !isSelected);
                     btn.classList.toggle('text-zinc-300', !isSelected);
