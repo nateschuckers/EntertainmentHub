@@ -93,12 +93,8 @@
         }
 
         @keyframes creep-fog {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         @keyframes red-pulse {
@@ -108,17 +104,16 @@
         }
 
         .theme-horror .font-script {
-            position: relative; /* Essential for pseudo-element positioning */
+            position: relative;
             font-family: 'Creepster', cursive !important;
             animation: flicker 2.5s infinite alternate;
-            overflow: hidden; /* Contain the fog behind the text */
+            overflow: hidden;
         }
         
-        /* Fog Layer 1 */
         .theme-horror .font-script::before {
             content: '';
             position: absolute;
-            bottom: -30%; /* Start below the text */
+            bottom: -30%;
             left: -50%;
             width: 200%;
             height: 100%;
@@ -126,35 +121,43 @@
             animation: creep-fog 18s linear infinite alternate;
         }
 
-        /* Fog Layer 2 */
         .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            bottom: -25%; /* Slightly different position */
+            bottom: -25%;
             left: -50%;
             width: 200%;
             height: 100%;
             background: radial-gradient(ellipse at 50% 100%, rgba(127, 29, 29, 0.2) 0%, transparent 60%);
-            animation: creep-fog 15s linear infinite alternate-reverse; /* Move in opposite direction */
-        }
-
-        .theme-horror .tab-button.border-zinc-400 {
-            border-color: #ef4444; /* red-500 */
-            color: #f87171; /* red-400 */
-            animation: red-pulse 2s infinite; /* Pulsing effect for active tab */
+            animation: creep-fog 15s linear infinite alternate-reverse;
         }
         
-        .theme-horror #deleteAccountBtn {
-             animation: red-pulse 2s infinite;
+        .theme-horror h2 { color: #ef4444; }
+        .theme-horror .tab-button.border-zinc-400 {
+            border-color: #ef4444;
+            color: #f87171;
+            animation: red-pulse 2s infinite;
         }
-
+        .theme-horror #deleteAccountBtn,
+        .theme-horror .upcoming-filter-btn.bg-zinc-900,
+        .theme-horror .fav-view-btn.bg-zinc-900,
+        .theme-horror .schedule-view-btn.bg-zinc-900 {
+            background-color: #b91c1c;
+            color: #fafafa;
+        }
+        .theme-horror .upcoming-filter-btn,
+        .theme-horror .fav-view-btn,
+        .theme-horror .schedule-view-btn {
+            background-color: #222;
+            color: #d4d4d8;
+        }
+        .theme-horror #deleteAccountBtn { animation: red-pulse 2s infinite; }
         .theme-horror .bg-zinc-900 { background-color: #000; }
         .theme-horror .bg-zinc-800 { background-color: #111; }
         .theme-horror .bg-zinc-700 { background-color: #222; }
         .theme-horror .hover\:bg-zinc-600:hover { background-color: #333; }
         .theme-horror .border-zinc-700 { border-color: #444; }
         .theme-horror .text-zinc-400 { color: #d4d4d8; }
-        .theme-horror .upcoming-filter-btn.bg-zinc-900 { background-color: #b91c1c; }
         .theme-horror #danger-zone {
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C60 10, 70 15, 60 25 C50 35, 40 40, 50 50 C60 60, 70 65, 60 75 C50 85, 40 90, 50 100" fill="%23991b1b" opacity="0.1" transform="rotate(20 50 50)"/><path d="M20 10 C30 20, 40 25, 30 35 C20 45, 10 50, 20 60 C30 70, 40 75, 30 85" fill="%237f1d1d" opacity="0.1" transform="rotate(-15 50 50)"/></svg>');
             background-repeat: no-repeat;
@@ -190,10 +193,24 @@
             animation: scanlines 0.5s linear infinite;
         }
 
+        .theme-scifi h2 { color: #4ade80; }
         .theme-scifi .tab-button.border-zinc-400 {
-            border-color: #4ade80; /* green-400 */
-            color: #86efac; /* green-300 */
+            border-color: #4ade80;
+            color: #86efac;
         }
+        .theme-scifi .upcoming-filter-btn.bg-zinc-900,
+        .theme-scifi .fav-view-btn.bg-zinc-900,
+        .theme-scifi .schedule-view-btn.bg-zinc-900 {
+            background-color: #15803d;
+            color: #fafafa;
+        }
+        .theme-scifi .upcoming-filter-btn,
+        .theme-scifi .fav-view-btn,
+        .theme-scifi .schedule-view-btn {
+            background-color: #1a2f38;
+            color: #86efac;
+        }
+
         .theme-scifi .bg-zinc-900, .theme-scifi body.bg-zinc-900 { background-color: #0c1417; }
         .theme-scifi .bg-zinc-800 { background-color: #111e24; }
         .theme-scifi .bg-zinc-700 { background-color: #1a2f38; }
@@ -201,23 +218,41 @@
         .theme-scifi .border-zinc-700 { border-color: #24434e; }
         .theme-scifi .text-zinc-400 { color: #86efac; }
         .theme-scifi .text-zinc-500 { color: #4ade80; }
-        .theme-scifi .upcoming-filter-btn.bg-zinc-900 { background-color: #15803d; }
 
         /* --- Clean Theme --- */
         body.theme-clean { background-color: #f8fafc; color: #18181b; }
         .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; color: #0ea5e9; }
-        .theme-clean .text-zinc-200 { color: #18181b; }
-        .theme-clean .text-zinc-400, .theme-clean .text-zinc-300 { color: #52525b; }
-        .theme-clean .text-zinc-500 { color: #71717a; }
+        
+        .theme-clean h2 { color: #18181b; }
+        .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500 { color: #52525b; }
+        
+        .theme-clean .tab-button.border-zinc-400 {
+            border-color: transparent;
+            background-color: #52525b;
+            color: #fafafa;
+        }
+        .theme-clean .tab-button {
+            color: #52525b;
+        }
+        .theme-clean .upcoming-filter-btn.bg-zinc-900,
+        .theme-clean .fav-view-btn.bg-zinc-900,
+        .theme-clean .schedule-view-btn.bg-zinc-900 {
+            background-color: #52525b;
+            color: #fafafa;
+        }
+        .theme-clean .upcoming-filter-btn,
+        .theme-clean .fav-view-btn,
+        .theme-clean .schedule-view-btn {
+            background-color: #e4e4e7;
+            color: #18181b;
+        }
+        
         .theme-clean .bg-zinc-900 { background-color: #f8fafc; }
         .theme-clean .bg-zinc-800, .theme-clean .modal-content { background-color: #fff; }
         .theme-clean .bg-zinc-700 { background-color: #e4e4e7; }
         .theme-clean .hover\:bg-zinc-600:hover { background-color: #d4d4d8; }
         .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
-        .theme-clean .tab-button.border-zinc-400 { border-color: #0ea5e9; color: #0ea5e9; }
-        .theme-clean .upcoming-filter-btn.bg-zinc-900, .theme-clean .fav-view-btn.bg-zinc-900, .theme-clean .schedule-view-btn.bg-zinc-900 { background-color: #0ea5e9; color: white; }
-        .theme-clean .upcoming-filter-btn.text-zinc-300, .theme-clean .fav-view-btn.text-zinc-300, .theme-clean .schedule-view-btn.text-zinc-300 { color: #3f3f46; }
-
+        
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
