@@ -266,17 +266,19 @@
                     mainApp.classList.remove('hidden');
                     
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+                        const wasAlreadyLoaded = isDataLoaded;
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
                         } else {
-                            // For a new user, save the initial empty state
-                            saveDataToFirestore(); 
+                            saveDataToFirestore();
+                            return; 
                         }
                         
-                        // This flag ensures the UI initializes only once per login
-                        if (!isDataLoaded) {
+                        if (!wasAlreadyLoaded) {
                            isDataLoaded = true;
                            initAppUI(); 
+                        } else {
+                           refreshCurrentView();
                         }
                     });
                 } else {
@@ -731,6 +733,26 @@
                     return `<div class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-gray-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
                 }).join('')}</div>`;
             }
+
+            async function refreshCurrentView() {
+                // This function is called whenever data changes in Firestore
+                updateAccountSection();
+                renderSubscriptions();
+                dashboardUserName.textContent = state.userName || 'You';
+                
+                if (state.activeTab === 'dashboard') {
+                    await fetchScheduleData(true);
+                    renderDashboardUpcoming();
+                }
+                if (state.activeTab === 'favorites') {
+                    await renderFavorites();
+                }
+                if (state.activeTab === 'schedule') { 
+                    await fetchScheduleData(); 
+                    renderSchedule(); 
+                }
+            }
+
 
             function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
             function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
