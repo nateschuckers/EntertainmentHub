@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&family=Orbitron:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -119,44 +120,32 @@
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
 
-        @keyframes creep-fog {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
         @keyframes red-pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
             70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
+        #horror-animation-container {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 200%;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .theme-horror #horror-animation-container {
+            display: block;
+        }
+
         .theme-horror .font-script {
             position: relative;
             font-family: 'Creepster', cursive !important;
             animation: flicker 2.5s infinite alternate;
-            overflow: hidden;
-        }
-        
-        .theme-horror .font-script::before {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -50%;
-            width: 200%;
-            height: 100%;
-            background: radial-gradient(ellipse at 50% 100%, rgba(99, 27, 27, 0.3) 0%, transparent 70%);
-            animation: creep-fog 18s linear infinite alternate;
-        }
-
-        .theme-horror .font-script::after {
-            content: '';
-            position: absolute;
-            bottom: -25%;
-            left: -50%;
-            width: 200%;
-            height: 100%;
-            background: radial-gradient(ellipse at 50% 100%, rgba(127, 29, 29, 0.2) 0%, transparent 60%);
-            animation: creep-fog 15s linear infinite alternate-reverse;
         }
         
         .theme-horror h2 { color: #ef4444; }
@@ -318,9 +307,12 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
-        <header class="text-center mb-8">
-            <h1 class="text-5xl sm:text-6xl font-script text-zinc-400">Entertainment Hub</h1>
-            <p class="text-zinc-400 mt-2">Find where to watch your favorite shows and movies.</p>
+        <header class="text-center mb-8 relative overflow-hidden">
+             <div id="horror-animation-container">
+                <lottie-player src="https://lottie.host/ffe5b7bd-7e2c-48a0-abd5-a0e069bb5f86/255wXmv06r.lottie" background="transparent" speed="1" loop autoplay></lottie-player>
+            </div>
+            <h1 class="text-5xl sm:text-6xl font-script text-zinc-400 relative">Entertainment Hub</h1>
+            <p class="text-zinc-400 mt-2 relative">Find where to watch your favorite shows and movies.</p>
         </header>
 
         <div class="mb-8 max-w-2xl mx-auto">
