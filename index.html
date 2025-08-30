@@ -133,7 +133,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 100%;
-            height: 100%;
+            height: 200%;
             z-index: 0;
             opacity: 0.3;
             pointer-events: none;
@@ -251,6 +251,21 @@
         .theme-scifi .text-zinc-500 { color: #4ade80; }
 
         /* --- Clean Theme --- */
+        #clean-animation-container {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            z-index: 0;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        .theme-clean #clean-animation-container {
+            display: block;
+        }
         body.theme-clean { background-color: #f8fafc; color: #18181b; }
         .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; color: #0ea5e9; }
         
@@ -317,6 +332,9 @@
             </div>
             <div id="scifi-animation-container">
                 <dotlottie-wc src="https://lottie.host/d54b467c-11c2-447e-b901-b56c4eab5d53/kYg7v2uYg1.lottie" speed="1" autoplay loop></dotlottie-wc>
+            </div>
+            <div id="clean-animation-container">
+                <dotlottie-wc src="https://lottie.host/e2771b7a-7d6f-4a71-93bc-59260fc50c18/bcEIrfHDKq.lottie" speed="1" autoplay loop></dotlottie-wc>
             </div>
             <h1 class="text-5xl sm:text-6xl font-script text-zinc-400 relative">Entertainment Hub</h1>
             <p class="text-zinc-400 mt-2 relative">Find where to watch your favorite shows and movies.</p>
@@ -1436,5 +1454,4 @@
     </script>
 </body>
 </html>
-
 
