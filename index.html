@@ -11,8 +11,8 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: {
-                            50:"#f8fafc",100:"#f1f5f9",200:"#e2e8f0",300:"#cbd5e1",400:"#94a3b8",500:"#64748b",600:"#475569",700:"#334155",800:"#1e293b",900:"#0f172a",950:"#020617"
+                        zinc: {
+                            50:"#fafafa",100:"#f4f4f5",200:"#e4e4e7",300:"#d4d4d8",400:"#a1a1aa",500:"#71717a",600:"#52525b",700:"#3f3f46",800:"#27272a",900:"#18181b",950:"#09090b"
                         }
                     }
                 }
@@ -27,29 +27,31 @@
             display: flex; justify-content: center; align-items: center; z-index: 50;
         }
         .modal-content { max-height: 90vh; overflow-y: auto; }
-        .calendar-day.has-event { background-color: #475569; border-radius: 50%; color: white; }
+        .calendar-day.has-event { background-color: #3f3f46; border-radius: 50%; color: white; }
         .scrolling-wrapper { -webkit-overflow-scrolling: touch; }
         .scrolling-wrapper::-webkit-scrollbar { display: none; }
         .config-error-screen {
             display: flex; align-items: center; justify-content: center;
-            position: fixed; inset: 0; background-color: #0f172a; z-index: 100;
+            position: fixed; inset: 0; background-color: #09090b; z-index: 100;
         }
         .config-error-box {
-            background-color: #1e293b; color: white; padding: 2rem; border-radius: 0.5rem;
+            background-color: #18181b; color: white; padding: 2rem; border-radius: 0.5rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             text-align: center; max-width: 500px;
         }
         .config-error-box h1 { font-size: 1.5rem; font-weight: bold; color: #ef4444; margin-bottom: 1rem; }
-        .config-error-box p { color: #cbd5e1; margin-bottom: 1.5rem; font-family: monospace; font-size: 0.875rem; text-align: left; background-color: #334155; padding: 1rem; border-radius: 0.25rem;}
+        .config-error-box p { color: #d4d4d8; margin-bottom: 1.5rem; font-family: monospace; font-size: 0.875rem; text-align: left; background-color: #3f3f46; padding: 1rem; border-radius: 0.25rem;}
         
         .favorite-card-manage-overlay {
             position: absolute;
             top: 0; right: 0; bottom: 0; left: 0;
             background-color: rgba(0,0,0,0.5);
             cursor: pointer;
-            border: 2px solid transparent;
             border-radius: 0.5rem; /* Match card rounding */
             transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .favorite-card-manage-checkbox {
             position: absolute;
@@ -57,24 +59,32 @@
             left: 0.5rem;
             width: 1.5rem;
             height: 1.5rem;
-            accent-color: #94a3b8; /* slate-400 */
+            opacity: 0; /* Hide the actual checkbox */
+            cursor: pointer;
+        }
+        .checkmark-svg {
+            display: none; /* Hidden by default */
+            width: 4rem;
+            height: 4rem;
+            color: white;
         }
         .favorite-card.selected .favorite-card-manage-overlay {
-            border-color: #f1f5f9; /* slate-100 */
-            background-color: rgba(148, 163, 184, 0.3);
-            border-width: 4px;
+            background-color: rgba(9, 9, 11, 0.7);
+        }
+        .favorite-card.selected .checkmark-svg {
+            display: block;
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200">
+<body class="bg-zinc-900 text-zinc-200">
     <div id="configErrorScreen" class="config-error-screen hidden"></div>
 
     <!-- Login Screen -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex flex-col justify-center items-center z-50">
+    <div id="loginScreen" class="fixed inset-0 bg-zinc-900 flex flex-col justify-center items-center z-50">
         <div class="text-center p-4">
-            <h1 class="text-4xl sm:text-5xl font-bold text-slate-400 mb-4">Entertainment Hub</h1>
-            <p class="text-slate-400 mb-8">Please sign in to continue</p>
-            <button id="signInWithGoogleButton" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center mx-auto">
+            <h1 class="text-4xl sm:text-5xl font-bold text-zinc-400 mb-4">Entertainment Hub</h1>
+            <p class="text-zinc-400 mb-8">Please sign in to continue</p>
+            <button id="signInWithGoogleButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center mx-auto">
                 <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
                 Sign in with Google
             </button>
@@ -84,37 +94,37 @@
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-400">Entertainment Hub</h1>
-            <p class="text-slate-400 mt-2">Find where to watch your favorite shows and movies.</p>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400">Entertainment Hub</h1>
+            <p class="text-zinc-400 mt-2">Find where to watch your favorite shows and movies.</p>
         </header>
 
         <div class="mb-8 max-w-2xl mx-auto">
             <div id="searchWrapper" class="relative">
-                <input type="text" id="searchInput" class="w-full bg-slate-800 border-2 border-slate-700 rounded-full py-3 px-6 text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
-                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-slate-600 hover:bg-slate-700 rounded-full p-2 focus:outline-none transition duration-300">
+                <input type="text" id="searchInput" class="w-full bg-zinc-800 border-2 border-zinc-700 rounded-full py-3 px-6 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
+                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-zinc-700 hover:bg-zinc-600 rounded-full p-2 focus:outline-none transition duration-300">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
-                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg"></div>
+                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg"></div>
             </div>
         </div>
 
         <div class="mb-8">
-            <div class="flex justify-center flex-wrap border-b border-slate-700">
-                <button data-tab="dashboard" class="tab-button flex items-center justify-center gap-2 py-2 px-2 sm:px-4 border-b-2 transition-colors duration-200">
+            <div class="flex justify-center flex-wrap border-b border-zinc-700">
+                <button data-tab="dashboard" class="tab-button flex items-center justify-center gap-2 py-2 px-2 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-                    <span class="hidden sm:inline">Dashboard</span>
+                    <span class="hidden md:inline">Dashboard</span>
                 </button>
-                <button data-tab="favorites" class="tab-button flex items-center justify-center gap-2 py-2 px-2 sm:px-4 border-b-2 transition-colors duration-200">
+                <button data-tab="favorites" class="tab-button flex items-center justify-center gap-2 py-2 px-2 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    <span class="hidden sm:inline">Favorites</span>
+                    <span class="hidden md:inline">Favorites</span>
                 </button>
-                <button data-tab="schedule" class="tab-button flex items-center justify-center gap-2 py-2 px-2 sm:px-4 border-b-2 transition-colors duration-200">
+                <button data-tab="schedule" class="tab-button flex items-center justify-center gap-2 py-2 px-2 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span class="hidden sm:inline">Schedule</span>
+                    <span class="hidden md:inline">Schedule</span>
                 </button>
-                <button data-tab="settings" class="tab-button flex items-center justify-center gap-2 py-2 px-2 sm:px-4 border-b-2 transition-colors duration-200">
+                <button data-tab="settings" class="tab-button flex items-center justify-center gap-2 py-2 px-2 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span class="hidden sm:inline">Settings</span>
+                    <span class="hidden md:inline">Settings</span>
                 </button>
             </div>
         </div>
@@ -122,13 +132,13 @@
         <main id="content-area">
             <div id="dashboard" class="tab-content">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-slate-800 p-6 rounded-lg">
+                    <div class="lg:col-span-2 bg-zinc-800 p-6 rounded-lg">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-bold">Upcoming for <span id="dashboardUserName">You</span></h2>
-                            <div class="flex space-x-1 bg-slate-700 p-1 rounded-lg">
-                                <button data-filter="today" class="upcoming-filter-btn bg-slate-600 text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
-                                <button data-filter="week" class="upcoming-filter-btn text-slate-300 px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
-                                <button data-filter="month" class="upcoming-filter-btn text-slate-300 px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
+                            <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                <button data-filter="today" class="upcoming-filter-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
+                                <button data-filter="week" class="upcoming-filter-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
+                                <button data-filter="month" class="upcoming-filter-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
                             </div>
                         </div>
                         <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
@@ -137,17 +147,17 @@
                         <div>
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
-                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-slate-800 p-4 rounded-lg"></div>
-                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-slate-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-slate-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
+                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
                         </div>
                          <div>
                              <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
                             <div class="relative">
-                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-slate-800 p-4 rounded-lg"></div>
-                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-slate-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-slate-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
+                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
                         </div>
                     </div>
@@ -156,7 +166,7 @@
 
             <div id="search-results" class="tab-content hidden">
                  <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
-                <p id="searchResultsMessage" class="text-center text-slate-500">Search for something to see results.</p>
+                <p id="searchResultsMessage" class="text-center text-zinc-500">Search for something to see results.</p>
                 <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
             </div>
 
@@ -165,56 +175,56 @@
                     <div id="favorites-header" class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">My Favorites</h2>
                         <div id="favorites-view-controls" class="flex items-center space-x-4">
-                            <div class="flex space-x-1 bg-slate-700 p-1 rounded-lg">
-                                <button class="fav-view-btn bg-slate-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
-                                <button class="fav-view-btn text-slate-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
+                            <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                <button class="fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
+                                <button class="fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
                             </div>
-                             <button id="manageFavoritesBtn" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                             <button id="manageFavoritesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                         </div>
                     </div>
-                     <div id="favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-slate-700 p-2 rounded-lg">
+                     <div id="favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                         <span id="favoritesSelectedCount" class="text-sm font-medium">0 selected</span>
                         <div class="flex space-x-2">
                              <button id="deleteSelectedFavoritesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
                              <button id="deleteAllFavoritesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
-                             <button id="cancelManageFavoritesBtn" class="bg-slate-500 hover:bg-slate-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
+                             <button id="cancelManageFavoritesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                         </div>
                     </div>
-                    <p id="favoritesMessage" class="text-center text-slate-500">Your favorite shows and movies will appear here.</p>
+                    <p id="favoritesMessage" class="text-center text-zinc-500">Your favorite shows and movies will appear here.</p>
                     <div id="favoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
                     <div id="favoritesListContainer" class="hidden space-y-3"></div>
                 </div>
             </div>
 
             <div id="schedule" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-slate-800 p-6 rounded-lg shadow-lg">
+                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">Upcoming Episodes</h2>
-                        <div class="flex space-x-1 bg-slate-700 p-1 rounded-lg">
-                            <button class="schedule-view-btn text-slate-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
-                            <button class="schedule-view-btn bg-slate-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
+                        <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                            <button class="schedule-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
+                            <button class="schedule-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
                         </div>
                     </div>
                     <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
-                     <p id="scheduleMessage" class="text-center text-slate-500 mt-4 hidden"></p>
+                     <p id="scheduleMessage" class="text-center text-zinc-500 mt-4 hidden"></p>
                 </div>
             </div>
 
             <div id="settings" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-slate-800 p-6 rounded-lg shadow-lg space-y-8">
+                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg space-y-8">
                     <div id="accountSection"></div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Your Name</h2>
-                        <p class="text-slate-400 mb-4">Personalize the dashboard greeting.</p>
+                        <p class="text-zinc-400 mb-4">Personalize the dashboard greeting.</p>
                         <div class="flex flex-col sm:flex-row sm:space-x-2">
-                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-slate-700 border border-slate-600 rounded-md py-2 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-slate-500" placeholder="Enter your name">
-                            <button id="saveUserNameButton" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
+                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500" placeholder="Enter your name">
+                            <button id="saveUserNameButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
                         </div>
                          <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Manage Your Streaming Services</h2>
-                        <p class="text-slate-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
+                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
                         <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                     </div>
                     <div class="border-t border-red-900/50 pt-6">
@@ -231,13 +241,13 @@
             </div>
         </main>
         
-        <div id="loadingSpinner" class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 flex justify-center items-center z-50">
-             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-500"></div>
+        <div id="loadingSpinner" class="hidden fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-50">
+             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-500"></div>
         </div>
     </div>
 
     <div id="detailsModal" class="modal-backdrop hidden">
-        <div id="modalContent" class="modal-content bg-slate-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
+        <div id="modalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
     </div>
 
     <script type="module">
@@ -378,7 +388,7 @@
             function updateAccountSection() {
                 const user = auth.currentUser;
                 if (user) {
-                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-slate-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
+                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-zinc-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
                     const signOutButton = $('signOutButton');
                     if(signOutButton) signOutButton.addEventListener('click', () => signOut(auth));
                     const deleteAccountBtn = $('deleteAccountBtn');
@@ -404,9 +414,9 @@
                 const confirmModalContent = `
                     <div class="text-center p-6">
                         <h2 class="text-2xl font-bold mb-4 text-red-400">Are you sure?</h2>
-                        <p class="text-slate-300 mb-6">${message}</p>
+                        <p class="text-zinc-300 mb-6">${message}</p>
                         <div class="flex justify-center space-x-4">
-                            <button id="confirmCancel" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-lg transition">Cancel</button>
+                            <button id="confirmCancel" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-2 px-6 rounded-lg transition">Cancel</button>
                             <button id="confirmAction" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">Confirm</button>
                         </div>
                     </div>`;
@@ -452,7 +462,7 @@
             }
             
             function promptForLogin(feature = 'this feature') {
-                 modalContent.innerHTML = `<div class="text-center p-4"><h2 class="text-2xl font-bold mb-4">Please Sign In</h2><p class="text-slate-400 mb-6">To use ${feature}, you need to be signed in.</p><button id="modalSignInButton" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-lg transition">Sign in with Google</button><button id="modalCloseButton" class="mt-4 text-slate-400 hover:text-white">Cancel</button></div>`;
+                 modalContent.innerHTML = `<div class="text-center p-4"><h2 class="text-2xl font-bold mb-4">Please Sign In</h2><p class="text-zinc-400 mb-6">To use ${feature}, you need to be signed in.</p><button id="modalSignInButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition">Sign in with Google</button><button id="modalCloseButton" class="mt-4 text-zinc-400 hover:text-white">Cancel</button></div>`;
                  modal.classList.remove('hidden');
                  $('modalSignInButton').addEventListener('click', () => { handleGoogleSignIn(); closeModal(); });
                  $('modalCloseButton').addEventListener('click', closeModal);
@@ -495,10 +505,10 @@
                 
                 tabs.forEach(tab => {
                     const isCurrentTab = tab.dataset.tab === tabName;
-                    tab.classList.toggle('text-slate-400', isCurrentTab);
-                    tab.classList.toggle('border-slate-400', isCurrentTab);
+                    tab.classList.toggle('text-zinc-400', isCurrentTab);
+                    tab.classList.toggle('border-zinc-400', isCurrentTab);
                     tab.classList.toggle('font-medium', isCurrentTab);
-                    tab.classList.toggle('text-slate-500', !isCurrentTab);
+                    tab.classList.toggle('text-zinc-500', !isCurrentTab);
                     tab.classList.toggle('border-transparent', !isCurrentTab);
                 });
 
@@ -512,21 +522,27 @@
                 cardWrapper.className = 'relative favorite-card';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
+                card.className = 'bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
                 card.dataset.id = item.id;
                 card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv');
                 const title = item.title || item.name;
                 const releaseDate = item.release_date || item.first_air_date;
                 const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
                 const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
-                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-slate-400">${year}</p></div>`;
+                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
                 
                 if (isManageMode) {
                     const overlay = document.createElement('div');
                     overlay.className = 'favorite-card-manage-overlay';
+                    overlay.innerHTML = `
+                        <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                            <circle cx="26" cy="26" r="25" fill="rgba(0,0,0,0.5)"/>
+                            <path fill="none" stroke="white" stroke-width="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                    `;
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.className = 'favorite-card-manage-checkbox w-6 h-6 rounded';
+                    checkbox.className = 'favorite-card-manage-checkbox w-full h-full absolute top-0 left-0';
                     checkbox.value = item.id;
                     overlay.appendChild(checkbox);
                     cardWrapper.appendChild(overlay);
@@ -568,7 +584,7 @@
                 validResults.forEach(item => {
                     const title = item.title || item.name;
                     const el = document.createElement('div');
-                    el.className = 'flex items-center space-x-3 p-3 hover:bg-slate-700 cursor-pointer';
+                    el.className = 'flex items-center space-x-3 p-3 hover:bg-zinc-700 cursor-pointer';
                     el.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-10 h-auto rounded-md"><span>${title}</span>`;
                     el.addEventListener('click', () => {
                         getMediaDetails(item.id, item.media_type);
@@ -587,7 +603,7 @@
                     const isChecked = state.subscriptions.includes(service.id);
                     const logoUrl = `https://image.tmdb.org/t/p/w92/${service.logo}`;
                     const item = document.createElement('div');
-                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300 ${isChecked ? 'bg-slate-600' : 'bg-slate-700 hover:bg-slate-600'}`;
+                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300 ${isChecked ? 'bg-zinc-900' : 'bg-zinc-700 hover:bg-zinc-600'}`;
                     item.dataset.serviceId = service.id;
                     item.innerHTML = `<img src="${logoUrl}" alt="${service.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${service.name}</span>`;
                     item.addEventListener('click', () => toggleSubscription(service.id));
@@ -600,9 +616,9 @@
                  const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
                  const isFavorite = state.favorites.some(fav => fav.id === details.id);
                  const providers = details['watch/providers']?.results?.US?.flatrate || [];
-                 let providersHtml = '<p class="text-slate-400">Not available for streaming.</p>';
+                 let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
                  if (providers.length > 0) {
-                     providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-slate-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
+                     providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
                  }
                  
                 let manualTimeHtml = '';
@@ -611,18 +627,18 @@
                     const favorite = state.favorites.find(f => f.id === details.id);
                     if (favorite) {
                         manualTimeHtml = `
-                            <div class="mt-4 pt-4 border-t border-slate-700">
+                            <div class="mt-4 pt-4 border-t border-zinc-700">
                                 <h3 class="text-xl font-semibold mb-2">Manual Air Time</h3>
-                                <p class="text-slate-400 text-sm mb-2">Set a time to help sort your schedule (e.g., "9:00 PM EST").</p>
+                                <p class="text-zinc-400 text-sm mb-2">Set a time to help sort your schedule (e.g., "9:00 PM EST").</p>
                                 <div id="manualTimeContainer" class="flex items-center space-x-4">
-                                    <p id="manualTimeDisplay" class="text-slate-300 flex-grow">${favorite.manualTime || 'Not set'}</p>
-                                    <button id="editTimeButton" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button>
+                                    <p id="manualTimeDisplay" class="text-zinc-300 flex-grow">${favorite.manualTime || 'Not set'}</p>
+                                    <button id="editTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button>
                                 </div>
                             </div>`;
                     }
                 }
                  
-                 modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-slate-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-600 hover:bg-slate-700'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
+                 modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
                  
                  const favoriteButton = $('favoriteButton');
                  if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
@@ -642,11 +658,11 @@
                 const container = $('manualTimeContainer');
                 container.innerHTML = `
                     <div class="flex-grow">
-                        <input type="text" id="timeInput" class="w-full bg-slate-700 border border-slate-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
+                        <input type="text" id="timeInput" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
                     </div>
                     <div class="flex space-x-2">
-                        <button id="saveTimeButton" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-1 px-3 rounded text-sm">Save</button>
-                        <button id="cancelTimeButton" class="bg-slate-600 hover:bg-slate-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button>
+                        <button id="saveTimeButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1 px-3 rounded text-sm">Save</button>
+                        <button id="cancelTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button>
                     </div>
                 `;
 
@@ -748,12 +764,12 @@
                         const title = details.title || details.name;
                         const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A';
                         const providers = details['watch/providers']?.results?.US?.flatrate || [];
-                        let providersHtml = '<span class="text-slate-400 text-sm">Not on streaming</span>';
+                        let providersHtml = '<span class="text-zinc-400 text-sm">Not on streaming</span>';
                         if (providers.length > 0) {
                             providersHtml = providers.map(p => `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="h-8 w-8 rounded-md object-cover" title="${p.provider_name}">`).join('');
                         }
                         const listItem = document.createElement('div');
-                        listItem.className = 'flex items-center space-x-4 p-3 bg-slate-800 rounded-lg cursor-pointer hover:bg-slate-700';
+                        listItem.className = 'flex items-center space-x-4 p-3 bg-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-700';
                         listItem.innerHTML = `
                             <img src="${posterUrl}" class="w-12 h-auto rounded-md flex-shrink-0">
                             <div class="flex-grow min-w-0"><p class="font-bold truncate">${title}</p></div>
@@ -788,7 +804,7 @@
                     renderDashboardUpcoming();
                 } catch (error) {
                     console.error("Failed to load dashboard:", error);
-                    upcomingContainer.innerHTML = `<p class="text-slate-500 text-sm">Could not load dashboard data.</p>`;
+                    upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
                     trendingContainer.innerHTML = '';
                     upcomingMoviesContainer.innerHTML = '';
                 } finally {
@@ -815,7 +831,7 @@
                     const card = document.createElement('div');
                     card.className = 'flex-shrink-0 w-32 cursor-pointer';
                     const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title}</p><p class="text-xs text-slate-300">${releaseDate}</p>`;
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title}</p><p class="text-xs text-zinc-300">${releaseDate}</p>`;
                     card.addEventListener('click', () => getMediaDetails(item.id, 'movie'));
                     upcomingMoviesContainer.appendChild(card);
                 });
@@ -912,13 +928,13 @@
                      });
 
                  if (upcoming.length === 0) {
-                     upcomingContainer.innerHTML = `<p class="text-slate-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                     upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
                      return;
                  }
                 
                 upcoming.forEach(ep => {
                     const el = document.createElement('div');
-                    el.className = 'flex items-center space-x-4 p-3 bg-slate-700 rounded-lg';
+                    el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
                     const airDate = parseLocalDate(ep.air_date);
                     const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
                     const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -926,17 +942,17 @@
                     if (ep.displayNetwork && ep.displayNetwork.logo_path) {
                         networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
                     } else if (ep.displayNetwork) {
-                        networkHtml = `<span class="text-xs text-slate-400">${ep.displayNetwork.name}</span>`;
+                        networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
                     }
                     el.innerHTML = `
                         <div class="text-center w-20 flex-shrink-0">
-                            <p class="font-bold text-xl text-slate-300">${day}</p>
-                            <p class="text-sm text-slate-400">${date}</p>
+                            <p class="font-bold text-xl text-zinc-300">${day}</p>
+                            <p class="text-sm text-zinc-400">${date}</p>
                         </div>
                         <div class="flex-grow min-w-0">
                             <p class="font-bold">${ep.showName}</p>
-                            <p class="text-sm text-slate-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
-                            <p class="text-sm font-semibold text-slate-300 mt-1">${ep.manualTime || ''}</p>
+                            <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
+                            <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
                         </div>
                         <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
                             <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
@@ -966,7 +982,7 @@
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 
                 const monthName = date.toLocaleString('default', { month: 'long' });
-                let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-slate-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`;
+                let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-zinc-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`;
 
                 for (let i = 0; i < firstDayOfWeek; i++) { html += `<div></div>`; }
                 
@@ -976,7 +992,7 @@
                         const epDate = parseLocalDate(ep.air_date);
                         return epDate && epDate.getTime() === dayDate.getTime();
                     });
-                    html += `<div class="p-2 h-20 border border-slate-700 rounded-md text-xs overflow-hidden ${dayEvents.length > 0 ? 'bg-slate-900' : ''}"><div class="font-bold">${day}</div><div class="truncate">${dayEvents.map(e => e.showName).join(', ')}</div></div>`;
+                    html += `<div class="p-2 h-20 border border-zinc-700 rounded-md text-xs overflow-hidden ${dayEvents.length > 0 ? 'bg-zinc-900' : ''}"><div class="font-bold">${day}</div><div class="truncate">${dayEvents.map(e => e.showName).join(', ')}</div></div>`;
                 }
                 html += `</div></div>`;
                 scheduleContent.innerHTML = html;
@@ -1007,8 +1023,8 @@
                     if (!airDate) return '';
                     const isPast = airDate < today;
                     let networkHtml = '';
-                     if (ep.displayNetwork && ep.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" alt="${ep.displayNetwork.name}">`; } else if (ep.displayNetwork) { networkHtml = `<span class="text-sm text-slate-400">${ep.displayNetwork.name}</span>`; }
-                    return `<div id="agenda-ep-${ep.id}" class="flex items-center space-x-4 p-3 bg-slate-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-slate-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-slate-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-slate-300">${ep.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
+                     if (ep.displayNetwork && ep.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" alt="${ep.displayNetwork.name}">`; } else if (ep.displayNetwork) { networkHtml = `<span class="text-sm text-zinc-400">${ep.displayNetwork.name}</span>`; }
+                    return `<div id="agenda-ep-${ep.id}" class="flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-zinc-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-zinc-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-zinc-300">${ep.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
                 }).join('')}</div>`;
 
                 const firstUpcomingIndex = sortedEpisodes.findIndex(ep => {
@@ -1085,9 +1101,9 @@
                 favViewBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.favoritesView = btn.dataset.view;
                     favViewBtns.forEach(b => {
-                        b.classList.toggle('bg-slate-600', b === btn);
+                        b.classList.toggle('bg-zinc-900', b === btn);
                         b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-slate-300', b !== btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
                     });
                     renderFavorites();
                 }));
@@ -1095,9 +1111,9 @@
                 scheduleViewBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.scheduleView = btn.dataset.view;
                     scheduleViewBtns.forEach(b => {
-                        b.classList.toggle('bg-slate-600', b === btn);
+                        b.classList.toggle('bg-zinc-900', b === btn);
                         b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-slate-300', b !== btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
                     });
                     renderSchedule();
                 }));
@@ -1105,9 +1121,9 @@
                 upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.dashboardScheduleFilter = btn.dataset.filter;
                     upcomingFilterBtns.forEach(b => {
-                        b.classList.toggle('bg-slate-600', b === btn);
+                        b.classList.toggle('bg-zinc-900', b === btn);
                         b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-slate-300', b !== btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
                     });
                     renderDashboardUpcoming();
                 }));
