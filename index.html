@@ -359,9 +359,13 @@
                     state.favorites.splice(index, 1);
                 } else {
                     state.favorites.push({
-                        id: mediaItem.id, name: mediaItem.name, title: mediaItem.title, poster_path: mediaItem.poster_path, 
-                        first_air_date: mediaItem.first_air_date, release_date: mediaItem.release_date, 
-                        media_type: mediaItem.title ? 'movie' : 'tv', manualTime: null
+                        id: mediaItem.id,
+                        name: mediaItem.name || null,
+                        title: mediaItem.title || null,
+                        poster_path: mediaItem.poster_path, 
+                        first_air_date: mediaItem.first_air_date,
+                        release_date: mediaItem.release_date, 
+                        media_type: mediaItem.title ? 'movie' : 'tv'
                     });
                 }
                 saveDataToFirestore();
