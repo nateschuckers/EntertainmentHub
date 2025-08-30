@@ -92,19 +92,17 @@
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
         
-        @keyframes web-dangle {
-            0%, 100% { transform: scaleY(0); }
-            15%, 85% { transform: scaleY(1); }
-        }
-
-        @keyframes spider-drop {
-            0%, 100% { transform: translateY(-30px); opacity: 0; }
-            15%, 85% { transform: translateY(50px); opacity: 1; }
-        }
-
-        @keyframes spider-swing {
-            0%, 100% { transform: rotate(7deg); }
-            50% { transform: rotate(-7deg); }
+        @keyframes window-flicker {
+            0%   { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            3%   { box-shadow: 15px -45px 0 0 #facc15, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            6%   { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            15%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #facc15; }
+            18%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            40%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #facc15, 15px -25px 0 0 #222; }
+            43%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            50%  { box-shadow: 15px -45px 0 0 #facc15, 35px -45px 0 0 #facc15, 15px -25px 0 0 #facc15; }
+            55%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+            100% { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
         }
 
         @keyframes red-pulse {
@@ -119,37 +117,37 @@
             animation: flicker 2.5s infinite alternate;
         }
         
-        /* The spider's web thread */
+        /* The house silhouette */
         .theme-horror .font-script::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 95%; /* Position horizontally */
-            width: 1px;
-            height: 80px; /* Max length of the web */
-            background: #555;
-            transform-origin: top center;
-            animation: web-dangle 8s infinite ease-in-out 1.2s;
+            left: 105%;
+            bottom: 0;
+            width: 10px; /* Base for drawing */
+            height: 10px; /* Base for drawing */
+            /* Draw the house with shadows */
+            box-shadow: 
+                /* Main house body */
+                5px 0px 0 0 #111, 15px 0px 0 0 #111, 25px 0px 0 0 #111, 35px 0px 0 0 #111, 45px 0px 0 0 #111, 
+                5px -10px 0 0 #111, 15px -10px 0 0 #111, 25px -10px 0 0 #111, 35px -10px 0 0 #111, 45px -10px 0 0 #111,
+                5px -20px 0 0 #111, 15px -20px 0 0 #111, 25px -20px 0 0 #111, 35px -20px 0 0 #111, 45px -20px 0 0 #111,
+                /* Tower */
+                15px -30px 0 0 #111, 25px -30px 0 0 #111, 35px -30px 0 0 #111,
+                15px -40px 0 0 #111, 25px -40px 0 0 #111, 35px -40px 0 0 #111,
+                /* Roof */
+                0px -25px 0 0 #111, 10px -30px 0 0 #111, 20px -50px 0 0 #111, 30px -50px 0 0 #111, 40px -30px 0 0 #111, 50px -25px 0 0 #111;
         }
 
-        /* The spider */
+        /* The flickering windows */
         .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: calc(95% - 6px); /* Center the spider on the thread */
-            width: 14px;
-            height: 10px;
-            background: #111;
-            border-radius: 50%;
-            opacity: 0;
-            box-shadow: 
-                -6px -4px 0 1px #111, -10px 0px 0 1px #111, -6px 4px 0 1px #111,
-                 6px -4px 0 1px #111,  10px 0px 0 1px #111,  6px 4px 0 1px #111;
-            animation: 
-                spider-drop 8s infinite ease-in-out 1.2s,
-                spider-swing 1.5s infinite ease-in-out 2.4s; /* Swing starts after it drops */
-            transform-origin: center -50px; /* Swing from the point it drops from */
+            left: 105%;
+            bottom: 0;
+            width: 8px; /* Window width */
+            height: 8px; /* Window height */
+            background: transparent;
+            animation: window-flicker 4s infinite ease-in-out 1s;
         }
 
         .theme-horror .tab-button.border-zinc-400 {
