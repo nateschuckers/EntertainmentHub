@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -190,12 +190,16 @@
         .theme-horror .hover\:bg-zinc-600:hover, .theme-horror #saveUserNameButton:hover, .theme-horror .theme-btn:hover { background-color: #333; }
         .theme-horror .border-zinc-700 { border-color: #444; }
         .theme-horror .text-zinc-400, .theme-horror .text-zinc-300, .theme-horror .text-zinc-200, .theme-horror p { color: #d4d4d8; }
+        .theme-horror #searchInput::placeholder { color: #b91c1c; }
         .theme-horror #danger-zone {
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C60 10, 70 15, 60 25 C50 35, 40 40, 50 50 C60 60, 70 65, 60 75 C50 85, 40 90, 50 100" fill="%23991b1b" opacity="0.1" transform="rotate(20 50 50)"/><path d="M20 10 C30 20, 40 25, 30 35 C20 45, 10 50, 20 60 C30 70, 40 75, 30 85" fill="%237f1d1d" opacity="0.1" transform="rotate(-15 50 50)"/></svg>');
             background-repeat: no-repeat;
             background-position: right -20px bottom -30px;
             background-size: 150px;
         }
+        .theme-horror #scheduleContent::-webkit-scrollbar-thumb { background-color: #b91c1c; }
+        .theme-horror #scheduleContent::-webkit-scrollbar-track { background-color: #222; }
+        
         
         /* --- Sci-Fi Theme --- */
         @keyframes stars {
@@ -241,6 +245,7 @@
         }
 
         .theme-scifi h2 { color: #4ade80; }
+        .theme-scifi #searchInput::placeholder { color: #4ade80; }
         .theme-scifi .tab-button.border-zinc-400 {
             border-color: #4ade80;
             color: #86efac;
@@ -270,6 +275,8 @@
         .theme-scifi .border-zinc-700 { border-color: #24434e; }
         .theme-scifi .text-zinc-200, .theme-scifi .text-zinc-300, .theme-scifi .text-zinc-400, .theme-scifi p { color: #86efac; }
         .theme-scifi .text-zinc-500 { color: #4ade80; }
+        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb { background-color: #15803d; }
+        .theme-scifi #scheduleContent::-webkit-scrollbar-track { background-color: #1a2f38; }
 
         /* --- Clean Theme --- */
         #clean-animation-container {
@@ -303,6 +310,7 @@
         
         .theme-clean h2 { color: #18181b; }
         .theme-clean #userNameInput { color: #27272a; }
+        .theme-clean #searchInput::placeholder { color: #a1a1aa; }
         .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500, .theme-clean p { color: #52525b; }
         
         .theme-clean .tab-button.border-zinc-400 {
@@ -338,6 +346,8 @@
         .theme-clean .bg-zinc-700 { background-color: #e4e4e7; }
         .theme-clean .hover\:bg-zinc-600:hover, .theme-clean #saveUserNameButton:hover, .theme-clean .theme-btn:hover { background-color: #d4d4d8; }
         .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
+        .theme-clean #scheduleContent::-webkit-scrollbar-thumb { background-color: #a1a1aa; }
+        .theme-clean #scheduleContent::-webkit-scrollbar-track { background-color: #e4e4e7; }
         
     </style>
 </head>
@@ -488,8 +498,8 @@
                 <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg space-y-8">
                     <div id="accountSection"></div>
                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Your Name</h2>
-                        <p class="text-zinc-400 mb-4">Personalize the dashboard greeting.</p>
+                        <h2 class="text-2xl font-bold mb-4">What's Your Name, Man?</h2>
+                        <p class="text-zinc-400 mb-4">Personalize your dashboard greeting, lest you be known as "The Dude".</p>
                         <div class="flex flex-col sm:flex-row sm:space-x-2">
                             <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500" placeholder="Enter your name">
                             <button id="saveUserNameButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
@@ -497,7 +507,7 @@
                          <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
                     </div>
                      <div>
-                        <h2 class="text-2xl font-bold mb-4">Theme</h2>
+                        <h2 class="text-2xl font-bold mb-4">Choose Your Destiny</h2>
                         <div id="themeSelector" class="flex space-x-2">
                             <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
                             <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
@@ -506,16 +516,16 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Manage Your Streaming Services</h2>
-                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
+                        <h2 class="text-2xl font-bold mb-4">The Fellowship of the Stream</h2>
+                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience. One does not simply watch all of them.</p>
                         <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                     </div>
                     <div id="danger-zone" class="border-t border-red-900/50 pt-6">
                         <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
                         <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
                             <div>
-                                <h3 class="font-bold">Delete Account & Data</h3>
-                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data.</p>
+                                <h3 class="font-bold">This is the Way... Out</h3>
+                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data. I have spoken.</p>
                             </div>
                              <button id="deleteAccountBtn" class="mt-4 sm:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Delete Account</button>
                         </div>
