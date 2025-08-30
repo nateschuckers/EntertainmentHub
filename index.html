@@ -91,35 +91,87 @@
             0%, 100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #ef4444, 0 0 10px #b91c1c; opacity: 1; }
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
-        @keyframes drip {
-            0% { transform: translateY(-20px) scaleY(0); opacity: 1; }
-            20% { transform: translateY(-20px) scaleY(0.2); }
-            40% { transform: translateY(0) scaleY(1); }
-            80% { transform: translateY(100px) scaleY(1); opacity: 1; }
-            81% { transform: translateY(100px) scale(1.5, 0.5); opacity: 0; } /* Puddle */
-            100% { transform: translateY(100px) scale(0); opacity: 0; }
+        
+        @keyframes blood-drip {
+            0% {
+                transform: translateY(-100%) scaleY(0.1);
+                opacity: 0.8;
+            }
+            40% {
+                transform: translateY(-10px) scaleY(0.8); /* Drop forms and hangs */
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(0) scaleY(1.2); /* Drop stretches */
+            }
+            90% {
+                transform: translateY(80px) scaleX(0.8); /* Drop falls */
+                opacity: 0.8;
+            }
+            99% {
+                transform: translateY(80px) scale(1.5, 0.1); /* Splat */
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(80px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes red-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
         .theme-horror .font-script {
+            position: relative; /* Essential for pseudo-element positioning */
             font-family: 'Creepster', cursive !important;
             animation: flicker 2.5s infinite alternate;
         }
-         .theme-horror .font-script::after {
+
+        /* Common styles for both drips */
+        .theme-horror .font-script::before,
+        .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            width: 4px;
-            height: 12px;
+            top: 90%; /* Start drip from near the bottom of the letters */
             background: #dc2626;
             border-radius: 0 0 50% 50%;
-            animation: drip 5s infinite cubic-bezier(0.6, 0.04, 0.98, 0.335);
-            animation-delay: 2s;
-            margin-left: 20px;
+            transform-origin: top center;
+            animation-name: blood-drip;
+            animation-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
+            animation-iteration-count: infinite;
+        }
+
+        /* First drip (right side) */
+        .theme-horror .font-script::after {
+            width: 4px;
+            height: 15px;
+            left: 75%;
+            animation-duration: 3.5s;
+            animation-delay: 2.1s;
+        }
+
+        /* Second drip (left side) */
+        .theme-horror .font-script::before {
+            width: 3px;
+            height: 12px;
+            left: 30%;
+            animation-duration: 4.5s;
+            animation-delay: 0.5s;
         }
 
         .theme-horror .tab-button.border-zinc-400 {
             border-color: #ef4444; /* red-500 */
             color: #f87171; /* red-400 */
+            animation: red-pulse 2s infinite; /* Pulsing effect for active tab */
         }
+        
+        .theme-horror #deleteAccountBtn {
+             animation: red-pulse 2s infinite;
+        }
+
         .theme-horror .bg-zinc-900 { background-color: #000; }
         .theme-horror .bg-zinc-800 { background-color: #111; }
         .theme-horror .bg-zinc-700 { background-color: #222; }
@@ -555,7 +607,7 @@
                 });
                 $('confirmCancel').addEventListener('click', closeModal);
             }
-             
+                
             async function saveDataToFirestore() {
                 if (!userDocRef) return;
                 const dataToSave = {
@@ -765,7 +817,7 @@
                  const providers = details['watch/providers']?.results?.US?.flatrate || [];
                  let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
                  if (providers.length > 0) {
-                     providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
+                      providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
                  }
                  
                 let manualTimeHtml = '';
@@ -1068,45 +1120,45 @@
                     })
                      .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
                      .sort((a,b) => {
-                        const dateA = parseLocalDate(a.air_date);
-                        const dateB = parseLocalDate(b.air_date);
-                        if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-                        return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
+                         const dateA = parseLocalDate(a.air_date);
+                         const dateB = parseLocalDate(b.air_date);
+                         if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+                         return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
                      });
 
                  if (upcoming.length === 0) {
-                     upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
-                     return;
+                      upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                      return;
                  }
                 
-                upcoming.forEach(ep => {
-                    const el = document.createElement('div');
-                    el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
-                    const airDate = parseLocalDate(ep.air_date);
-                    const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
-                    const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                    let networkHtml = '';
-                    if (ep.displayNetwork && ep.displayNetwork.logo_path) {
-                        networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
-                    } else if (ep.displayNetwork) {
-                        networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
-                    }
-                    el.innerHTML = `
-                        <div class="text-center w-20 flex-shrink-0">
-                            <p class="font-bold text-xl text-zinc-300">${day}</p>
-                            <p class="text-sm text-zinc-400">${date}</p>
-                        </div>
-                        <div class="flex-grow min-w-0">
-                            <p class="font-bold">${ep.showName}</p>
-                            <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
-                            <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
-                        </div>
-                        <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
-                            <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
-                            <div class="h-6 flex items-center justify-center">${networkHtml}</div>
-                        </div>`;
-                    upcomingContainer.appendChild(el);
-                });
+                 upcoming.forEach(ep => {
+                     const el = document.createElement('div');
+                     el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
+                     const airDate = parseLocalDate(ep.air_date);
+                     const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
+                     const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                     let networkHtml = '';
+                     if (ep.displayNetwork && ep.displayNetwork.logo_path) {
+                         networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
+                     } else if (ep.displayNetwork) {
+                         networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
+                     }
+                     el.innerHTML = `
+                         <div class="text-center w-20 flex-shrink-0">
+                             <p class="font-bold text-xl text-zinc-300">${day}</p>
+                             <p class="text-sm text-zinc-400">${date}</p>
+                         </div>
+                         <div class="flex-grow min-w-0">
+                             <p class="font-bold">${ep.showName}</p>
+                             <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
+                             <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
+                         </div>
+                         <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
+                             <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
+                             <div class="h-6 flex items-center justify-center">${networkHtml}</div>
+                         </div>`;
+                     upcomingContainer.appendChild(el);
+                 });
             }
             
             function renderSchedule() {
