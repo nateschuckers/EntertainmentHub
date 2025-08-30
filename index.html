@@ -87,6 +87,32 @@
             filter: grayscale(80%) brightness(50%);
         }
 
+        #suggestion-avatar-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 40;
+            transition: transform 0.2s ease-in-out;
+        }
+        #suggestion-avatar-btn:hover {
+            transform: scale(1.1);
+        }
+        #suggestion-avatar-btn svg {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+        body:not(.theme-horror):not(.theme-scifi):not(.theme-clean) #default-avatar,
+        .theme-horror #pinhead-avatar,
+        .theme-scifi #alien-avatar,
+        .theme-clean #pulp-fiction-avatar {
+            display: block;
+        }
+
         /* --- Default Theme --- */
         .tab-button.border-zinc-400 {
             border-color: #3b82f6; /* blue-500 */
@@ -537,6 +563,45 @@
         <div id="modalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
     </div>
 
+    <div id="suggestion-avatar-btn">
+        <!-- SVGs will be shown/hidden by CSS based on theme -->
+        <svg id="default-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#3b82f6" stroke="#fafafa" stroke-width="4"/>
+            <text x="50" y="65" font-size="50" fill="#fafafa" text-anchor="middle" font-family="Arial, sans-serif">?</text>
+        </svg>
+        <svg id="pinhead-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#111" stroke="#b91c1c" stroke-width="4"/>
+            <circle cx="50" cy="50" r="40" fill="#222"/>
+            <path d="M50 10 V 90 M10 50 H 90 M22 22 L 78 78 M22 78 L 78 22" stroke="#555" stroke-width="2"/>
+            <circle cx="50" cy="50" r="3" fill="#b91c1c"/>
+        </svg>
+        <svg id="alien-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="50" fill="#1a2f38"/>
+            <path d="M50 15 C 65 15, 85 30, 85 50 C 85 80, 65 95, 50 95 C 35 95, 15 80, 15 50 C 15 30, 35 15, 50 15 Z" fill="#111e24"/>
+            <path d="M50 20 C 70 20, 80 35, 80 50 C 80 70, 70 85, 50 90 C 30 85, 20 70, 20 50 C 20 35, 30 20, 50 20 Z" fill="#15803d" opacity="0.3"/>
+            <path d="M40 75 Q 50 65, 60 75" stroke="#86efac" stroke-width="2" fill="none"/>
+        </svg>
+        <svg id="pulp-fiction-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="50" fill="#e4e4e7"/>
+            <path d="M 50,30 A 20,15 0 0 0 50,60" fill="#18181b"/>
+            <rect x="30" y="30" width="40" height="10" fill="#18181b"/>
+            <rect x="48" y="60" width="4" height="10" fill="#18181b" />
+        </svg>
+    </div>
+
+     <div id="suggestionModal" class="modal-backdrop hidden">
+        <div id="suggestionModalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
+            <button id="closeSuggestionModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button>
+            <h2 id="suggestionModalTitle" class="text-2xl font-bold mb-2">Got a Suggestion?</h2>
+            <p id="suggestionModalSubtitle" class="text-zinc-400 mb-4">We'd love to hear it. Let us know what we can do to improve your experience.</p>
+            <form id="suggestionForm">
+                <textarea id="suggestionText" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 h-32" placeholder="Your suggestion..."></textarea>
+                <button type="submit" class="w-full mt-4 bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded-lg transition">Send It</button>
+            </form>
+        </div>
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -593,12 +658,12 @@
                     subtitle: "All play and no work makes for a great watchlist."
                 },
                 scifi: {
-                    title: "Entertainment Hub",
-                    subtitle: "Find where to watch your favorite shows and movies."
+                    title: "Game Over, Man!",
+                    subtitle: "Find your next great watch before it's too late."
                 },
                 clean: {
-                    title: "Entertainment Hub",
-                    subtitle: "Find where to watch your favorite shows and movies."
+                    title: "There Will Be Shows",
+                    subtitle: "Find the next series you can really sink your teeth into."
                 }
             };
 
@@ -658,6 +723,10 @@
             const scheduleViewBtns = document.querySelectorAll('.schedule-view-btn');
             const upcomingFilterBtns = document.querySelectorAll('.upcoming-filter-btn');
             const themeBtns = document.querySelectorAll('.theme-btn');
+            const suggestionAvatarBtn = $('suggestion-avatar-btn');
+            const suggestionModal = $('suggestionModal');
+            const closeSuggestionModalBtn = $('closeSuggestionModal');
+            const suggestionForm = $('suggestionForm');
 
             onAuthStateChanged(auth, (user) => {
                 if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -668,6 +737,7 @@
                     userDocRef = doc(db, "users", userId);
                     loginScreen.classList.add('hidden');
                     mainApp.classList.remove('hidden');
+                    suggestionAvatarBtn.classList.remove('hidden');
                     
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                         const wasAlreadyLoaded = isDataLoaded;
@@ -694,6 +764,7 @@
                     applyTheme('default'); // Reset to default on logout
                     loginScreen.classList.remove('hidden');
                     mainApp.classList.add('hidden');
+                    suggestionAvatarBtn.classList.add('hidden');
                     state.favorites = [];
                     state.subscriptions = [];
                     state.userName = null;
@@ -1405,6 +1476,28 @@
             function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
             function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
             function closeModal() { modal.classList.add('hidden'); }
+            function closeSuggestionModal() { suggestionModal.classList.add('hidden'); }
+
+            function openSuggestionModal() {
+                 const title = $('suggestionModalTitle');
+                const subtitle = $('suggestionModalSubtitle');
+                const textarea = $('suggestionText');
+
+                if (state.theme === 'horror') {
+                    title.textContent = "We Have Such Sights to Show You";
+                    subtitle.textContent = "What is your pleasure, sir? Let us know what features you desire.";
+                } else if (state.theme === 'scifi') {
+                    title.textContent = "Feature Request Transmission";
+                    subtitle.textContent = "They mostly come at night. Mostly. But your suggestions can come anytime.";
+                } else if (state.theme === 'clean') {
+                    title.textContent = "This is a Tasty Burger!";
+                    subtitle.textContent = "Enjoying your app? Let us know how we can make it even better.";
+                } else {
+                    title.textContent = "Got a Suggestion?";
+                    subtitle.textContent = "We'd love to hear it. Let us know what we can do to improve your experience.";
+                }
+                suggestionModal.classList.remove('hidden');
+            }
 
             async function initAppUI() {
                 if (!isDataLoaded) return;
@@ -1482,6 +1575,21 @@
                     applyTheme(state.theme);
                     saveDataToFirestore();
                 }));
+
+                suggestionAvatarBtn.addEventListener('click', openSuggestionModal);
+                closeSuggestionModalBtn.addEventListener('click', closeSuggestionModal);
+                suggestionModal.addEventListener('click', (e) => {
+                    if (e.target === suggestionModal) closeSuggestionModal();
+                });
+                suggestionForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const suggestion = $('suggestionText').value;
+                    if(suggestion.trim()) {
+                        window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
+                        $('suggestionText').value = '';
+                        closeSuggestionModal();
+                    }
+                });
 
                 // Favorites Management
                 $('manageFavoritesBtn').addEventListener('click', () => {
