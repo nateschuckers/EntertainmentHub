@@ -269,8 +269,11 @@
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
                         } else {
+                            // For a new user, save the initial empty state
                             saveDataToFirestore(); 
                         }
+                        
+                        // This flag ensures the UI initializes only once per login
                         if (!isDataLoaded) {
                            isDataLoaded = true;
                            initAppUI(); 
@@ -281,6 +284,7 @@
                     userDocRef = null;
                     loginScreen.classList.remove('hidden');
                     mainApp.classList.add('hidden');
+                    // Reset local state on logout
                     state.favorites = [];
                     state.subscriptions = [];
                     state.userName = null;
@@ -510,13 +514,14 @@
                     favoritesContainer.innerHTML = '';
                     sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item)));
                 } else {
-                    // Logic for list view
+                    // Logic for list view will go here
                 }
             }
             
             async function fetchDashboardData() {
                 showLoading();
                 try {
+                    dashboardUserName.textContent = state.userName || 'You';
                     const trendingPromise = apiFetch(`trending/all/day`);
                     const upcomingPromise = apiFetch(`movie/upcoming`);
                     const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, fetchScheduleData(true)]);
@@ -606,7 +611,7 @@
                 if (!isDataLoaded) return;
                 updateAccountSection();
                 renderSubscriptions();
-                await switchTab(state.activeTab);
+                await switchTab('dashboard');
             }
 
             function handleFullSearch() {
@@ -635,19 +640,31 @@
                 
                 favViewBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.favoritesView = btn.dataset.view;
-                    favViewBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    favViewBtns.forEach(b => {
+                        b.classList.toggle('bg-indigo-600', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-gray-300', b !== btn);
+                    });
                     renderFavorites();
                 }));
                 
                 scheduleViewBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.scheduleView = btn.dataset.view;
-                    scheduleViewBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    scheduleViewBtns.forEach(b => {
+                        b.classList.toggle('bg-indigo-600', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-gray-300', b !== btn);
+                    });
                     renderSchedule();
                 }));
 
                 upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.dashboardScheduleFilter = btn.dataset.filter;
-                    upcomingFilterBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    upcomingFilterBtns.forEach(b => {
+                        b.classList.toggle('bg-indigo-600', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-gray-300', b !== btn);
+                    });
                     renderDashboardUpcoming();
                 }));
 
