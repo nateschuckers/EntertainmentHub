@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -19,7 +19,8 @@
                     },
                     fontFamily: {
                         'script': ['Caveat', 'cursive'],
-                        'horror': ['Creepster', 'cursive']
+                        'horror': ['Creepster', 'cursive'],
+                        'scifi': ['Orbitron', 'sans-serif']
                     }
                 }
             }
@@ -111,6 +112,47 @@
             background-position: right -20px bottom -30px;
             background-size: 150px;
         }
+        
+        /* --- Sci-Fi Theme --- */
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        @keyframes stars {
+            from { background-position: 0 0; }
+            to { background-position: 0 1000px; }
+        }
+        .theme-scifi {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><circle cx="1" cy="1" r="1" fill="rgba(134, 239, 172, 0.1)"/><circle cx="5" cy="8" r="1" fill="rgba(134, 239, 172, 0.1)"/><circle cx="8" cy="3" r="1" fill="rgba(134, 239, 172, 0.1)"/></svg>');
+            animation: stars 60s linear infinite;
+        }
+
+        .theme-scifi .font-script {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px #4ade80, 0 0 10px #4ade80;
+            position: relative;
+        }
+        .theme-scifi .font-script::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(rgba(16, 185, 129, 0.2) 1px, transparent 1px);
+            background-size: 100% 3px;
+            animation: scanlines 0.5s linear infinite;
+        }
+
+        .theme-scifi .tab-button.border-zinc-400 {
+            border-color: #4ade80; /* green-400 */
+            color: #86efac; /* green-300 */
+        }
+        .theme-scifi .bg-zinc-900 { background-color: #020617; }
+        .theme-scifi .bg-zinc-800 { background-color: #0f172a; }
+        .theme-scifi .bg-zinc-700 { background-color: #1e293b; }
+        .theme-scifi .hover\:bg-zinc-600:hover { background-color: #334155; }
+        .theme-scifi .border-zinc-700 { border-color: #334155; }
+        .theme-scifi .text-zinc-400 { color: #94a3b8; }
+        .theme-scifi .upcoming-filter-btn.bg-zinc-900 { background-color: #15803d; }
+
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
@@ -264,6 +306,7 @@
                         <div id="themeSelector" class="flex space-x-2">
                             <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
                             <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
+                            <button data-theme="scifi" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Sci-Fi</button>
                         </div>
                     </div>
                     <div>
@@ -499,9 +542,9 @@
             }
 
             function applyTheme(theme) {
-                document.body.classList.remove('theme-horror');
-                if(theme === 'horror') {
-                    document.body.classList.add('theme-horror');
+                document.body.classList.remove('theme-horror', 'theme-scifi');
+                if(theme === 'horror' || theme === 'scifi') {
+                    document.body.classList.add(`theme-${theme}`);
                 }
                 themeBtns.forEach(btn => {
                     btn.classList.toggle('bg-zinc-900', btn.dataset.theme === theme);
