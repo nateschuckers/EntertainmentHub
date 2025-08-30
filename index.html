@@ -34,6 +34,8 @@
             background-color: rgba(0,0,0,0.5);
             cursor: pointer;
             border: 2px solid transparent;
+            border-radius: 0.5rem; /* Match card rounding */
+            transition: all 0.2s ease-in-out;
         }
         .favorite-card-manage-checkbox {
             position: absolute;
@@ -41,9 +43,12 @@
             left: 0.5rem;
             width: 1.5rem;
             height: 1.5rem;
+            accent-color: #818cf8; /* Indigo-400 */
         }
         .favorite-card.selected .favorite-card-manage-overlay {
-            border-color: #6366f1; /* Indigo-500 */
+            border-color: #818cf8; /* Indigo-400 */
+            background-color: rgba(99, 102, 241, 0.3);
+            border-width: 3px;
         }
     </style>
 </head>
@@ -1141,5 +1146,7 @@
         document.addEventListener('DOMContentLoaded', initializeAppWithConfig);
     </script>
 </body>
-</html>
+</html>" is selected.Of course. I have updated the styling for the "Manage Favorites" view to make the selection much more obvious, as you requested.
+
+The updated `index.html` file is in the Canvas. I've changed the selection indicator from a faint border to a much thicker, brighter border with a semi-transparent colored overlay. This will make it very clear which items you have selected for deletion.
 
