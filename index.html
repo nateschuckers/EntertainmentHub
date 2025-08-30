@@ -91,18 +91,14 @@
             0%, 100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #ef4444, 0 0 10px #b91c1c; opacity: 1; }
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
-        
-        @keyframes window-flicker {
-            0%   { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            3%   { box-shadow: 15px -45px 0 0 #facc15, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            6%   { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            15%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #facc15; }
-            18%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            40%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #facc15, 15px -25px 0 0 #222; }
-            43%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            50%  { box-shadow: 15px -45px 0 0 #facc15, 35px -45px 0 0 #facc15, 15px -25px 0 0 #facc15; }
-            55%  { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
-            100% { box-shadow: 15px -45px 0 0 #222, 35px -45px 0 0 #222, 15px -25px 0 0 #222; }
+
+        @keyframes creep-fog {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         @keyframes red-pulse {
@@ -115,39 +111,31 @@
             position: relative; /* Essential for pseudo-element positioning */
             font-family: 'Creepster', cursive !important;
             animation: flicker 2.5s infinite alternate;
+            overflow: hidden; /* Contain the fog behind the text */
         }
         
-        /* The house silhouette */
+        /* Fog Layer 1 */
         .theme-horror .font-script::before {
             content: '';
             position: absolute;
-            left: 105%;
-            bottom: 0;
-            width: 10px; /* Base for drawing */
-            height: 10px; /* Base for drawing */
-            /* Draw the house with shadows */
-            box-shadow: 
-                /* Main house body */
-                5px 0px 0 0 #111, 15px 0px 0 0 #111, 25px 0px 0 0 #111, 35px 0px 0 0 #111, 45px 0px 0 0 #111, 
-                5px -10px 0 0 #111, 15px -10px 0 0 #111, 25px -10px 0 0 #111, 35px -10px 0 0 #111, 45px -10px 0 0 #111,
-                5px -20px 0 0 #111, 15px -20px 0 0 #111, 25px -20px 0 0 #111, 35px -20px 0 0 #111, 45px -20px 0 0 #111,
-                /* Tower */
-                15px -30px 0 0 #111, 25px -30px 0 0 #111, 35px -30px 0 0 #111,
-                15px -40px 0 0 #111, 25px -40px 0 0 #111, 35px -40px 0 0 #111,
-                /* Roof */
-                0px -25px 0 0 #111, 10px -30px 0 0 #111, 20px -50px 0 0 #111, 30px -50px 0 0 #111, 40px -30px 0 0 #111, 50px -25px 0 0 #111;
+            bottom: -30%; /* Start below the text */
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 100%, rgba(99, 27, 27, 0.3) 0%, transparent 70%);
+            animation: creep-fog 18s linear infinite alternate;
         }
 
-        /* The flickering windows */
+        /* Fog Layer 2 */
         .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            left: 105%;
-            bottom: 0;
-            width: 8px; /* Window width */
-            height: 8px; /* Window height */
-            background: transparent;
-            animation: window-flicker 4s infinite ease-in-out 1s;
+            bottom: -25%; /* Slightly different position */
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 100%, rgba(127, 29, 29, 0.2) 0%, transparent 60%);
+            animation: creep-fog 15s linear infinite alternate-reverse; /* Move in opposite direction */
         }
 
         .theme-horror .tab-button.border-zinc-400 {
