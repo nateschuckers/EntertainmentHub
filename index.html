@@ -92,29 +92,20 @@
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
         
-        @keyframes blood-drip {
+        @keyframes ghost-float {
             0% {
-                transform: translateY(-100%) scaleY(0.1);
-                opacity: 0.8;
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
             }
-            40% {
-                transform: translateY(-10px) scaleY(0.8); /* Drop forms and hangs */
-                opacity: 1;
+            30%, 70% {
+                opacity: 0.6;
             }
             50% {
-                transform: translateY(0) scaleY(1.2); /* Drop stretches */
-            }
-            90% {
-                transform: translateY(80px) scaleX(0.8); /* Drop falls */
-                opacity: 0.8;
-            }
-            99% {
-                transform: translateY(80px) scale(1.5, 0.1); /* Splat */
-                opacity: 0.4;
+                 transform: translateY(-70px) translateX(-15px) rotate(-10deg) scale(1.05);
             }
             100% {
-                transform: translateY(80px) scale(0);
                 opacity: 0;
+                transform: translateY(-140px) translateX(15px) rotate(10deg) scale(0.8);
             }
         }
 
@@ -129,37 +120,26 @@
             font-family: 'Creepster', cursive !important;
             animation: flicker 2.5s infinite alternate;
         }
+        
+        /* Make sure the ::before pseudo-element from the old drip animation is gone */
+        .theme-horror .font-script::before {
+            content: none;
+        }
 
-        /* Common styles for both drips */
-        .theme-horror .font-script::before,
+        /* A spooky ghost floating by */
         .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            top: 90%; /* Start drip from near the bottom of the letters */
-            background: #dc2626;
-            border-radius: 0 0 50% 50%;
-            transform-origin: top center;
-            animation-name: blood-drip;
-            animation-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
-            animation-iteration-count: infinite;
-        }
-
-        /* First drip (right side) */
-        .theme-horror .font-script::after {
-            width: 4px;
-            height: 15px;
-            left: 75%;
-            animation-duration: 3.5s;
-            animation-delay: 2.1s;
-        }
-
-        /* Second drip (left side) */
-        .theme-horror .font-script::before {
-            width: 3px;
-            height: 12px;
-            left: 30%;
-            animation-duration: 4.5s;
-            animation-delay: 0.5s;
+            width: 30px;
+            height: 40px;
+            background: white;
+            top: 50%;
+            left: 102%;
+            border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+            opacity: 0;
+            filter: blur(3px);
+            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #c0c0c0;
+            animation: ghost-float 9s infinite ease-in-out 1.5s;
         }
 
         .theme-horror .tab-button.border-zinc-400 {
@@ -1382,3 +1362,4 @@
     </script>
 </body>
 </html>
+
