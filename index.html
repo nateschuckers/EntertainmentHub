@@ -92,11 +92,12 @@
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
         @keyframes drip {
-            0% { transform: translateY(-100%) scaleY(0); }
-            10% { transform: translateY(-100%) scaleY(0.1); }
-            30% { transform: translateY(0) scaleY(1); }
-            90% { opacity: 1; }
-            100% { transform: translateY(150px); opacity: 0; }
+            0% { transform: translateY(-20px) scaleY(0); opacity: 1; }
+            20% { transform: translateY(-20px) scaleY(0.2); }
+            40% { transform: translateY(0) scaleY(1); }
+            80% { transform: translateY(100px) scaleY(1); opacity: 1; }
+            81% { transform: translateY(100px) scale(1.5, 0.5); opacity: 0; } /* Puddle */
+            100% { transform: translateY(100px) scale(0); opacity: 0; }
         }
 
         .theme-horror .font-script {
@@ -106,12 +107,12 @@
          .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            width: 3px;
-            height: 15px;
-            background: #ef4444;
+            width: 4px;
+            height: 12px;
+            background: #dc2626;
             border-radius: 0 0 50% 50%;
-            animation: drip 4s infinite ease-in;
-            animation-delay: 1.5s;
+            animation: drip 5s infinite cubic-bezier(0.6, 0.04, 0.98, 0.335);
+            animation-delay: 2s;
             margin-left: 20px;
         }
 
@@ -143,7 +144,7 @@
             to { background-position: 0 1000px; }
         }
         body.theme-scifi {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><circle cx="1" cy="1" r="1" fill="rgba(134, 239, 172, 0.1)"/><circle cx="5" cy="8" r="1" fill="rgba(134, 239, 172, 0.1)"/><circle cx="8" cy="3" r="1" fill="rgba(134, 239, 172, 0.1)"/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-size="10" fill="rgba(74, 222, 128, 0.05)">01</text><text x="60" y="80" font-size="10" fill="rgba(74, 222, 128, 0.05)">1</text><text x="30" y="90" font-size="10" fill="rgba(74, 222, 128, 0.05)">0</text><text x="80" y="50" font-size="10" fill="rgba(74, 222, 128, 0.05)">10</text></svg>');
             animation: stars 60s linear infinite;
         }
 
@@ -165,19 +166,20 @@
             border-color: #4ade80; /* green-400 */
             color: #86efac; /* green-300 */
         }
-        .theme-scifi .bg-zinc-900, .theme-scifi body.bg-zinc-900 { background-color: #020617; }
-        .theme-scifi .bg-zinc-800 { background-color: #0f172a; }
-        .theme-scifi .bg-zinc-700 { background-color: #1e293b; }
-        .theme-scifi .hover\:bg-zinc-600:hover { background-color: #334155; }
-        .theme-scifi .border-zinc-700 { border-color: #334155; }
+        .theme-scifi .bg-zinc-900, .theme-scifi body.bg-zinc-900 { background-color: #0c1417; }
+        .theme-scifi .bg-zinc-800 { background-color: #111e24; }
+        .theme-scifi .bg-zinc-700 { background-color: #1a2f38; }
+        .theme-scifi .hover\:bg-zinc-600:hover { background-color: #24434e; }
+        .theme-scifi .border-zinc-700 { border-color: #24434e; }
         .theme-scifi .text-zinc-400 { color: #86efac; }
+        .theme-scifi .text-zinc-500 { color: #4ade80; }
         .theme-scifi .upcoming-filter-btn.bg-zinc-900 { background-color: #15803d; }
 
         /* --- Clean Theme --- */
         body.theme-clean { background-color: #f8fafc; color: #18181b; }
-        .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; }
+        .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; color: #0ea5e9; }
         .theme-clean .text-zinc-200 { color: #18181b; }
-        .theme-clean .text-zinc-400 { color: #52525b; }
+        .theme-clean .text-zinc-400, .theme-clean .text-zinc-300 { color: #52525b; }
         .theme-clean .text-zinc-500 { color: #71717a; }
         .theme-clean .bg-zinc-900 { background-color: #f8fafc; }
         .theme-clean .bg-zinc-800, .theme-clean .modal-content { background-color: #fff; }
@@ -185,8 +187,8 @@
         .theme-clean .hover\:bg-zinc-600:hover { background-color: #d4d4d8; }
         .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
         .theme-clean .tab-button.border-zinc-400 { border-color: #0ea5e9; color: #0ea5e9; }
-        .theme-clean .upcoming-filter-btn.bg-zinc-900 { background-color: #0ea5e9; }
-        .theme-clean .upcoming-filter-btn.text-zinc-300 { color: #3f3f46; }
+        .theme-clean .upcoming-filter-btn.bg-zinc-900, .theme-clean .fav-view-btn.bg-zinc-900, .theme-clean .schedule-view-btn.bg-zinc-900 { background-color: #0ea5e9; color: white; }
+        .theme-clean .upcoming-filter-btn.text-zinc-300, .theme-clean .fav-view-btn.text-zinc-300, .theme-clean .schedule-view-btn.text-zinc-300 { color: #3f3f46; }
 
     </style>
 </head>
@@ -589,10 +591,9 @@
                     btn.classList.toggle('text-zinc-300', btn.dataset.theme !== theme);
 
                     if (theme === 'clean') {
-                        btn.classList.toggle('bg-slate-200', btn.dataset.theme === 'clean');
-                        btn.classList.toggle('text-slate-800', btn.dataset.theme === 'clean');
-                         btn.classList.toggle('bg-white', btn.dataset.theme !== 'clean');
-                         btn.classList.toggle('text-slate-500', btn.dataset.theme !== 'clean');
+                        btn.classList.toggle('bg-sky-500', btn.dataset.theme === 'clean');
+                         btn.classList.toggle('bg-slate-200', btn.dataset.theme !== 'clean');
+                         btn.classList.toggle('text-slate-800', btn.dataset.theme !== 'clean');
                     }
                 });
             }
