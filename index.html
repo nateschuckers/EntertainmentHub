@@ -966,7 +966,7 @@
             }
 
             function renderAgenda() {
-                 const sortedEpisodes = [...state.scheduledEpisodes]
+                const sortedEpisodes = [...state.scheduledEpisodes]
                     .map(ep => {
                         const favorite = state.favorites.find(f => f.id === ep.showId);
                         return { ...ep, manualTime: favorite ? favorite.manualTime : null };
@@ -989,8 +989,23 @@
                     const isPast = airDate < today;
                     let networkHtml = '';
                      if (ep.displayNetwork && ep.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" alt="${ep.displayNetwork.name}">`; } else if (ep.displayNetwork) { networkHtml = `<span class="text-sm text-gray-400">${ep.displayNetwork.name}</span>`; }
-                    return `<div class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-gray-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-gray-300">${ep.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
+                    return `<div id="agenda-ep-${ep.id}" class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-gray-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-gray-300">${ep.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
                 }).join('')}</div>`;
+
+                const firstUpcomingIndex = sortedEpisodes.findIndex(ep => {
+                    const airDate = parseLocalDate(ep.air_date);
+                    return airDate && airDate >= today;
+                });
+
+                if (firstUpcomingIndex !== -1) {
+                    const firstUpcomingId = sortedEpisodes[firstUpcomingIndex].id;
+                    setTimeout(() => {
+                        const element = $(`agenda-ep-${firstUpcomingId}`);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                }
             }
 
             async function refreshCurrentView() {
