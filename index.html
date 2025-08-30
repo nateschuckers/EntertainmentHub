@@ -200,28 +200,32 @@
     <div id="detailsModal" class="modal-backdrop hidden">
         <div id="modalContent" class="modal-content bg-gray-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
     </div>
+    
+    <!-- The firebaseConfig object will be injected here by Netlify -->
 
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Use environment variables for Firebase config
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', () => {
             
             // --- Configuration Check ---
-            if (!firebaseConfig) {
+            // The 'firebaseConfig' variable is now expected to be in the global scope,
+            // injected by Netlify's snippet injection feature.
+            if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey) {
                 document.body.innerHTML = `
                     <div class="flex items-center justify-center h-screen bg-gray-900 text-white">
                         <div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4">
                             <h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1>
-                            <p class="text-gray-300">This application requires a Firebase configuration to function.</p>
+                            <p class="text-gray-300 mb-6">
+                                The Firebase configuration was not found. Please ensure you have set up
+                                Snippet Injection correctly in your Netlify site settings.
+                            </p>
+                            <a href="https://docs.netlify.com/builds/inject-snippets/" target="_blank" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                                Netlify Docs: Snippet Injection
+                            </a>
                         </div>
                     </div>
                 `;
@@ -235,6 +239,7 @@
             const googleProvider = new GoogleAuthProvider();
             let userDocRef = null;
             let unsubscribeUserDoc = null; 
+            const appId = firebaseConfig.appId || 'default-app-id';
 
             // --- App State ---
             const state = {
@@ -265,7 +270,6 @@
             
             // --- Element Selectors ---
             const loginScreen = $('loginScreen');
-            const mainApp = $('app');
             const signInWithGoogleButton = $('signInWithGoogleButton');
             const searchInput = $('searchInput'), searchButton = $('searchButton');
             const searchResultsContainer = $('searchResultsContainer'), favoritesContainer = $('favoritesContainer');
@@ -287,7 +291,6 @@
             const upcomingMoviesContainer = $('upcomingMoviesContainer');
             const scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
             const tabs = document.querySelectorAll('.tab-button');
-            const userIdDisplay = $('userIdDisplay');
             const accountSection = $('accountSection');
 
             // --- Helper Functions ---
@@ -308,7 +311,6 @@
                 }
 
                 if (user) {
-                    // User is signed in.
                     loginScreen.classList.add('hidden');
                     state.userId = user.uid;
                     userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/data/appData`);
@@ -323,21 +325,15 @@
                             loadDataFromFirestore({}); // Ensure state is clean before saving
                             saveDataToFirestore(); 
                         }
-                        // BUG FIX: Explicitly wait for schedule data to be fetched
-                        // before updating the UI to prevent race conditions.
                         await fetchScheduleData();
                         initAppUI();
                     }, (error) => {
                         console.error("Error with Firestore snapshot listener:", error);
                     });
                 } else {
-                    // No user is signed in.
                     state.userId = null;
                     userDocRef = null;
-                    
-                    // BUG FIX: Fully reset all user-related state upon logout.
                     loadDataFromFirestore({});
-                    
                     updateAccountSection(null);
                     initAppUI();
                 }
@@ -359,7 +355,6 @@
                     `;
                     $('signOutButton').addEventListener('click', () => signOut(auth));
                 } else {
-                    // Logged-out user view
                     accountSection.innerHTML = `
                         <h2 class="text-2xl font-bold mb-4">Account</h2>
                         <p class="text-gray-400 mb-4">Sign in with your Google account to save your favorites and preferences across devices.</p>
@@ -386,18 +381,16 @@
                 }
             }
             
-            // BUG FIX: This function now completely resets all user-specific state.
             function loadDataFromFirestore(data) {
                 state.userName = data.userName || null;
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
-                state.scheduledEpisodes = []; // Always clear schedule on data load.
+                state.scheduledEpisodes = [];
 
                 if (userNameInput) {
                     userNameInput.value = state.userName || '';
                 }
             }
-
 
             // --- Core App Logic ---
             function parseLocalDate(dateString) { if (!dateString) return null; const [year, month, day] = dateString.split('-').map(Number); return new Date(year, month - 1, day); }
@@ -419,55 +412,42 @@
                 const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
                 if (favoriteTvShows.length === 0) {
                     state.scheduledEpisodes = [];
-                    return; // Exit early if no favorites
+                    return;
                 }
 
-                // This function is now called after favorites are loaded,
-                // so we don't need to show a separate loading spinner here.
                 try {
                     const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
-                    
                     const showDetailResults = await Promise.allSettled(showDetailPromises);
-                    const showDetailsList = showDetailResults
-                        .filter(result => {
-                            if (result.status === 'rejected') console.error("Failed to fetch show details:", result.reason);
-                            return result.status === 'fulfilled';
-                        })
-                        .map(result => result.value);
+                    const showDetailsList = showDetailResults.filter(r => r.status === 'fulfilled').map(r => r.value);
 
-                    const seasonPromises = [];
-                    for (const showDetail of showDetailsList) {
-                        if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
-                            const latestSeason = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
-                            if (latestSeason) {
-                                seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${latestSeason.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
+                    const seasonPromises = showDetailsList
+                        .map(showDetail => {
+                            if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
+                                const latestSeason = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
+                                if (latestSeason) {
+                                    return apiFetch(`tv/${showDetail.id}/season/${latestSeason.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] }));
+                                }
                             }
-                        }
-                    }
+                            return null;
+                        })
+                        .filter(Boolean);
                     
                     const seasonDetailResults = await Promise.allSettled(seasonPromises);
-                    const seasonDetailsList = seasonDetailResults
-                        .filter(result => {
-                            if (result.status === 'rejected') console.error("Failed to fetch season details:", result.reason);
-                            return result.status === 'fulfilled';
-                        })
-                        .map(result => result.value);
+                    const seasonDetailsList = seasonDetailResults.filter(r => r.status === 'fulfilled').map(r => r.value);
 
-                    const allEpisodes = [];
-                    for (const season of seasonDetailsList) {
-                        if (season.episodes) {
-                            const us_providers = season.providers?.results?.US?.flatrate || [];
-                            const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
-                            let displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks && season.networks.length > 0 ? season.networks[0] : null);
-                            const episodesWithContext = season.episodes.filter(ep => ep.air_date).map(ep => ({ ...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork }));
-                            allEpisodes.push(...episodesWithContext);
-                        }
-                    }
+                    const allEpisodes = seasonDetailsList.flatMap(season => {
+                        if (!season.episodes) return [];
+                        const us_providers = season.providers?.results?.US?.flatrate || [];
+                        const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
+                        const displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks?.[0] || null);
+                        return season.episodes
+                            .filter(ep => ep.air_date)
+                            .map(ep => ({ ...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork }));
+                    });
                     state.scheduledEpisodes = allEpisodes;
-
                 } catch (error) {
                     console.error("Error during schedule data processing:", error);
-                    state.scheduledEpisodes = []; // Ensure schedule is empty on error
+                    state.scheduledEpisodes = [];
                 }
             }
 
@@ -503,7 +483,8 @@
             function renderDashboardUpcomingMovies(items = []) { const container = upcomingMoviesContainer; container.innerHTML = ''; if(items.length === 0) { return; } items.filter(item => item.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'flex-shrink-0 w-32 cursor-pointer relative'; const posterUrl = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); card.innerHTML = `<img src="${posterUrl}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><p class="text-sm mt-2 truncate font-semibold">${item.title}</p><p class="text-xs text-indigo-300">${releaseDate}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, 'movie')); container.appendChild(card); }); }
             function handleFullSearch() { const query = searchInput.value.trim(); liveSearchResults.classList.add('hidden'); switchTab('search-results'); searchMedia(query, false); }
             let debounceTimer; function handleLiveSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { searchMedia(searchInput.value.trim(), true); }, 300); }
-            async function switchTab(tabName) { state.activeTab = tabName; document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if ($(tabName)) $(tabName).classList.remove('hidden'); tabs.forEach(tab => { const isCurrentTab = tab.dataset.tab === tabName; tab.classList.toggle('text-indigo-400', isCurrentTab); tab.classList.toggle('border-indigo-400', isCurrentTab); tab.classList.toggle('font-medium', isCurrentTab); tab.classList.toggle('text-gray-500', !isCurrentTab); tab.classList.toggle('border-transparent', !isCurrentTab); }); if (tabName === 'dashboard') { renderDashboardUpcoming(); renderDashboardHeader(); } if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') { renderSchedule(); } }
+            
+            function switchTab(tabName) { state.activeTab = tabName; document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if ($(tabName)) $(tabName).classList.remove('hidden'); tabs.forEach(tab => { const isCurrentTab = tab.dataset.tab === tabName; tab.classList.toggle('text-indigo-400', isCurrentTab); tab.classList.toggle('border-indigo-400', isCurrentTab); tab.classList.toggle('font-medium', isCurrentTab); tab.classList.toggle('text-gray-500', !isCurrentTab); tab.classList.toggle('border-transparent', !isCurrentTab); }); if (tabName === 'dashboard') { renderDashboardUpcoming(); renderDashboardHeader(); } if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') { renderSchedule(); } }
             
             function toggleSubscription(serviceId) {
                 if (!auth.currentUser) {
@@ -528,18 +509,12 @@
                 } else {
                     state.favorites.push({ id: mediaItem.id, name: mediaItem.name, title: mediaItem.title, poster_path: mediaItem.poster_path, first_air_date: mediaItem.first_air_date, release_date: mediaItem.release_date, media_type: mediaItem.title ? 'movie' : 'tv', manualTime: null });
                 }
-                // Don't await this, let it save in the background
                 saveDataToFirestore(); 
-
-                // Optimistically update the UI
                 renderModal(mediaItem);
-                
-                // Refetch schedule data in the background and update the UI when done.
                 fetchScheduleData().then(() => {
                     if (state.activeTab === 'dashboard') renderDashboardUpcoming();
                     if (state.activeTab === 'schedule') renderSchedule();
                 });
-
                 if (state.activeTab === 'favorites') {
                     renderFavorites();
                 }
@@ -588,7 +563,6 @@
             
             // --- App Entry Point ---
             initEventListeners();
-            // Load public data on initial start, everyone can see this.
             fetchDashboardPublicData();
 
         });
