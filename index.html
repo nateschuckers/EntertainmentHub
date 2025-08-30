@@ -113,6 +113,16 @@
             display: block;
         }
 
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+
+        #quote-container {
+            min-height: 4rem;
+            animation: fadeInOut 4s infinite;
+        }
+
         /* --- Default Theme --- */
         .tab-button.border-zinc-400 {
             border-color: #3b82f6; /* blue-500 */
@@ -138,7 +148,7 @@
              background-color: #3b82f6;
             color: #fafafa;
         }
-
+        #quote-container { color: #60a5fa; /* blue-400 */}
 
         /* --- Horror Theme --- */
         @keyframes flicker {
@@ -183,6 +193,7 @@
         }
         
         .theme-horror h2 { color: #ef4444; }
+        .theme-horror #quote-container { color: #f87171; }
         .theme-horror .tab-button.border-zinc-400 {
             border-color: #ef4444;
             color: #f87171;
@@ -268,6 +279,7 @@
 
         .theme-scifi h2 { color: #4ade80; }
         .theme-scifi #searchInput::placeholder { color: #4ade80; }
+        .theme-scifi #quote-container { color: #86efac; }
         .theme-scifi .tab-button.border-zinc-400 {
             border-color: #4ade80;
             color: #86efac;
@@ -331,6 +343,7 @@
         .theme-clean h2 { color: #18181b; }
         .theme-clean #userNameInput { color: #27272a; }
         .theme-clean #searchInput::placeholder { color: #a1a1aa; }
+        .theme-clean #quote-container { color: #52525b; }
         .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500, .theme-clean p { color: #52525b; }
         
         .theme-clean .tab-button.border-zinc-400 {
@@ -410,6 +423,11 @@
                 </button>
                 <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg"></div>
             </div>
+        </div>
+
+        <div id="quote-container" class="text-center my-4">
+            <p id="quote-text" class="text-lg italic"></p>
+            <p id="quote-attribution" class="text-sm mt-1"></p>
         </div>
 
         <div class="mb-8">
