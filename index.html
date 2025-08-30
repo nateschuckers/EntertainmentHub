@@ -182,6 +182,7 @@
                 errorScreen.innerHTML = `<div class="config-error-box"><h1>Application Error</h1><p>${message}</p></div>`;
                 errorScreen.classList.remove('hidden');
                 document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('app').classList.add('hidden');
             }
 
             try {
@@ -294,7 +295,8 @@
                 const user = auth.currentUser;
                 if (user) {
                     accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
-                    $('signOutButton').addEventListener('click', () => signOut(auth));
+                    const signOutButton = $('signOutButton');
+                    if(signOutButton) signOutButton.addEventListener('click', () => signOut(auth));
                 }
             }
              
@@ -363,7 +365,8 @@
             async function switchTab(tabName) {
                 state.activeTab = tabName;
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-                if ($(tabName)) $(tabName).classList.remove('hidden');
+                const tabEl = $(tabName);
+                if (tabEl) tabEl.classList.remove('hidden');
                 
                 tabs.forEach(tab => {
                     const isCurrentTab = tab.dataset.tab === tabName;
@@ -378,6 +381,55 @@
                 if (tabName === 'favorites') await renderFavorites();
                 if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); }
             }
+
+            function createMediaCard(item) {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 cursor-pointer';
+                card.dataset.id = item.id;
+                card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv');
+                const title = item.title || item.name;
+                const releaseDate = item.release_date || item.first_air_date;
+                const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
+                const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-gray-400">${year}</p></div>`;
+                card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
+                return card;
+            }
+
+            function renderSearchResults(mediaResults = []) {
+                const validMedia = mediaResults.filter(item => item.media_type !== 'person' && item.poster_path);
+                searchResultsContainer.innerHTML = '';
+                searchResultsMessage.classList.add('hidden');
+                if (validMedia.length === 0) {
+                    searchResultsMessage.textContent = 'No results found.';
+                    searchResultsMessage.classList.remove('hidden');
+                    return;
+                }
+                validMedia.forEach(item => searchResultsContainer.appendChild(createMediaCard(item)));
+            }
+            
+            function renderLiveSearchResults(results = []) {
+                liveSearchResults.innerHTML = '';
+                const validResults = results.filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5);
+                if (validResults.length === 0) {
+                    liveSearchResults.classList.add('hidden');
+                    return;
+                }
+                validResults.forEach(item => {
+                    const title = item.title || item.name;
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center space-x-3 p-3 hover:bg-gray-700 cursor-pointer';
+                    el.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-10 h-auto rounded-md"><span>${title}</span>`;
+                    el.addEventListener('click', () => {
+                        getMediaDetails(item.id, item.media_type);
+                        liveSearchResults.classList.add('hidden');
+                        searchInput.value = '';
+                    });
+                    liveSearchResults.appendChild(el);
+                });
+                liveSearchResults.classList.remove('hidden');
+            }
+
 
             function renderSubscriptions() {
                 subscriptionList.innerHTML = '';
@@ -403,16 +455,148 @@
                      providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-gray-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
                  }
                  modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-gray-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div></div></div>`;
-                 $('favoriteButton').addEventListener('click', () => toggleFavorite(details));
+                 const favoriteButton = $('favoriteButton');
+                 if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
                  modal.classList.remove('hidden');
-                 $('closeModal').addEventListener('click', closeModal);
+                 const closeModalBtn = $('closeModal');
+                 if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
             }
 
-            async function fetchDashboardData() { /* ... full function ... */ }
-            async function renderFavorites() { /* ... full function ... */ }
-            async function fetchScheduleData() { /* ... full function ... */ }
-            function renderSchedule() { /* ... full function ... */ }
-            // ... all other rendering functions
+            async function searchMedia(query, isLiveSearch = false) {
+                if (!query) { liveSearchResults.classList.add('hidden'); return; }
+                if(!isLiveSearch) showLoading();
+                try {
+                    const data = await apiFetch(`search/multi?query=${query}`);
+                    if (isLiveSearch) {
+                        renderLiveSearchResults(data.results);
+                    } else {
+                        renderSearchResults(data.results);
+                    }
+                } catch (error) {
+                    console.error('Search failed:', error);
+                    if (!isLiveSearch) {
+                        searchResultsMessage.textContent = "Search failed. Please try again.";
+                        searchResultsMessage.classList.remove('hidden');
+                    }
+                } finally {
+                    if(!isLiveSearch) hideLoading();
+                }
+            }
+
+            async function getMediaDetails(id, type) {
+                showLoading();
+                try {
+                    const data = await apiFetch(`${type}/${id}?append_to_response=watch/providers,credits`);
+                    renderModal(data);
+                } catch (error) {
+                    console.error('Failed to get details:', error);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            async function renderFavorites() {
+                favoritesMessage.classList.toggle('hidden', state.favorites.length > 0);
+                if (state.favorites.length === 0) {
+                    favoritesContainer.innerHTML = '';
+                    favoritesListContainer.innerHTML = '';
+                    return;
+                }
+                const sortedFavorites = [...state.favorites].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
+
+                if (state.favoritesView === 'grid') {
+                    favoritesContainer.classList.remove('hidden');
+                    favoritesListContainer.classList.add('hidden');
+                    favoritesContainer.innerHTML = '';
+                    sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item)));
+                } else {
+                    // Logic for list view
+                }
+            }
+            
+            async function fetchDashboardData() {
+                showLoading();
+                try {
+                    const trendingPromise = apiFetch(`trending/all/day`);
+                    const upcomingPromise = apiFetch(`movie/upcoming`);
+                    const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, fetchScheduleData(true)]);
+                    
+                    renderDashboardTrending(trendingData.results);
+                    renderDashboardUpcomingMovies(upcomingData.results);
+                    renderDashboardUpcoming();
+                } catch (error) {
+                    console.error("Failed to load dashboard:", error);
+                    upcomingContainer.innerHTML = `<p class="text-gray-500 text-sm">Could not load dashboard data.</p>`;
+                    trendingContainer.innerHTML = '';
+                    upcomingMoviesContainer.innerHTML = '';
+                } finally {
+                    hideLoading();
+                }
+            }
+            
+            function renderDashboardTrending(items = []) {
+                trendingContainer.innerHTML = '';
+                if(items.length === 0) { return; }
+                items.filter(item => item.poster_path).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
+                    card.addEventListener('click', () => getMediaDetails(item.id, item.media_type));
+                    trendingContainer.appendChild(card);
+                });
+            }
+
+            function renderDashboardUpcomingMovies(items = []) {
+                upcomingMoviesContainer.innerHTML = '';
+                if(items.length === 0) { return; }
+                items.filter(item => item.poster_path).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                    const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title}</p><p class="text-xs text-indigo-300">${releaseDate}</p>`;
+                    card.addEventListener('click', () => getMediaDetails(item.id, 'movie'));
+                    upcomingMoviesContainer.appendChild(card);
+                });
+            }
+
+            function parseLocalDate(dateString) {
+                if (!dateString) return null;
+                const [year, month, day] = dateString.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            function renderDashboardUpcoming() {
+                upcomingContainer.innerHTML = '';
+                 const today = new Date(); today.setHours(0,0,0,0);
+                 let endDate = new Date(today);
+                 if (state.dashboardScheduleFilter === 'today') {} 
+                 else if (state.dashboardScheduleFilter === 'week') { endDate.setDate(today.getDate() + 6); } 
+                 else if (state.dashboardScheduleFilter === 'month') { endDate.setMonth(today.getMonth() + 1); }
+
+                 const upcoming = state.scheduledEpisodes
+                     .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
+                     .sort((a,b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date));
+
+                 if (upcoming.length === 0) {
+                     upcomingContainer.innerHTML = `<p class="text-gray-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                     return;
+                 }
+                // render logic here
+            }
+
+            async function fetchScheduleData(isDashboard = false) {
+                 const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
+                 if (favoriteTvShows.length === 0) {
+                     state.scheduledEpisodes = [];
+                     return;
+                 }
+                 // fetching logic here
+            }
+            
+            function renderSchedule() {
+                // schedule rendering logic
+            }
+
 
             function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
             function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
@@ -425,14 +609,67 @@
                 await switchTab(state.activeTab);
             }
 
+            function handleFullSearch() {
+                const query = searchInput.value.trim();
+                liveSearchResults.classList.add('hidden');
+                switchTab('search-results');
+                searchMedia(query, false);
+            }
+
+            let debounceTimer;
+            function handleLiveSearch() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    searchMedia(searchInput.value.trim(), true);
+                }, 300);
+            }
+
             function initEventListeners() {
                 $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
-                searchButton.addEventListener('click', () => { /* ... */ });
-                // ... all other event listeners
+                
+                searchButton.addEventListener('click', handleFullSearch);
+                searchInput.addEventListener('input', handleLiveSearch);
+                searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleFullSearch(); });
+
+                tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+                
+                favViewBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.favoritesView = btn.dataset.view;
+                    favViewBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    renderFavorites();
+                }));
+                
+                scheduleViewBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.scheduleView = btn.dataset.view;
+                    scheduleViewBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    renderSchedule();
+                }));
+
+                upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.dashboardScheduleFilter = btn.dataset.filter;
+                    upcomingFilterBtns.forEach(b => b.classList.toggle('bg-indigo-600', b === btn));
+                    renderDashboardUpcoming();
+                }));
+
+                saveUserNameButton.addEventListener('click', () => {
+                    if(!userId) { promptForLogin('saving your name'); return; }
+                    const name = userNameInput.value.trim();
+                    state.userName = name;
+                    saveDataToFirestore();
+                    userNameMessage.textContent = 'Name saved!';
+                    userNameMessage.classList.remove('hidden');
+                    setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
+                });
+
+                scrollLeftBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
+                scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
+                scrollUpcomingLeftBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
+                scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
+
+                modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             }
 
             initEventListeners();
-            switchTab('dashboard'); 
         }
 
         document.addEventListener('DOMContentLoaded', initializeAppWithConfig);
