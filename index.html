@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -14,6 +16,9 @@
                         zinc: {
                             50:"#fafafa",100:"#f4f4f5",200:"#e4e4e7",300:"#d4d4d8",400:"#a1a1aa",500:"#71717a",600:"#52525b",700:"#3f3f46",800:"#27272a",900:"#18181b",950:"#09090b"
                         }
+                    },
+                    fontFamily: {
+                        'script': ['Caveat', 'cursive']
                     }
                 }
             }
@@ -74,6 +79,9 @@
         .favorite-card.selected .x-mark-svg {
             display: block;
         }
+        .favorite-card.selected img {
+            filter: grayscale(80%) brightness(50%);
+        }
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
@@ -82,7 +90,7 @@
     <!-- Login Screen -->
     <div id="loginScreen" class="fixed inset-0 bg-zinc-900 flex flex-col justify-center items-center z-50">
         <div class="text-center p-4">
-            <h1 class="text-4xl sm:text-5xl font-bold text-zinc-400 mb-4">Entertainment Hub</h1>
+            <h1 class="text-5xl sm:text-6xl font-script text-zinc-400 mb-4">Entertainment Hub</h1>
             <p class="text-zinc-400 mb-8">Please sign in to continue</p>
             <button id="signInWithGoogleButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center mx-auto">
                 <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
@@ -94,7 +102,7 @@
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400">Entertainment Hub</h1>
+            <h1 class="text-5xl sm:text-6xl font-script text-zinc-400">Entertainment Hub</h1>
             <p class="text-zinc-400 mt-2">Find where to watch your favorite shows and movies.</p>
         </header>
 
@@ -529,7 +537,7 @@
                 const releaseDate = item.release_date || item.first_air_date;
                 const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
                 const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
-                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
+                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover transition-all duration-300"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
                 
                 if (isManageMode) {
                     const overlay = document.createElement('div');
