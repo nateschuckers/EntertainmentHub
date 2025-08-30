@@ -92,21 +92,19 @@
             50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
         }
         
-        @keyframes ghost-float {
-            0% {
-                opacity: 0;
-                transform: translateY(20px) scale(0.9);
-            }
-            30%, 70% {
-                opacity: 0.6;
-            }
-            50% {
-                 transform: translateY(-70px) translateX(-15px) rotate(-10deg) scale(1.05);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-140px) translateX(15px) rotate(10deg) scale(0.8);
-            }
+        @keyframes web-dangle {
+            0%, 100% { transform: scaleY(0); }
+            15%, 85% { transform: scaleY(1); }
+        }
+
+        @keyframes spider-drop {
+            0%, 100% { transform: translateY(-30px); opacity: 0; }
+            15%, 85% { transform: translateY(50px); opacity: 1; }
+        }
+
+        @keyframes spider-swing {
+            0%, 100% { transform: rotate(7deg); }
+            50% { transform: rotate(-7deg); }
         }
 
         @keyframes red-pulse {
@@ -121,25 +119,37 @@
             animation: flicker 2.5s infinite alternate;
         }
         
-        /* Make sure the ::before pseudo-element from the old drip animation is gone */
+        /* The spider's web thread */
         .theme-horror .font-script::before {
-            content: none;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 95%; /* Position horizontally */
+            width: 1px;
+            height: 80px; /* Max length of the web */
+            background: #555;
+            transform-origin: top center;
+            animation: web-dangle 8s infinite ease-in-out 1.2s;
         }
 
-        /* A spooky ghost floating by */
+        /* The spider */
         .theme-horror .font-script::after {
             content: '';
             position: absolute;
-            width: 30px;
-            height: 40px;
-            background: white;
-            top: 50%;
-            left: 102%;
-            border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+            top: 0;
+            left: calc(95% - 6px); /* Center the spider on the thread */
+            width: 14px;
+            height: 10px;
+            background: #111;
+            border-radius: 50%;
             opacity: 0;
-            filter: blur(3px);
-            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #c0c0c0;
-            animation: ghost-float 9s infinite ease-in-out 1.5s;
+            box-shadow: 
+                -6px -4px 0 1px #111, -10px 0px 0 1px #111, -6px 4px 0 1px #111,
+                 6px -4px 0 1px #111,  10px 0px 0 1px #111,  6px 4px 0 1px #111;
+            animation: 
+                spider-drop 8s infinite ease-in-out 1.2s,
+                spider-swing 1.5s infinite ease-in-out 2.4s; /* Swing starts after it drops */
+            transform-origin: center -50px; /* Swing from the point it drops from */
         }
 
         .theme-horror .tab-button.border-zinc-400 {
