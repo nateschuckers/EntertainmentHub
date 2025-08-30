@@ -91,12 +91,24 @@
             border-color: #3b82f6; /* blue-500 */
             color: #3b82f6;
         }
-        .upcoming-filter-btn, .fav-view-btn, .schedule-view-btn {
+        .upcoming-filter-btn, .fav-view-btn, .schedule-view-btn, .theme-btn {
             background-color: #fafafa;
             color: #27272a;
         }
-         .upcoming-filter-btn.bg-zinc-900, .fav-view-btn.bg-zinc-900, .schedule-view-btn.bg-zinc-900 {
+        .upcoming-filter-btn.bg-zinc-900, .fav-view-btn.bg-zinc-900, .schedule-view-btn.bg-zinc-900, .theme-btn.bg-zinc-900 {
             background-color: #3b82f6; /* blue-500 */
+            color: #fafafa;
+        }
+        #saveUserNameButton {
+            background-color: #3b82f6;
+            color: #fafafa;
+        }
+        #subscriptionList div {
+            background-color: #fafafa;
+            color: #27272a;
+        }
+        #subscriptionList div.bg-zinc-900 {
+             background-color: #3b82f6;
             color: #fafafa;
         }
 
@@ -153,27 +165,31 @@
             color: #f87171;
             animation: red-pulse 2s infinite;
         }
-        .theme-horror #deleteAccountBtn,
-        .theme-horror .upcoming-filter-btn.bg-zinc-900,
-        .theme-horror .fav-view-btn.bg-zinc-900,
-        .theme-horror .schedule-view-btn.bg-zinc-900 {
-            background-color: #b91c1c;
-            color: #fafafa;
-        }
         .theme-horror .upcoming-filter-btn,
         .theme-horror .fav-view-btn,
-        .theme-horror .schedule-view-btn {
+        .theme-horror .schedule-view-btn,
+        .theme-horror .theme-btn {
             background-color: #222;
             color: #fafafa;
         }
+        .theme-horror #deleteAccountBtn,
+        .theme-horror #saveUserNameButton,
+        .theme-horror .upcoming-filter-btn.bg-zinc-900,
+        .theme-horror .fav-view-btn.bg-zinc-900,
+        .theme-horror .schedule-view-btn.bg-zinc-900,
+        .theme-horror .theme-btn.bg-zinc-900,
+        .theme-horror #subscriptionList div.bg-zinc-900 {
+            background-color: #b91c1c;
+            color: #fafafa;
+        }
         .theme-horror #deleteAccountBtn { animation: red-pulse 2s infinite; }
-        .theme-horror .bg-zinc-900 { background-color: #000; }
+        .theme-horror .bg-zinc-900, .theme-horror body { background-color: #000 !important; }
         .theme-horror .bg-zinc-800 { background-color: #111; }
         .theme-horror .bg-zinc-700 { background-color: #222; }
-        .theme-horror .hover\:bg-zinc-600:hover { background-color: #333; }
+        .theme-horror .hover\:bg-zinc-600:hover, .theme-horror #saveUserNameButton:hover, .theme-horror .theme-btn:hover { background-color: #333; }
         .theme-horror .border-zinc-700 { border-color: #444; }
-        .theme-horror .text-zinc-400 { color: #d4d4d8; }
-        .theme-horror #danger-zone {
+        .theme-horror .text-zinc-400, .theme-horror .text-zinc-300, .theme-horror .text-zinc-200, .theme-horror p { color: #d4d4d8; }
+        #danger-zone {
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C60 10, 70 15, 60 25 C50 35, 40 40, 50 50 C60 60, 70 65, 60 75 C50 85, 40 90, 50 100" fill="%23991b1b" opacity="0.1" transform="rotate(20 50 50)"/><path d="M20 10 C30 20, 40 25, 30 35 C20 45, 10 50, 20 60 C30 70, 40 75, 30 85" fill="%237f1d1d" opacity="0.1" transform="rotate(-15 50 50)"/></svg>');
             background-repeat: no-repeat;
             background-position: right -20px bottom -30px;
@@ -213,25 +229,29 @@
             border-color: #4ade80;
             color: #86efac;
         }
-        .theme-scifi .upcoming-filter-btn.bg-zinc-900,
-        .theme-scifi .fav-view-btn.bg-zinc-900,
-        .theme-scifi .schedule-view-btn.bg-zinc-900 {
-            background-color: #15803d;
-            color: #fafafa;
-        }
         .theme-scifi .upcoming-filter-btn,
         .theme-scifi .fav-view-btn,
-        .theme-scifi .schedule-view-btn {
+        .theme-scifi .schedule-view-btn,
+        .theme-scifi .theme-btn {
             background-color: #1a2f38;
             color: #86efac;
+        }
+        .theme-scifi #saveUserNameButton,
+        .theme-scifi .upcoming-filter-btn.bg-zinc-900,
+        .theme-scifi .fav-view-btn.bg-zinc-900,
+        .theme-scifi .schedule-view-btn.bg-zinc-900,
+        .theme-scifi .theme-btn.bg-zinc-900,
+        .theme-scifi #subscriptionList div.bg-zinc-900 {
+            background-color: #15803d;
+            color: #fafafa;
         }
 
         .theme-scifi .bg-zinc-900, .theme-scifi body.bg-zinc-900 { background-color: #0c1417; }
         .theme-scifi .bg-zinc-800 { background-color: #111e24; }
         .theme-scifi .bg-zinc-700 { background-color: #1a2f38; }
-        .theme-scifi .hover\:bg-zinc-600:hover { background-color: #24434e; }
+        .theme-scifi .hover\:bg-zinc-600:hover, .theme-scifi #saveUserNameButton:hover, .theme-scifi .theme-btn:hover { background-color: #24434e; }
         .theme-scifi .border-zinc-700 { border-color: #24434e; }
-        .theme-scifi .text-zinc-400 { color: #86efac; }
+        .theme-scifi .text-zinc-200, .theme-scifi .text-zinc-300, .theme-scifi .text-zinc-400, .theme-scifi p { color: #86efac; }
         .theme-scifi .text-zinc-500 { color: #4ade80; }
 
         /* --- Clean Theme --- */
@@ -239,33 +259,39 @@
         .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; color: #0ea5e9; }
         
         .theme-clean h2 { color: #18181b; }
-        .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500 { color: #52525b; }
+        .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500, .theme-clean p { color: #52525b; }
         
         .theme-clean .tab-button.border-zinc-400 {
             border-color: transparent;
-            background-color: #52525b;
-            color: #fafafa;
         }
         .theme-clean .tab-button {
             color: #52525b;
         }
-        .theme-clean .upcoming-filter-btn.bg-zinc-900,
-        .theme-clean .fav-view-btn.bg-zinc-900,
-        .theme-clean .schedule-view-btn.bg-zinc-900 {
-            background-color: #52525b;
-            color: #fafafa;
-        }
         .theme-clean .upcoming-filter-btn,
         .theme-clean .fav-view-btn,
-        .theme-clean .schedule-view-btn {
+        .theme-clean .schedule-view-btn,
+        .theme-clean .theme-btn {
             background-color: #e4e4e7;
             color: #18181b;
         }
-        
+        .theme-clean #saveUserNameButton,
+        .theme-clean .upcoming-filter-btn.bg-zinc-900,
+        .theme-clean .fav-view-btn.bg-zinc-900,
+        .theme-clean .schedule-view-btn.bg-zinc-900,
+        .theme-clean .theme-btn.bg-zinc-900,
+        .theme-clean #subscriptionList div.bg-zinc-900 {
+            background-color: #52525b;
+            color: #fafafa;
+        }
+        .theme-clean .tab-button.border-zinc-400 {
+            background-color: #52525b;
+            color: #fafafa;
+        }
+
         .theme-clean .bg-zinc-900 { background-color: #f8fafc; }
         .theme-clean .bg-zinc-800, .theme-clean .modal-content { background-color: #fff; }
         .theme-clean .bg-zinc-700 { background-color: #e4e4e7; }
-        .theme-clean .hover\:bg-zinc-600:hover { background-color: #d4d4d8; }
+        .theme-clean .hover\:bg-zinc-600:hover, .theme-clean #saveUserNameButton:hover, .theme-clean .theme-btn:hover { background-color: #d4d4d8; }
         .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
         
     </style>
@@ -658,21 +684,17 @@
             }
 
             function applyTheme(theme) {
-                document.body.classList.remove('theme-horror', 'theme-scifi', 'theme-clean');
+                document.body.className = 'bg-zinc-900 text-zinc-200'; // Reset body classes
                 if(theme === 'horror' || theme === 'scifi' || theme === 'clean') {
                     document.body.classList.add(`theme-${theme}`);
                 }
                 themeBtns.forEach(btn => {
-                    btn.classList.toggle('bg-zinc-900', btn.dataset.theme === theme);
-                    btn.classList.toggle('text-white', btn.dataset.theme === theme);
-                    btn.classList.toggle('bg-zinc-700', btn.dataset.theme !== theme);
-                    btn.classList.toggle('text-zinc-300', btn.dataset.theme !== theme);
-
-                    if (theme === 'clean') {
-                        btn.classList.toggle('bg-sky-500', btn.dataset.theme === 'clean');
-                         btn.classList.toggle('bg-slate-200', btn.dataset.theme !== 'clean');
-                         btn.classList.toggle('text-slate-800', btn.dataset.theme !== 'clean');
-                    }
+                    // This logic is now mostly handled by CSS for consistency
+                    const isSelected = btn.dataset.theme === theme;
+                    btn.classList.toggle('bg-zinc-900', isSelected); // Used as a "selected" marker by CSS
+                    btn.classList.toggle('text-white', isSelected);
+                    btn.classList.toggle('bg-zinc-700', !isSelected);
+                    btn.classList.toggle('text-zinc-300', !isSelected);
                 });
             }
 
@@ -828,7 +850,9 @@
                     const isChecked = state.subscriptions.includes(service.id);
                     const logoUrl = `https://image.tmdb.org/t/p/w92/${service.logo}`;
                     const item = document.createElement('div');
-                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300 ${isChecked ? 'bg-zinc-900' : 'bg-zinc-700 hover:bg-zinc-600'}`;
+                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300`;
+                    item.classList.toggle('bg-zinc-900', isChecked);
+                    item.classList.toggle('bg-zinc-700', !isChecked);
                     item.dataset.serviceId = service.id;
                     item.innerHTML = `<img src="${logoUrl}" alt="${service.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${service.name}</span>`;
                     item.addEventListener('click', () => toggleSubscription(service.id));
