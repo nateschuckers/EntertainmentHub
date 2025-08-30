@@ -28,6 +28,23 @@
         }
         .config-error-box h1 { font-size: 1.5rem; font-weight: bold; color: #ef4444; margin-bottom: 1rem; }
         .config-error-box p { color: #d1d5db; margin-bottom: 1.5rem; font-family: monospace; font-size: 0.875rem; text-align: left; background-color: #374151; padding: 1rem; border-radius: 0.25rem;}
+        .favorite-card-manage-overlay {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background-color: rgba(0,0,0,0.5);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .favorite-card-manage-checkbox {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        .favorite-card.selected .favorite-card-manage-overlay {
+            border-color: #6366f1; /* Indigo-500 */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -126,15 +143,26 @@
 
             <div id="favorites" class="tab-content hidden">
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex justify-between items-center mb-4">
+                    <div id="favorites-header" class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">My Favorites</h2>
-                        <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
-                            <button class="fav-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
-                            <button class="fav-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
+                        <div id="favorites-view-controls" class="flex items-center space-x-4">
+                            <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
+                                <button class="fav-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
+                                <button class="fav-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
+                            </div>
+                             <button id="manageFavoritesBtn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                        </div>
+                    </div>
+                     <div id="favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-gray-700 p-2 rounded-lg">
+                        <span id="favoritesSelectedCount" class="text-sm font-medium">0 selected</span>
+                        <div class="flex space-x-2">
+                             <button id="deleteSelectedFavoritesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                             <button id="deleteAllFavoritesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                             <button id="cancelManageFavoritesBtn" class="bg-gray-500 hover:bg-gray-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                         </div>
                     </div>
                     <p id="favoritesMessage" class="text-center text-gray-500">Your favorite shows and movies will appear here.</p>
-                    <div id="favoritesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+                    <div id="favoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
                     <div id="favoritesListContainer" class="hidden space-y-3"></div>
                 </div>
             </div>
@@ -170,6 +198,16 @@
                         <p class="text-gray-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
                         <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                     </div>
+                    <div class="border-t border-red-900/50 pt-6">
+                        <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
+                        <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
+                            <div>
+                                <h3 class="font-bold">Delete Account & Data</h3>
+                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data.</p>
+                            </div>
+                             <button id="deleteAccountBtn" class="mt-4 sm:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Delete Account</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -186,7 +224,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         async function initializeAppWithConfig() {
             function renderConfigError(message) {
@@ -235,6 +273,7 @@
                 favoritesView: 'grid',
                 scheduleView: 'agenda',
                 dashboardScheduleFilter: 'today',
+                isManagingFavorites: false,
                 currentDate: new Date(),
                 subscriptions: [],
                 favorites: [],
@@ -264,7 +303,8 @@
             scheduleContent = $('scheduleContent'), scheduleMessage = $('scheduleMessage'), subscriptionList = $('subscriptionList'), userNameInput = $('userNameInput'), 
             saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage'), dashboardUserName = $('dashboardUserName'), upcomingContainer = $('upcomingContainer'),
             trendingContainer = $('trendingContainer'), upcomingMoviesContainer = $('upcomingMoviesContainer'), scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'),
-            scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
+            scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn'),
+            favoritesViewControls = $('favorites-view-controls'), favoritesManageControls = $('favorites-manage-controls');
             
             const tabs = document.querySelectorAll('.tab-button');
             const favViewBtns = document.querySelectorAll('.fav-view-btn');
@@ -286,6 +326,9 @@
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
                         } else {
+                            // Document doesn't exist, likely just deleted.
+                            // The signOut call will handle the UI reset.
+                            if(isDataLoaded) return; // Prevent saving if doc was deleted
                             saveDataToFirestore();
                             return; 
                         }
@@ -319,7 +362,43 @@
                     accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
                     const signOutButton = $('signOutButton');
                     if(signOutButton) signOutButton.addEventListener('click', () => signOut(auth));
+                    const deleteAccountBtn = $('deleteAccountBtn');
+                    if(deleteAccountBtn) deleteAccountBtn.addEventListener('click', handleDeleteAccount);
                 }
+            }
+
+            function handleDeleteAccount() {
+                showConfirmationModal("Are you sure you want to delete your account and all data? This action cannot be undone.", async () => {
+                    if (userDocRef) {
+                        try {
+                            await deleteDoc(userDocRef);
+                            // After deleting doc, signOut will trigger UI reset via onAuthStateChanged
+                            await signOut(auth);
+                        } catch (e) {
+                            console.error("Error deleting document: ", e);
+                        }
+                    }
+                });
+            }
+
+            function showConfirmationModal(message, onConfirm) {
+                const confirmModalContent = `
+                    <div class="text-center p-6">
+                        <h2 class="text-2xl font-bold mb-4 text-red-400">Are you sure?</h2>
+                        <p class="text-gray-300 mb-6">${message}</p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="confirmCancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition">Cancel</button>
+                            <button id="confirmAction" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">Confirm</button>
+                        </div>
+                    </div>`;
+                modalContent.innerHTML = confirmModalContent;
+                modal.classList.remove('hidden');
+                
+                $('confirmAction').addEventListener('click', () => {
+                    onConfirm();
+                    closeModal();
+                });
+                $('confirmCancel').addEventListener('click', closeModal);
             }
              
             async function saveDataToFirestore() {
@@ -409,9 +488,12 @@
                 if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); }
             }
 
-            function createMediaCard(item) {
+            function createMediaCard(item, isManageMode = false) {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'relative favorite-card';
+
                 const card = document.createElement('div');
-                card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 cursor-pointer';
+                card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
                 card.dataset.id = item.id;
                 card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv');
                 const title = item.title || item.name;
@@ -419,8 +501,30 @@
                 const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
                 const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
                 card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-gray-400">${year}</p></div>`;
-                card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
-                return card;
+                
+                if (isManageMode) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'favorite-card-manage-overlay';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'favorite-card-manage-checkbox w-6 h-6 rounded';
+                    checkbox.value = item.id;
+                    overlay.appendChild(checkbox);
+                    cardWrapper.appendChild(overlay);
+
+                    cardWrapper.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        checkbox.checked = !checkbox.checked;
+                        cardWrapper.classList.toggle('selected');
+                        updateSelectedCount();
+                    });
+                } else {
+                     card.classList.add('cursor-pointer');
+                     card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
+                }
+
+                cardWrapper.appendChild(card);
+                return cardWrapper;
             }
 
             function renderSearchResults(mediaResults = []) {
@@ -589,7 +693,10 @@
             }
 
             async function renderFavorites() {
-                favoritesMessage.classList.toggle('hidden', state.favorites.length === 0);
+                favoritesViewControls.classList.toggle('hidden', state.isManagingFavorites);
+                favoritesManageControls.classList.toggle('hidden', !state.isManagingFavorites);
+                
+                favoritesMessage.classList.toggle('hidden', state.favorites.length > 0);
                 if (state.favorites.length === 0) {
                     favoritesContainer.innerHTML = '';
                     favoritesListContainer.innerHTML = '';
@@ -601,12 +708,13 @@
                     favoritesContainer.classList.remove('hidden');
                     favoritesListContainer.classList.add('hidden');
                     favoritesContainer.innerHTML = '';
-                    sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item)));
+                    sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item, state.isManagingFavorites)));
                 } else {
                     favoritesContainer.classList.add('hidden');
                     favoritesListContainer.classList.remove('hidden');
-                    await renderFavoritesList(sortedFavorites);
+                    await renderFavoritesList(sortedFavorites); // Manage mode not supported for list yet
                 }
+                updateSelectedCount();
             }
             
             async function renderFavoritesList(sortedFavorites) {
@@ -641,6 +749,11 @@
                 } finally {
                     hideLoading();
                 }
+            }
+
+            function updateSelectedCount() {
+                const selected = favoritesContainer.querySelectorAll('.favorite-card-manage-checkbox:checked');
+                $('favoritesSelectedCount').textContent = `${selected.length} selected`;
             }
             
             async function fetchDashboardData() {
@@ -974,6 +1087,30 @@
                     userNameMessage.classList.remove('hidden');
                     setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
                 });
+
+                // Favorites Management
+                $('manageFavoritesBtn').addEventListener('click', () => {
+                    state.isManagingFavorites = true;
+                    renderFavorites();
+                });
+                 $('cancelManageFavoritesBtn').addEventListener('click', () => {
+                    state.isManagingFavorites = false;
+                    renderFavorites();
+                });
+                $('deleteAllFavoritesBtn').addEventListener('click', () => {
+                    showConfirmationModal("Are you sure you want to remove all favorites?", () => {
+                        state.favorites = [];
+                        saveDataToFirestore();
+                    });
+                });
+                 $('deleteSelectedFavoritesBtn').addEventListener('click', () => {
+                    const selected = favoritesContainer.querySelectorAll('.favorite-card-manage-checkbox:checked');
+                    if (selected.length === 0) return;
+                    const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
+                    state.favorites = state.favorites.filter(fav => !idsToDelete.includes(fav.id));
+                    saveDataToFirestore();
+                });
+
 
                 scrollLeftBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
                 scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
