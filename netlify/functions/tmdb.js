@@ -30,3 +30,4 @@ exports.handler = async function(event, context) {
     return { statusCode: 500, body: JSON.stringify({ error: "Failed to fetch data from the TMDb API." }) };
   }
 };
+
