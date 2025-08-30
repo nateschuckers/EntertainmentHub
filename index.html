@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -18,7 +18,8 @@
                         }
                     },
                     fontFamily: {
-                        'script': ['Caveat', 'cursive']
+                        'script': ['Caveat', 'cursive'],
+                        'horror': ['Creepster', 'cursive']
                     }
                 }
             }
@@ -81,6 +82,34 @@
         }
         .favorite-card.selected img {
             filter: grayscale(80%) brightness(50%);
+        }
+
+        /* --- Horror Theme --- */
+        @keyframes flicker {
+            0%, 100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #ef4444; opacity: 1; }
+            50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
+        }
+
+        .theme-horror .font-script {
+            font-family: 'Creepster', cursive;
+            animation: flicker 2.5s infinite alternate;
+        }
+        .theme-horror .tab-button.border-zinc-400 {
+            border-color: #ef4444; /* red-500 */
+            color: #f87171; /* red-400 */
+        }
+        .theme-horror .bg-zinc-900 { background-color: #000; }
+        .theme-horror .bg-zinc-800 { background-color: #111; }
+        .theme-horror .bg-zinc-700 { background-color: #222; }
+        .theme-horror .hover\:bg-zinc-600:hover { background-color: #333; }
+        .theme-horror .border-zinc-700 { border-color: #444; }
+        .theme-horror .text-zinc-400 { color: #d4d4d8; }
+        .theme-horror .upcoming-filter-btn.bg-zinc-900 { background-color: #b91c1c; }
+        .theme-horror #danger-zone {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C60 10, 70 15, 60 25 C50 35, 40 40, 50 50 C60 60, 70 65, 60 75 C50 85, 40 90, 50 100" fill="%23991b1b" opacity="0.1" transform="rotate(20 50 50)"/><path d="M20 10 C30 20, 40 25, 30 35 C20 45, 10 50, 20 60 C30 70, 40 75, 30 85" fill="%237f1d1d" opacity="0.1" transform="rotate(-15 50 50)"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right -20px bottom -30px;
+            background-size: 150px;
         }
     </style>
 </head>
@@ -230,12 +259,19 @@
                         </div>
                          <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
                     </div>
+                     <div>
+                        <h2 class="text-2xl font-bold mb-4">Theme</h2>
+                        <div id="themeSelector" class="flex space-x-2">
+                            <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
+                            <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
+                        </div>
+                    </div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Manage Your Streaming Services</h2>
                         <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
                         <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                     </div>
-                    <div class="border-t border-red-900/50 pt-6">
+                    <div id="danger-zone" class="border-t border-red-900/50 pt-6">
                         <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
                         <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
                             <div>
@@ -306,6 +342,7 @@
 
             const state = {
                 userName: null,
+                theme: 'default',
                 activeTab: 'dashboard',
                 favoritesView: 'grid',
                 scheduleView: 'agenda',
@@ -347,6 +384,7 @@
             const favViewBtns = document.querySelectorAll('.fav-view-btn');
             const scheduleViewBtns = document.querySelectorAll('.schedule-view-btn');
             const upcomingFilterBtns = document.querySelectorAll('.upcoming-filter-btn');
+            const themeBtns = document.querySelectorAll('.theme-btn');
 
             onAuthStateChanged(auth, (user) => {
                 if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -363,13 +401,13 @@
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
                         } else {
-                            // Document doesn't exist, likely just deleted.
-                            // The signOut call will handle the UI reset.
-                            if(isDataLoaded) return; // Prevent saving if doc was deleted
+                            if(isDataLoaded) return;
                             saveDataToFirestore();
                             return; 
                         }
                         
+                        applyTheme(state.theme);
+
                         if (!wasAlreadyLoaded) {
                            isDataLoaded = true;
                            initAppUI(); 
@@ -380,9 +418,9 @@
                 } else {
                     userId = null;
                     userDocRef = null;
+                    applyTheme('default'); // Reset to default on logout
                     loginScreen.classList.remove('hidden');
                     mainApp.classList.add('hidden');
-                    // Reset local state on logout
                     state.favorites = [];
                     state.subscriptions = [];
                     state.userName = null;
@@ -409,7 +447,6 @@
                     if (userDocRef) {
                         try {
                             await deleteDoc(userDocRef);
-                            // After deleting doc, signOut will trigger UI reset via onAuthStateChanged
                             await signOut(auth);
                         } catch (e) {
                             console.error("Error deleting document: ", e);
@@ -443,7 +480,8 @@
                 const dataToSave = {
                     userName: state.userName,
                     subscriptions: state.subscriptions,
-                    favorites: state.favorites
+                    favorites: state.favorites,
+                    theme: state.theme
                 };
                 try {
                     await setDoc(userDocRef, dataToSave, { merge: true });
@@ -456,7 +494,19 @@
                 state.userName = data.userName || null;
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
+                state.theme = data.theme || 'default';
                 if (userNameInput && state.userName) userNameInput.value = state.userName;
+            }
+
+            function applyTheme(theme) {
+                document.body.classList.remove('theme-horror');
+                if(theme === 'horror') {
+                    document.body.classList.add('theme-horror');
+                }
+                themeBtns.forEach(btn => {
+                    btn.classList.toggle('bg-zinc-900', btn.dataset.theme === theme);
+                    btn.classList.toggle('bg-zinc-700', btn.dataset.theme !== theme);
+                });
             }
 
             async function apiFetch(endpoint) {
@@ -1145,6 +1195,12 @@
                     userNameMessage.classList.remove('hidden');
                     setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
                 });
+                
+                themeBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.theme = btn.dataset.theme;
+                    applyTheme(state.theme);
+                    saveDataToFirestore();
+                }));
 
                 // Favorites Management
                 $('manageFavoritesBtn').addEventListener('click', () => {
