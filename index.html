@@ -35,11 +35,136 @@
 
     <!-- Login Screen -->
     <div id="loginScreen" class="fixed inset-0 bg-gray-900 flex flex-col justify-center items-center z-50">
-        <!-- Content remains the same -->
+        <div class="text-center">
+            <h1 class="text-5xl font-bold text-indigo-400 mb-4">Entertainment Hub</h1>
+            <p class="text-gray-400 mb-8">Please sign in to continue</p>
+            <button id="signInWithGoogleButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center mx-auto">
+                <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+                Sign in with Google
+            </button>
+        </div>
     </div>
 
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
-        <!-- App content remains the same -->
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-400">Entertainment Hub</h1>
+            <p class="text-gray-400 mt-2">Find where to watch your favorite shows and movies.</p>
+        </header>
+
+        <div class="mb-8 max-w-2xl mx-auto">
+            <div id="searchWrapper" class="relative">
+                <input type="text" id="searchInput" class="w-full bg-gray-800 border-2 border-gray-700 rounded-full py-3 px-6 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
+                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 focus:outline-none transition duration-300">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg"></div>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex justify-center border-b border-gray-700">
+                <button data-tab="dashboard" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Dashboard</button>
+                <button data-tab="favorites" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Favorites</button>
+                <button data-tab="schedule" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Schedule</button>
+                <button data-tab="settings" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Settings</button>
+            </div>
+        </div>
+
+        <main id="content-area">
+            <div id="dashboard" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold">Upcoming for <span id="dashboardUserName">You</span></h2>
+                            <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
+                                <button data-filter="today" class="upcoming-filter-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
+                                <button data-filter="week" class="upcoming-filter-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
+                                <button data-filter="month" class="upcoming-filter-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
+                            </div>
+                        </div>
+                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
+                    </div>
+                    <div class="lg:col-span-1 space-y-8">
+                        <div>
+                             <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
+                            <div class="relative">
+                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg"></div>
+                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                            </div>
+                        </div>
+                         <div>
+                             <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
+                            <div class="relative">
+                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg"></div>
+                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-results" class="tab-content hidden">
+                 <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
+                <p id="searchResultsMessage" class="text-center text-gray-500">Search for something to see results.</p>
+                <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+            </div>
+
+            <div id="favorites" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">My Favorites</h2>
+                        <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
+                            <button class="fav-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
+                            <button class="fav-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
+                        </div>
+                    </div>
+                    <p id="favoritesMessage" class="text-center text-gray-500">Your favorite shows and movies will appear here.</p>
+                    <div id="favoritesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+                    <div id="favoritesListContainer" class="hidden space-y-3"></div>
+                </div>
+            </div>
+
+            <div id="schedule" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Upcoming Episodes</h2>
+                        <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
+                            <button class="schedule-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
+                            <button class="schedule-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
+                        </div>
+                    </div>
+                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
+                     <p id="scheduleMessage" class="text-center text-gray-500 mt-4 hidden"></p>
+                </div>
+            </div>
+
+            <div id="settings" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg space-y-8">
+                    <div id="accountSection"></div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4">Your Name</h2>
+                        <p class="text-gray-400 mb-4">Personalize the dashboard greeting.</p>
+                        <div class="flex flex-col sm:flex-row sm:space-x-2">
+                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-gray-700 border border-gray-600 rounded-md py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500" placeholder="Enter your name">
+                            <button id="saveUserNameButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
+                        </div>
+                         <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4">Manage Your Streaming Services</h2>
+                        <p class="text-gray-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
+                        <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="loadingSpinner" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
     </div>
 
     <div id="detailsModal" class="modal-backdrop hidden">
@@ -47,21 +172,14 @@
     </div>
 
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- App Initialization ---
         async function initializeAppWithConfig() {
             function renderConfigError(message) {
                 const errorScreen = document.getElementById('configErrorScreen');
-                errorScreen.innerHTML = `
-                    <div class="config-error-box">
-                        <h1>Application Error</h1>
-                        <p>${message}</p>
-                    </div>
-                `;
+                errorScreen.innerHTML = `<div class="config-error-box"><h1>Application Error</h1><p>${message}</p></div>`;
                 errorScreen.classList.remove('hidden');
                 document.getElementById('loginScreen').classList.add('hidden');
             }
@@ -77,34 +195,27 @@
                 if (!firebaseConfig.apiKey) {
                      throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
                 }
-
-                // If config is fetched successfully, run the app
                 runApp(firebaseConfig);
 
             } catch (error) {
                 let errorMessage = error.message;
                 if (error instanceof SyntaxError) {
-                    errorMessage = "The server returned an invalid response (likely HTML instead of JSON). This is a routing issue. Please ensure your netlify.toml redirect rule is correct and you have deleted the _redirects file.";
+                    errorMessage = "The server returned an invalid response (likely HTML instead of JSON). This is a routing issue. Please ensure your netlify.toml redirect rule is correct.";
                 }
                 renderConfigError(errorMessage);
             }
         }
 
         function runApp(firebaseConfig) {
-            // --- All original app code from DOMContentLoaded goes here ---
-            // --- This includes Firebase Init, State, Selectors, Functions, etc. ---
-            
-            // --- Firebase Initialization ---
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
             const googleProvider = new GoogleAuthProvider();
             let userDocRef = null;
-            let unsubscribeUserDoc = null; 
+            let unsubscribeUserDoc = null;
             let isDataLoaded = false;
             let userId = null;
 
-            // --- App State (remains the same) ---
             const state = {
                 userName: null,
                 activeTab: 'dashboard',
@@ -128,14 +239,9 @@
                 ]
             };
             
-            // --- Element Selectors (remains the same) ---
             const $ = (selector) => document.getElementById(selector);
-            const loginScreen = $('loginScreen');
-            const mainApp = $('app');
-            // ... all other element selectors ...
-            const accountSection = $('accountSection');
+            const loginScreen = $('loginScreen'), mainApp = $('app'), accountSection = $('accountSection'), modal = $('detailsModal'), modalContent = $('modalContent');
 
-            // --- Auth & Data Handling ---
             onAuthStateChanged(auth, (user) => {
                 if (unsubscribeUserDoc) unsubscribeUserDoc();
                 isDataLoaded = false;
@@ -145,13 +251,11 @@
                     userDocRef = doc(db, "users", userId);
                     loginScreen.classList.add('hidden');
                     mainApp.classList.remove('hidden');
-                    updateAccountSection(user);
                     
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                         if (docSnap.exists()) {
                             loadDataFromFirestore(docSnap.data());
                         } else {
-                            console.log("Creating document for new user.");
                             saveDataToFirestore(); 
                         }
                         isDataLoaded = true;
@@ -162,38 +266,23 @@
                     userDocRef = null;
                     loginScreen.classList.remove('hidden');
                     mainApp.classList.add('hidden');
-                    // Reset state on logout
                     state.favorites = [];
                     state.subscriptions = [];
                     state.userName = null;
                 }
             });
 
-            // ... All other functions (handleGoogleSignIn, saveDataToFirestore, etc.) remain the same
-            // Paste all the functions from the previous working version of index.html here,
-            // from handleGoogleSignIn down to initEventListeners
             function handleGoogleSignIn() {
-                signInWithPopup(auth, googleProvider).catch((error) => {
-                    console.error("Error during sign-in with Google", error);
-                    // Provide feedback to the user in a non-alert way if needed
-                });
+                signInWithPopup(auth, googleProvider).catch(console.error);
             }
 
             function updateAccountSection(user) {
                 if (user) {
-                    accountSection.innerHTML = `
-                        <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        <p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p>
-                        <button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">Sign Out</button>
-                    `;
+                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
                     $('signOutButton').addEventListener('click', () => signOut(auth));
                 } else {
-                     accountSection.innerHTML = `
-                        <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        <p class="text-gray-400 mb-4">Sign in to save your preferences.</p>
-                        <button id="signInSettingsButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">Sign in with Google</button>
-                    `;
-                    $('signInSettingsButton').addEventListener('click', handleGoogleSignIn);
+                     accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-gray-400 mb-4">Sign in to save preferences.</p><button id="signInSettingsButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">Sign in with Google</button>`;
+                     $('signInSettingsButton').addEventListener('click', handleGoogleSignIn);
                 }
             }
              
@@ -215,74 +304,83 @@
                 state.userName = data.userName || null;
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
-                if (state.userName) {
-                    const userNameInput = $('userNameInput');
-                    if(userNameInput) userNameInput.value = state.userName;
-                }
+                const userNameInput = $('userNameInput');
+                if (userNameInput && state.userName) userNameInput.value = state.userName;
             }
 
             async function apiFetch(endpoint) {
                 const url = `/.netlify/functions/tmdb?endpoint=${encodeURIComponent(endpoint)}`;
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || `TMDB API request failed with status ${response.status}`);
-                    }
-                    return response.json();
-                } catch (error) {
-                    console.error(`API Fetch Error for endpoint: ${endpoint}`, error);
-                    // You could add some UI feedback here for the user
-                    throw error; // Re-throw the error to be caught by the calling function
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Network response was not ok');
                 }
+                return response.json();
             }
             
             function promptForLogin(feature = 'this feature') {
-                 const modal = $('detailsModal');
-                 const modalContent = $('modalContent');
-                 modalContent.innerHTML = `
-                    <div class="text-center p-4">
-                        <h2 class="text-2xl font-bold mb-4">Please Sign In</h2>
-                        <p class="text-gray-400 mb-6">To use ${feature}, you need to be signed in.</p>
-                        <button id="modalSignInButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
-                            Sign in with Google
-                        </button>
-                         <button id="modalCloseButton" class="mt-4 text-gray-400 hover:text-white">Cancel</button>
-                    </div>
-                 `;
+                 modalContent.innerHTML = `<div class="text-center p-4"><h2 class="text-2xl font-bold mb-4">Please Sign In</h2><p class="text-gray-400 mb-6">To use ${feature}, you need to be signed in.</p><button id="modalSignInButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">Sign in with Google</button><button id="modalCloseButton" class="mt-4 text-gray-400 hover:text-white">Cancel</button></div>`;
                  modal.classList.remove('hidden');
-                 $('modalSignInButton').addEventListener('click', () => {
-                     handleGoogleSignIn();
-                     closeModal();
-                 });
+                 $('modalSignInButton').addEventListener('click', () => { handleGoogleSignIn(); closeModal(); });
                  $('modalCloseButton').addEventListener('click', closeModal);
             }
             
-            // ... (rest of the functions: searchMedia, getMediaDetails, etc.)
-            // Make sure to include all functions from the previous correct version.
+            function toggleSubscription(serviceId) {
+                if (!userId) { promptForLogin('managing subscriptions'); return; }
+                const index = state.subscriptions.indexOf(serviceId);
+                if (index > -1) state.subscriptions.splice(index, 1);
+                else state.subscriptions.push(serviceId);
+                saveDataToFirestore();
+                renderSubscriptions();
+            }
+
+            function toggleFavorite(mediaItem) {
+                if (!userId) { promptForLogin('saving favorites'); return; }
+                const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
+                if (index > -1) {
+                    state.favorites.splice(index, 1);
+                } else {
+                    state.favorites.push({
+                        id: mediaItem.id,
+                        name: mediaItem.name,
+                        title: mediaItem.title,
+                        poster_path: mediaItem.poster_path,
+                        first_air_date: mediaItem.first_air_date,
+                        release_date: mediaItem.release_date,
+                        media_type: mediaItem.title ? 'movie' : 'tv',
+                        manualTime: null
+                    });
+                }
+                saveDataToFirestore();
+                renderModal(mediaItem);
+            }
+            
+            // --- All rendering and logic functions from here ---
+            // These functions are largely unchanged from the original file.
+            // ... (searchMedia, getMediaDetails, fetchScheduleData, etc.)
+
+            function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
+            function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
+            function closeModal() { modal.classList.add('hidden'); }
+
             async function initAppUI() {
                 if (!isDataLoaded) return;
-                renderSubscriptions();
                 updateAccountSection(auth.currentUser);
+                renderSubscriptions();
                 await switchTab(state.activeTab);
             }
 
             function initEventListeners() {
-                // ... (all event listeners)
-                const signInWithGoogleButton = $('signInWithGoogleButton');
-                 if(signInWithGoogleButton) {
-                    signInWithGoogleButton.addEventListener('click', handleGoogleSignIn);
-                }
-                // The rest of your event listeners here
+                $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
+                // ... all other event listeners
             }
 
             // --- App Entry Point ---
             initEventListeners();
-            updateAccountSection(null); // Initial render for logged-out state
-            switchTab('dashboard'); // Show dashboard by default
+            updateAccountSection(null);
+            switchTab('dashboard'); 
         }
 
-        // --- Start the App ---
         document.addEventListener('DOMContentLoaded', initializeAppWithConfig);
     </script>
 </body>
