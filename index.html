@@ -363,8 +363,8 @@
                         name: mediaItem.name || null,
                         title: mediaItem.title || null,
                         poster_path: mediaItem.poster_path, 
-                        first_air_date: mediaItem.first_air_date,
-                        release_date: mediaItem.release_date, 
+                        first_air_date: mediaItem.first_air_date || null,
+                        release_date: mediaItem.release_date || null, 
                         media_type: mediaItem.title ? 'movie' : 'tv'
                     });
                 }
