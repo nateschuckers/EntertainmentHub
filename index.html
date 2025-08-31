@@ -433,9 +433,9 @@
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                             <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming for <span id="dashboardUserName">You</span></h2>
                             <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                <button data-filter="today" class="upcoming-filter-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
-                                <button data-filter="week" class="upcoming-filter-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
-                                <button data-filter="month" class="upcoming-filter-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
+                                <button data-filter="today" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">Today</button>
+                                <button data-filter="week" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
+                                <button data-filter="month" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
                             </div>
                         </div>
                         <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
@@ -653,7 +653,7 @@
                 const firebaseConfig = await response.json();
                 
                 if (!firebaseConfig.apiKey) {
-                     throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
+                        throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
                 }
                 runApp(firebaseConfig);
 
@@ -785,7 +785,7 @@
                            isDataLoaded = true;
                            initAppUI(); 
                         } else {
-                           refreshCurrentView();
+                            refreshCurrentView();
                         }
                     });
                 } else {
@@ -855,7 +855,8 @@
                     userName: state.userName,
                     subscriptions: state.subscriptions,
                     favorites: state.favorites,
-                    theme: state.theme
+                    theme: state.theme,
+                    dashboardScheduleFilter: state.dashboardScheduleFilter
                 };
                 try {
                     await setDoc(userDocRef, dataToSave, { merge: true });
@@ -869,6 +870,7 @@
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
                 state.theme = data.theme || 'default';
+                state.dashboardScheduleFilter = data.dashboardScheduleFilter || 'today';
                 if (userNameInput && state.userName) userNameInput.value = state.userName;
             }
 
@@ -992,8 +994,8 @@
                         updateSelectedCount(card.dataset.type);
                     });
                 } else {
-                     card.classList.add('cursor-pointer');
-                     card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
+                      card.classList.add('cursor-pointer');
+                      card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
                 }
 
                 cardWrapper.appendChild(card);
@@ -1058,7 +1060,7 @@
                  const providers = details['watch/providers']?.results?.US?.flatrate || [];
                  let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
                  if (providers.length > 0) {
-                       providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
+                         providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
                  }
                  
                 let manualTimeHtml = '';
@@ -1383,46 +1385,46 @@
                         const favorite = state.favorites.find(f => f.id === ep.showId);
                         return { ...ep, manualTime: favorite ? favorite.manualTime : null };
                     })
-                     .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
-                     .sort((a,b) => {
-                         const dateA = parseLocalDate(a.air_date);
-                         const dateB = parseLocalDate(b.air_date);
-                         if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-                         return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
-                     });
+                      .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
+                      .sort((a,b) => {
+                           const dateA = parseLocalDate(a.air_date);
+                           const dateB = parseLocalDate(b.air_date);
+                           if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+                           return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
+                       });
 
                  if (upcoming.length === 0) {
-                       upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
-                       return;
+                        upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                        return;
                  }
                 
                  upcoming.forEach(ep => {
-                     const el = document.createElement('div');
-                     el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
-                     const airDate = parseLocalDate(ep.air_date);
-                     const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
-                     const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                     let networkHtml = '';
-                     if (ep.displayNetwork && ep.displayNetwork.logo_path) {
-                         networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
-                     } else if (ep.displayNetwork) {
-                         networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
-                     }
-                     el.innerHTML = `
-                         <div class="text-center w-20 flex-shrink-0">
-                             <p class="font-bold text-xl text-zinc-300">${day}</p>
-                             <p class="text-sm text-zinc-400">${date}</p>
-                         </div>
-                         <div class="flex-grow min-w-0">
-                             <p class="font-bold">${ep.showName}</p>
-                             <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
-                             <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
-                         </div>
-                         <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
-                             <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
-                             <div class="h-6 flex items-center justify-center">${networkHtml}</div>
-                         </div>`;
-                     upcomingContainer.appendChild(el);
+                      const el = document.createElement('div');
+                      el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
+                      const airDate = parseLocalDate(ep.air_date);
+                      const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
+                      const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                      let networkHtml = '';
+                      if (ep.displayNetwork && ep.displayNetwork.logo_path) {
+                           networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
+                      } else if (ep.displayNetwork) {
+                           networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
+                      }
+                      el.innerHTML = `
+                           <div class="text-center w-20 flex-shrink-0">
+                                <p class="font-bold text-xl text-zinc-300">${day}</p>
+                                <p class="text-sm text-zinc-400">${date}</p>
+                           </div>
+                           <div class="flex-grow min-w-0">
+                                <p class="font-bold">${ep.showName}</p>
+                                <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
+                                <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
+                           </div>
+                           <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
+                                <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
+                                <div class="h-6 flex items-center justify-center">${networkHtml}</div>
+                           </div>`;
+                      upcomingContainer.appendChild(el);
                  });
             }
             
@@ -1511,6 +1513,7 @@
                 // This function is called whenever data changes in Firestore
                 updateAccountSection();
                 renderSubscriptions();
+                updateUpcomingFilterButtonsUI(); // Refresh button state
                 dashboardUserName.textContent = state.userName || 'You';
                 
                 if (state.activeTab === 'dashboard') {
@@ -1533,7 +1536,7 @@
             function closeSuggestionModal() { suggestionModal.classList.add('hidden'); }
 
             function openSuggestionModal() {
-                 const title = $('suggestionModalTitle');
+                const title = $('suggestionModalTitle');
                 const subtitle = $('suggestionModalSubtitle');
                 const textarea = $('suggestionText');
 
@@ -1553,10 +1556,21 @@
                 suggestionModal.classList.remove('hidden');
             }
 
+            // A new helper function to manage the UI of the filter buttons
+            function updateUpcomingFilterButtonsUI() {
+                upcomingFilterBtns.forEach(b => {
+                    const isSelected = b.dataset.filter === state.dashboardScheduleFilter;
+                    b.classList.toggle('bg-zinc-900', isSelected);
+                    b.classList.toggle('text-white', isSelected);
+                    b.classList.toggle('text-zinc-300', !isSelected);
+                });
+            }
+
             async function initAppUI() {
                 if (!isDataLoaded) return;
                 updateAccountSection();
                 renderSubscriptions();
+                updateUpcomingFilterButtonsUI(); // Set the initial state of the buttons
                 await switchTab('dashboard');
             }
 
@@ -1644,11 +1658,8 @@
 
                 upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.dashboardScheduleFilter = btn.dataset.filter;
-                    upcomingFilterBtns.forEach(b => {
-                        b.classList.toggle('bg-zinc-900', b === btn);
-                        b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-zinc-300', b !== btn);
-                    });
+                    updateUpcomingFilterButtonsUI(); // Update button visuals
+                    saveDataToFirestore(); // Save the new preference
                     renderDashboardUpcoming();
                 }));
 
