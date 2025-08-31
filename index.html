@@ -113,16 +113,6 @@
             display: block;
         }
 
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            10%, 90% { opacity: 1; }
-        }
-
-        #quote-container {
-            min-height: 4rem;
-            animation: fadeInOut 4s infinite;
-        }
-
         /* --- Default Theme --- */
         .tab-button.border-zinc-400 {
             border-color: #3b82f6; /* blue-500 */
@@ -148,7 +138,7 @@
              background-color: #3b82f6;
             color: #fafafa;
         }
-        #quote-container { color: #60a5fa; /* blue-400 */}
+
 
         /* --- Horror Theme --- */
         @keyframes flicker {
@@ -193,7 +183,6 @@
         }
         
         .theme-horror h2 { color: #ef4444; }
-        .theme-horror #quote-container { color: #f87171; }
         .theme-horror .tab-button.border-zinc-400 {
             border-color: #ef4444;
             color: #f87171;
@@ -279,7 +268,6 @@
 
         .theme-scifi h2 { color: #4ade80; }
         .theme-scifi #searchInput::placeholder { color: #4ade80; }
-        .theme-scifi #quote-container { color: #86efac; }
         .theme-scifi .tab-button.border-zinc-400 {
             border-color: #4ade80;
             color: #86efac;
@@ -343,7 +331,6 @@
         .theme-clean h2 { color: #18181b; }
         .theme-clean #userNameInput { color: #27272a; }
         .theme-clean #searchInput::placeholder { color: #a1a1aa; }
-        .theme-clean #quote-container { color: #52525b; }
         .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500, .theme-clean p { color: #52525b; }
         
         .theme-clean .tab-button.border-zinc-400 {
@@ -425,11 +412,6 @@
             </div>
         </div>
 
-        <div id="quote-container" class="text-center my-4">
-            <p id="quote-text" class="text-lg italic"></p>
-            <p id="quote-attribution" class="text-sm mt-1"></p>
-        </div>
-
         <div class="mb-8">
             <div class="flex justify-center flex-wrap border-b border-zinc-700">
                 <button data-tab="dashboard" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
@@ -493,64 +475,28 @@
             </div>
 
             <div id="favorites" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto space-y-8">
-                    <!-- Movies Section -->
-                    <div class="bg-zinc-800 p-4 rounded-lg">
-                        <div id="movies-section-header" class="flex justify-between items-center cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite Movies</h2>
-                            <svg id="movies-arrow" class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                        <div id="movies-section-content" class="mt-4">
-                            <div id="movies-controls" class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                                <div id="movies-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn-movies bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
-                                        <button class="fav-view-btn-movies text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
-                                    </div>
-                                    <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div id="favorites-header" class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                        <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">My Favorites</h2>
+                        <div id="favorites-view-controls" class="flex items-center space-x-4">
+                            <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                <button class="fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
+                                <button class="fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
                             </div>
-                            <div id="movies-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="moviesSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                    <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                    <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                            <p id="moviesMessage" class="text-center text-zinc-500">Your favorite movies will appear here.</p>
-                            <div id="moviesGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="moviesListContainer" class="hidden space-y-3"></div>
+                             <button id="manageFavoritesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                         </div>
                     </div>
-
-                    <!-- TV Shows Section -->
-                    <div class="bg-zinc-800 p-4 rounded-lg">
-                        <div id="tv-section-header" class="flex justify-between items-center cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite TV Shows</h2>
-                            <svg id="tv-arrow" class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                        <div id="tv-section-content" class="mt-4">
-                           <div id="tv-controls" class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                                <div id="tv-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn-tv bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid">Grid</button>
-                                        <button class="fav-view-btn-tv text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list">List</button>
-                                    </div>
-                                    <button id="manageTvBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
-                            </div>
-                             <div id="tv-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="tvSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                    <button id="deleteSelectedTvBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                    <button id="cancelManageTvBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                            <p id="tvMessage" class="text-center text-zinc-500">Your favorite TV shows will appear here.</p>
-                            <div id="tvGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="tvListContainer" class="hidden space-y-3"></div>
+                     <div id="favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
+                        <span id="favoritesSelectedCount" class="text-sm font-medium">0 selected</span>
+                        <div class="flex space-x-2">
+                             <button id="deleteSelectedFavoritesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                             <button id="deleteAllFavoritesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                             <button id="cancelManageFavoritesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                         </div>
                     </div>
+                    <p id="favoritesMessage" class="text-center text-zinc-500">Your favorite shows and movies will appear here.</p>
+                    <div id="favoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                    <div id="favoritesListContainer" class="hidden space-y-3"></div>
                 </div>
             </div>
 
@@ -1684,22 +1630,3 @@
     </script>
 </body>
 </html>
-"
-
-" code between  and  in the most up-to-date Canvas "Entertainment Hub" document above and am asking a query about/based on this code below.
-Instructions to follow:
-  * Don't output/edit the document if the query is Direct/Simple. For example, if the query asks for a simple explanation, output a direct answer.
-  * Make sure to **edit** the document if the query shows the intent of editing the document, in which case output the entire edited document, **not just that section or the edits**.
-    * Don't output the same document/empty document and say that you have edited it.
-    * Don't change unrelated code in the document.
-  * Don't output  and  in your final response.
-  * Any references like "this" or "selected code" refers to the code between  and  tags.
-  * Just acknowledge my request in the introduction.
-  * Make sure to refer to the document as "Canvas" in your response.
-
-i don't see any quotes appearing on the page, but it does look like the space has been increased where i asked you to add it.
-
-i woudl also like you to modify the favorites section to separate out the movies and tv shows. they should be expanding/contracting sections, and both should be able to sort by the grid/list and both should have the manage button in each section. file
-These are the files that the user uploaded:
-{"contentFetchId":"uploaded:image_60e699.png-6e12f6f6-9eb6-4db9-a7fc-a16d5e539f26","fileMimeType":"image/png","fileName":"image_60e699.png","fileNameIsCodeAccessible":true}
-
