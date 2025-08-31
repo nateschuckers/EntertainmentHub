@@ -1054,15 +1054,42 @@
             }
 
             function renderModal(details) {
-                 const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
-                 const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
-                 const isFavorite = state.favorites.some(fav => fav.id === details.id);
-                 const providers = details['watch/providers']?.results?.US?.flatrate || [];
-                 let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
-                 if (providers.length > 0) {
-                         providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
-                 }
-                 
+                const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
+                const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+                const isFavorite = state.favorites.some(fav => fav.id === details.id);
+                const providers = details['watch/providers']?.results?.US?.flatrate || [];
+                let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
+                if (providers.length > 0) {
+                        providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
+                }
+
+                let scoreHtml = '';
+                if (details.vote_average && details.vote_count > 10) {
+                    const score = Math.round(details.vote_average * 10);
+                    let scoreColor = 'bg-zinc-600';
+                    let borderColor = 'border-zinc-500';
+                    
+                    if (score >= 70) {
+                        scoreColor = 'bg-green-600';
+                        borderColor = 'border-green-400';
+                    } else if (score >= 40) {
+                        scoreColor = 'bg-yellow-600';
+                        borderColor = 'border-yellow-400';
+                    } else if (score > 0) {
+                        scoreColor = 'bg-red-600';
+                        borderColor = 'border-red-400';
+                    }
+
+                    scoreHtml = `
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center ${scoreColor} text-white font-bold text-lg border-2 ${borderColor}">
+                                ${score}<span class="text-xs">%</span>
+                            </div>
+                            <span class="font-semibold text-lg">User Score</span>
+                        </div>
+                    `;
+                }
+                
                 let manualTimeHtml = '';
                 const mediaType = details.title ? 'movie' : 'tv';
                 if (mediaType === 'tv') {
@@ -1079,18 +1106,18 @@
                             </div>`;
                     }
                 }
-                 
-                 modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
-                 
-                 const favoriteButton = $('favoriteButton');
-                 if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
-                 
-                 const editTimeButton = $('editTimeButton');
-                 if(editTimeButton) editTimeButton.addEventListener('click', () => editManualTime(details));
+                
+                modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p>${scoreHtml}<button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
+                
+                const favoriteButton = $('favoriteButton');
+                if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
+                
+                const editTimeButton = $('editTimeButton');
+                if(editTimeButton) editTimeButton.addEventListener('click', () => editManualTime(details));
 
-                 modal.classList.remove('hidden');
-                 const closeModalBtn = $('closeModal');
-                 if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+                modal.classList.remove('hidden');
+                const closeModalBtn = $('closeModal');
+                if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
             }
 
             function editManualTime(details) {
@@ -1713,3 +1740,4 @@
     </script>
 </body>
 </html>
+
