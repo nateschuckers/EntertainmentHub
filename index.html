@@ -363,55 +363,6 @@
         .theme-clean #scheduleContent::-webkit-scrollbar-thumb { background-color: #a1a1aa; }
         .theme-clean #scheduleContent::-webkit-scrollbar-track { background-color: #e4e4e7; }
         
-        /* --- NEW: CSS for Score Gauge --- */
-        .score-circle {
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #081c22;
-            position: relative;
-            color: white;
-            flex-shrink: 0;
-        }
-        .score-circle-inner {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #18181b; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-        .score-circle-inner span {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-        .score-circle-inner sup {
-            font-size: 0.75rem;
-            top: -0.5em;
-        }
-        .score-circle::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 68px;
-            height: 68px;
-            margin: -34px 0 0 -34px;
-            border-radius: 50%;
-            background: conic-gradient(
-                var(--score-color-fg) calc(var(--score-percent) * 1%), 
-                var(--score-color-bg) 0
-            );
-        }
-        .score-circle.high-score { --score-color-fg: #21d07a; --score-color-bg: #204529; }
-        .score-circle.medium-score { --score-color-fg: #d2d531; --score-color-bg: #423d0f; }
-        .score-circle.low-score { --score-color-fg: #db2360; --score-color-bg: #571435; }
-        .score-circle.no-score { --score-color-fg: #666666; --score-color-bg: #333333; }
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
@@ -502,4 +453,1252 @@
                              <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
                             <div class="relative">
                                 <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-
+                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-results" class="tab-content hidden">
+                 <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
+                <p id="searchResultsMessage" class="text-center text-zinc-500">Search for something to see results.</p>
+                <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+            </div>
+
+            <div id="favorites" class="tab-content hidden">
+                <div class="max-w-5xl mx-auto">
+                    <details class="mb-8 group" open>
+                        <summary class="list-none flex items-center justify-between cursor-pointer">
+                            <h2 class="text-2xl font-bold">Favorite Movies</h2>
+                            <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="mt-4">
+                            <div id="movie-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
+                                <div id="movie-favorites-view-controls" class="flex items-center space-x-4">
+                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                        <button class="fav-view-btn movie-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
+                                        <button class="fav-view-btn movie-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
+                                    </div>
+                                    <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                                </div>
+                            </div>
+                             <div id="movie-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
+                                <span id="movieFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
+                                <div class="flex space-x-2">
+                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="deleteAllMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                                     <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
+                                </div>
+                            </div>
+                            <p id="movieFavoritesMessage" class="text-center text-zinc-500"></p>
+                            <div id="movieFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                            <div id="movieFavoritesListContainer" class="hidden space-y-3"></div>
+                        </div>
+                    </details>
+                    
+                    <details class="group" open>
+                        <summary class="list-none flex items-center justify-between cursor-pointer">
+                            <h2 class="text-2xl font-bold">Favorite TV Shows</h2>
+                             <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                         <div class="mt-4">
+                            <div id="tv-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
+                                <div id="tv-favorites-view-controls" class="flex items-center space-x-4">
+                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                        <button class="fav-view-btn tv-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
+                                        <button class="fav-view-btn tv-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
+                                    </div>
+                                    <button id="manageTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                                </div>
+                            </div>
+                             <div id="tv-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
+                                <span id="tvFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
+                                <div class="flex space-x-2">
+                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="deleteAllTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                                     <button id="cancelManageTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
+                                </div>
+                            </div>
+                             <p id="tvFavoritesMessage" class="text-center text-zinc-500"></p>
+                            <div id="tvFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                            <div id="tvFavoritesListContainer" class="hidden space-y-3"></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div id="schedule" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                        <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming Episodes</h2>
+                        <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                            <button class="schedule-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
+                            <button class="schedule-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
+                        </div>
+                    </div>
+                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
+                     <p id="scheduleMessage" class="text-center text-zinc-500 mt-4 hidden"></p>
+                </div>
+            </div>
+
+            <div id="settings" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg space-y-8">
+                    <div id="accountSection"></div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4">What's Your Name, Man?</h2>
+                        <p class="text-zinc-400 mb-4">Personalize your dashboard greeting, lest you be known as "The Dude".</p>
+                        <div class="flex flex-col sm:flex-row sm:space-x-2">
+                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500" placeholder="Enter your name">
+                            <button id="saveUserNameButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
+                        </div>
+                         <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
+                    </div>
+                     <div>
+                        <h2 class="text-2xl font-bold mb-4">Choose Your Destiny</h2>
+                        <div id="themeSelector" class="flex space-x-2">
+                            <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
+                            <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
+                            <button data-theme="scifi" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Sci-Fi</button>
+                            <button data-theme="clean" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Clean</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4">The Fellowship of the Stream</h2>
+                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience. One does not simply watch all of them.</p>
+                        <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                    </div>
+                    <div id="danger-zone" class="border-t border-red-900/50 pt-6">
+                        <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
+                        <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
+                            <div>
+                                <h3 class="font-bold">This is the Way... Out</h3>
+                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data. I have spoken.</p>
+                            </div>
+                             <button id="deleteAccountBtn" class="mt-4 sm:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="loadingSpinner" class="hidden fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-50">
+             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-500"></div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal-backdrop hidden">
+        <div id="modalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
+    </div>
+
+    <div id="suggestion-avatar-btn">
+        <svg id="default-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#3b82f6" stroke="#fafafa" stroke-width="4"/>
+            <text x="50" y="65" font-size="50" fill="#fafafa" text-anchor="middle" font-family="Arial, sans-serif">?</text>
+        </svg>
+        <svg id="pinhead-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#111" stroke="#b91c1c" stroke-width="4"/>
+            <circle cx="50" cy="50" r="40" fill="#222"/>
+            <path d="M50 10 V 90 M10 50 H 90 M22 22 L 78 78 M22 78 L 78 22" stroke="#555" stroke-width="2"/>
+            <circle cx="50" cy="50" r="3" fill="#b91c1c"/>
+        </svg>
+        <svg id="alien-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="50" fill="#1a2f38"/>
+            <path d="M50 15 C 65 15, 85 30, 85 50 C 85 80, 65 95, 50 95 C 35 95, 15 80, 15 50 C 15 30, 35 15, 50 15 Z" fill="#111e24"/>
+            <path d="M50 20 C 70 20, 80 35, 80 50 C 80 70, 70 85, 50 90 C 30 85, 20 70, 20 50 C 20 35, 30 20, 50 20 Z" fill="#15803d" opacity="0.3"/>
+            <path d="M40 75 Q 50 65, 60 75" stroke="#86efac" stroke-width="2" fill="none"/>
+        </svg>
+        <svg id="pulp-fiction-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="50" fill="#e4e4e7"/>
+            <path d="M 50,30 A 20,15 0 0 0 50,60" fill="#18181b"/>
+            <rect x="30" y="30" width="40" height="10" fill="#18181b"/>
+            <rect x="48" y="60" width="4" height="10" fill="#18181b" />
+        </svg>
+    </div>
+
+     <div id="suggestionModal" class="modal-backdrop hidden">
+        <div id="suggestionModalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
+            <button id="closeSuggestionModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button>
+            <h2 id="suggestionModalTitle" class="text-2xl font-bold mb-2">Got a Suggestion?</h2>
+            <p id="suggestionModalSubtitle" class="text-zinc-400 mb-4">We'd love to hear it. Let us know what we can do to improve your experience.</p>
+            <form id="suggestionForm">
+                <textarea id="suggestionText" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 h-32" placeholder="Your suggestion..."></textarea>
+                <button type="submit" class="w-full mt-4 bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded-lg transition">Send It</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        async function initializeAppWithConfig() {
+            function renderConfigError(message) {
+                const errorScreen = document.getElementById('configErrorScreen');
+                errorScreen.innerHTML = `<div class="config-error-box"><h1>Application Error</h1><p>${message}</p></div>`;
+                errorScreen.classList.remove('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('app').classList.add('hidden');
+            }
+
+            try {
+                const response = await fetch('/.netlify/functions/get-firebase-config');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server returned status ${response.status}. Response: ${errorText.substring(0, 200)}...`);
+                }
+                const firebaseConfig = await response.json();
+                
+                if (!firebaseConfig.apiKey) {
+                     throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
+                }
+                runApp(firebaseConfig);
+
+            } catch (error) {
+                let errorMessage = error.message;
+                if (error instanceof SyntaxError) {
+                    errorMessage = "The server returned an invalid response (likely HTML instead of JSON). This is a routing issue. Please ensure your netlify.toml redirect rule is correct.";
+                }
+                renderConfigError(errorMessage);
+            }
+        }
+
+        function runApp(firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const googleProvider = new GoogleAuthProvider();
+            let userDocRef = null;
+            let unsubscribeUserDoc = null;
+            let isDataLoaded = false;
+            let userId = null;
+
+            const themeContent = {
+                default: {
+                    title: "Entertainment Hub",
+                    subtitle: "Find where to watch your favorite shows and movies."
+                },
+                horror: {
+                    title: "The Overlook",
+                    subtitle: "All play and no work makes for a great watchlist."
+                },
+                scifi: {
+                    title: "Game Over, Man!",
+                    subtitle: "Find your next great watch before it's too late."
+                },
+                clean: {
+                    title: "There Will Be Shows",
+                    subtitle: "Find the next series you can really sink your teeth into."
+                }
+            };
+
+            function updateHeaderText(theme) {
+                const content = themeContent[theme] || themeContent.default;
+                const loginTitle = document.getElementById('loginTitle');
+                const mainTitle = document.getElementById('mainTitle');
+                const mainSubtitle = document.getElementById('mainSubtitle');
+
+                if (loginTitle) loginTitle.textContent = content.title;
+                if (mainTitle) mainTitle.textContent = content.title;
+                if (mainSubtitle) mainSubtitle.textContent = content.subtitle;
+            }
+
+            const state = {
+                userName: null,
+                theme: 'default',
+                activeTab: 'dashboard',
+                movieFavoritesView: 'grid',
+                tvFavoritesView: 'grid',
+                scheduleView: 'agenda',
+                dashboardScheduleFilter: 'today',
+                isManagingMovies: false,
+                isManagingTvs: false,
+                currentDate: new Date(),
+                subscriptions: [],
+                favorites: [],
+                scheduledEpisodes: [],
+                streamingServices: [
+                    { id: 528, name: 'AMC+', logo: 'l4g1BT502p1H42a3j1s2lG9nK.jpg' },
+                    { id: 9, name: 'Amazon Prime', logo: '68MNdJkIZ1hqhGPY3e4L2MSuD1I.jpg' },
+                    { id: 2, name: 'Apple TV+', logo: '3oTfWy5TAmY5822b53eKwL1xS2z.jpg' },
+                    { id: 26, name: 'Criterion Channel', logo: 'hFCiMC5st22wV3weHl15qj7N0v1.jpg' },
+                    { id: 337, name: 'Disney+', logo: '7rwgEs15tFwyR9NPQ5vpzxTj1Ae.jpg' },
+                    { id: 257, name: 'FuboTV', logo: 'fVjXoJkU1H_2p7iN1b1g2p1fOUl.jpg' },
+                    { id: 15, name: 'Hulu', logo: 'uJ2w33J32O2h05Iu1CjC7mGn4T.jpg' },
+                    { id: 1899, name: 'Max', logo: '2a0aJqjuiD5ytdcZz2uISeidU8C.jpg' },
+                    { id: 8, name: 'Netflix', logo: 'ar4pMQERJSYppG3Qfo9ltM4S2sM.jpg' },
+                    { id: 531, name: 'Paramount+', logo: 'zBv2r2k2sV3E9s08i0lBq4vIZy.jpg' },
+                    { id: 387, name: 'Peacock', logo: 'pZGE52Lz17c38gNT7P7y0B0iC4.jpg' },
+                    { id: 37, name: 'Showtime', logo: 'oF4enqrXXsFRU3aG2I32vpsbQv.jpg' },
+                    { id: 43, name: 'Starz', logo: 'crFbxgG3JSddT2DAorfOqdfE5s9.jpg' }
+                ]
+            };
+            
+            const $ = (selector) => document.getElementById(selector);
+            
+            const loginScreen = $('loginScreen'), mainApp = $('app'), accountSection = $('accountSection'), modal = $('detailsModal'), modalContent = $('modalContent'),
+            searchInput = $('searchInput'), searchButton = $('searchButton'), liveSearchResults = $('liveSearchResults'), searchResultsContainer = $('searchResultsContainer'), 
+            searchResultsMessage = $('searchResultsMessage'), 
+            movieFavoritesContainer = $('movieFavoritesContainer'), movieFavoritesListContainer = $('movieFavoritesListContainer'), movieFavoritesMessage = $('movieFavoritesMessage'),
+            tvFavoritesContainer = $('tvFavoritesContainer'), tvFavoritesListContainer = $('tvFavoritesListContainer'), tvFavoritesMessage = $('tvFavoritesMessage'),
+            scheduleContent = $('scheduleContent'), scheduleMessage = $('scheduleMessage'), subscriptionList = $('subscriptionList'), userNameInput = $('userNameInput'), 
+            saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage'), dashboardUserName = $('dashboardUserName'), upcomingContainer = $('upcomingContainer'),
+            trendingContainer = $('trendingContainer'), upcomingMoviesContainer = $('upcomingMoviesContainer'), scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'),
+            scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
+            
+            const tabs = document.querySelectorAll('.tab-button');
+            const scheduleViewBtns = document.querySelectorAll('.schedule-view-btn');
+            const upcomingFilterBtns = document.querySelectorAll('.upcoming-filter-btn');
+            const themeBtns = document.querySelectorAll('.theme-btn');
+            const suggestionAvatarBtn = $('suggestion-avatar-btn');
+            const suggestionModal = $('suggestionModal');
+            const closeSuggestionModalBtn = $('closeSuggestionModal');
+            const suggestionForm = $('suggestionForm');
+
+            onAuthStateChanged(auth, (user) => {
+                if (unsubscribeUserDoc) unsubscribeUserDoc();
+                isDataLoaded = false;
+
+                if (user) {
+                    userId = user.uid;
+                    userDocRef = doc(db, "users", userId);
+                    loginScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    suggestionAvatarBtn.classList.remove('hidden');
+                    
+                    unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+                        const wasAlreadyLoaded = isDataLoaded;
+                        if (docSnap.exists()) {
+                            loadDataFromFirestore(docSnap.data());
+                        } else {
+                            if(isDataLoaded) return;
+                            saveDataToFirestore();
+                            return; 
+                        }
+                        
+                        applyTheme(state.theme);
+
+                        if (!wasAlreadyLoaded) {
+                           isDataLoaded = true;
+                           initAppUI(); 
+                        } else {
+                           refreshCurrentView();
+                        }
+                    });
+                } else {
+                    userId = null;
+                    userDocRef = null;
+                    applyTheme('default'); // Reset to default on logout
+                    loginScreen.classList.remove('hidden');
+                    mainApp.classList.add('hidden');
+                    suggestionAvatarBtn.classList.add('hidden');
+                    state.favorites = [];
+                    state.subscriptions = [];
+                    state.userName = null;
+                }
+            });
+
+            function handleGoogleSignIn() {
+                signInWithPopup(auth, googleProvider).catch(console.error);
+            }
+
+            function updateAccountSection() {
+                const user = auth.currentUser;
+                if (user) {
+                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-zinc-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
+                    const signOutButton = $('signOutButton');
+                    if(signOutButton) signOutButton.addEventListener('click', () => signOut(auth));
+                    const deleteAccountBtn = $('deleteAccountBtn');
+                    if(deleteAccountBtn) deleteAccountBtn.addEventListener('click', handleDeleteAccount);
+                }
+            }
+
+            function handleDeleteAccount() {
+                showConfirmationModal("Are you sure you want to delete your account and all data? This action cannot be undone.", async () => {
+                    if (userDocRef) {
+                        try {
+                            await deleteDoc(userDocRef);
+                            await signOut(auth);
+                        } catch (e) {
+                            console.error("Error deleting document: ", e);
+                        }
+                    }
+                });
+            }
+
+            function showConfirmationModal(message, onConfirm) {
+                const confirmModalContent = `
+                    <div class="text-center p-6">
+                        <h2 class="text-2xl font-bold mb-4 text-red-400">Are you sure?</h2>
+                        <p class="text-zinc-300 mb-6">${message}</p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="confirmCancel" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-2 px-6 rounded-lg transition">Cancel</button>
+                            <button id="confirmAction" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">Confirm</button>
+                        </div>
+                    </div>`;
+                modalContent.innerHTML = confirmModalContent;
+                modal.classList.remove('hidden');
+                
+                $('confirmAction').addEventListener('click', () => {
+                    onConfirm();
+                    closeModal();
+                });
+                $('confirmCancel').addEventListener('click', closeModal);
+            }
+                
+            async function saveDataToFirestore() {
+                if (!userDocRef) return;
+                const dataToSave = {
+                    userName: state.userName,
+                    subscriptions: state.subscriptions,
+                    favorites: state.favorites,
+                    theme: state.theme
+                };
+                try {
+                    await setDoc(userDocRef, dataToSave, { merge: true });
+                } catch (e) {
+                    console.error("Error writing document: ", e);
+                }
+            }
+
+            function loadDataFromFirestore(data) {
+                state.userName = data.userName || null;
+                state.subscriptions = data.subscriptions || [];
+                state.favorites = data.favorites || [];
+                state.theme = data.theme || 'default';
+                if (userNameInput && state.userName) userNameInput.value = state.userName;
+            }
+
+            function applyTheme(theme) {
+                document.body.className = 'bg-zinc-900 text-zinc-200'; // Reset body classes
+                if(theme === 'horror' || theme === 'scifi' || theme === 'clean') {
+                    document.body.classList.add(`theme-${theme}`);
+                }
+                
+                updateHeaderText(theme);
+
+                themeBtns.forEach(btn => {
+                    const isSelected = btn.dataset.theme === theme;
+                    btn.classList.toggle('bg-zinc-900', isSelected); // Used as a "selected" marker by CSS
+                    btn.classList.toggle('text-white', isSelected);
+                    btn.classList.toggle('bg-zinc-700', !isSelected);
+                    btn.classList.toggle('text-zinc-300', !isSelected);
+                });
+            }
+
+            async function apiFetch(endpoint) {
+                const url = `/.netlify/functions/tmdb?endpoint=${encodeURIComponent(endpoint)}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Network response was not ok');
+                }
+                return response.json();
+            }
+            
+            function promptForLogin(feature = 'this feature') {
+                 modalContent.innerHTML = `<div class="text-center p-4"><h2 class="text-2xl font-bold mb-4">Please Sign In</h2><p class="text-zinc-400 mb-6">To use ${feature}, you need to be signed in.</p><button id="modalSignInButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition">Sign in with Google</button><button id="modalCloseButton" class="mt-4 text-zinc-400 hover:text-white">Cancel</button></div>`;
+                 modal.classList.remove('hidden');
+                 $('modalSignInButton').addEventListener('click', () => { handleGoogleSignIn(); closeModal(); });
+                 $('modalCloseButton').addEventListener('click', closeModal);
+            }
+            
+            function toggleSubscription(serviceId) {
+                if (!userId) { promptForLogin('managing subscriptions'); return; }
+                const index = state.subscriptions.indexOf(serviceId);
+                if (index > -1) state.subscriptions.splice(index, 1);
+                else state.subscriptions.push(serviceId);
+                saveDataToFirestore();
+            }
+
+            function toggleFavorite(mediaItem) {
+                if (!userId) { promptForLogin('saving favorites'); return; }
+                const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
+                if (index > -1) {
+                    state.favorites.splice(index, 1);
+                } else {
+                    state.favorites.push({
+                        id: mediaItem.id,
+                        name: mediaItem.name || null,
+                        title: mediaItem.title || null,
+                        poster_path: mediaItem.poster_path, 
+                        first_air_date: mediaItem.first_air_date || null,
+                        release_date: mediaItem.release_date || null, 
+                        media_type: mediaItem.title ? 'movie' : 'tv',
+                        manualTime: null
+                    });
+                }
+                saveDataToFirestore();
+                renderModal(mediaItem);
+            }
+            
+            async function switchTab(tabName) {
+                state.activeTab = tabName;
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                const tabEl = $(tabName);
+                if (tabEl) tabEl.classList.remove('hidden');
+                
+                tabs.forEach(tab => {
+                    const isCurrentTab = tab.dataset.tab === tabName;
+                    tab.classList.toggle('text-zinc-400', isCurrentTab);
+                    tab.classList.toggle('border-zinc-400', isCurrentTab);
+                    tab.classList.toggle('font-medium', isCurrentTab);
+                    tab.classList.toggle('text-zinc-500', !isCurrentTab);
+                    tab.classList.toggle('border-transparent', !isCurrentTab);
+                });
+
+                if (tabName === 'dashboard') await fetchDashboardData();
+                if (tabName === 'favorites') await renderFavorites();
+                if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); }
+            }
+
+            function createMediaCard(item, isManageMode = false) {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'relative favorite-card';
+
+                const card = document.createElement('div');
+                card.className = 'bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
+                card.dataset.id = item.id;
+                card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv');
+                const title = item.title || item.name;
+                const releaseDate = item.release_date || item.first_air_date;
+                const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
+                const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover transition-all duration-300"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
+                
+                if (isManageMode) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'favorite-card-manage-overlay';
+                    overlay.innerHTML = `
+                        <svg class="x-mark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                            <circle cx="26" cy="26" r="25" fill="rgba(239, 68, 68, 0.7)"/>
+                            <path stroke="white" stroke-width="5" d="M16 16 36 36 M36 16 16 36" />
+                        </svg>
+                    `;
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'favorite-card-manage-checkbox w-full h-full absolute top-0 left-0';
+                    checkbox.value = item.id;
+                    overlay.appendChild(checkbox);
+                    cardWrapper.appendChild(overlay);
+
+                    cardWrapper.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        checkbox.checked = !checkbox.checked;
+                        cardWrapper.classList.toggle('selected');
+                        updateSelectedCount(card.dataset.type);
+                    });
+                } else {
+                     card.classList.add('cursor-pointer');
+                     card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
+                }
+
+                cardWrapper.appendChild(card);
+                return cardWrapper;
+            }
+
+            function renderSearchResults(mediaResults = []) {
+                const validMedia = mediaResults.filter(item => item.media_type !== 'person' && item.poster_path);
+                searchResultsContainer.innerHTML = '';
+                searchResultsMessage.classList.add('hidden');
+                if (validMedia.length === 0) {
+                    searchResultsMessage.textContent = 'No results found.';
+                    searchResultsMessage.classList.remove('hidden');
+                    return;
+                }
+                validMedia.forEach(item => searchResultsContainer.appendChild(createMediaCard(item)));
+            }
+            
+            function renderLiveSearchResults(results = []) {
+                liveSearchResults.innerHTML = '';
+                const validResults = results.filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5);
+                if (validResults.length === 0) {
+                    liveSearchResults.classList.add('hidden');
+                    return;
+                }
+                validResults.forEach(item => {
+                    const title = item.title || item.name;
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center space-x-3 p-3 hover:bg-zinc-700 cursor-pointer';
+                    el.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-10 h-auto rounded-md"><span>${title}</span>`;
+                    el.addEventListener('click', () => {
+                        getMediaDetails(item.id, item.media_type);
+                        liveSearchResults.classList.add('hidden');
+                        searchInput.value = '';
+                    });
+                    liveSearchResults.appendChild(el);
+                });
+                liveSearchResults.classList.remove('hidden');
+            }
+
+
+            function renderSubscriptions() {
+                subscriptionList.innerHTML = '';
+                state.streamingServices.forEach(service => {
+                    const isChecked = state.subscriptions.includes(service.id);
+                    const logoUrl = `https://image.tmdb.org/t/p/w92/${service.logo}`;
+                    const item = document.createElement('div');
+                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300`;
+                    item.classList.toggle('bg-zinc-900', isChecked);
+                    item.classList.toggle('bg-zinc-700', !isChecked);
+                    item.dataset.serviceId = service.id;
+                    item.innerHTML = `<img src="${logoUrl}" alt="${service.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${service.name}</span>`;
+                    item.addEventListener('click', () => toggleSubscription(service.id));
+                    subscriptionList.appendChild(item);
+                });
+            }
+
+            function renderModal(details) {
+                 const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
+                 const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+                 const isFavorite = state.favorites.some(fav => fav.id === details.id);
+                 const providers = details['watch/providers']?.results?.US?.flatrate || [];
+                 let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
+                 if (providers.length > 0) {
+                       providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
+                 }
+                 
+                let manualTimeHtml = '';
+                const mediaType = details.title ? 'movie' : 'tv';
+                if (mediaType === 'tv') {
+                    const favorite = state.favorites.find(f => f.id === details.id);
+                    if (favorite) {
+                        manualTimeHtml = `
+                            <div class="mt-4 pt-4 border-t border-zinc-700">
+                                <h3 class="text-xl font-semibold mb-2">Manual Air Time</h3>
+                                <p class="text-zinc-400 text-sm mb-2">Set a time to help sort your schedule (e.g., "9:00 PM EST").</p>
+                                <div id="manualTimeContainer" class="flex items-center space-x-4">
+                                    <p id="manualTimeDisplay" class="text-zinc-300 flex-grow">${favorite.manualTime || 'Not set'}</p>
+                                    <button id="editTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button>
+                                </div>
+                            </div>`;
+                    }
+                }
+                 
+                 modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
+                 
+                 const favoriteButton = $('favoriteButton');
+                 if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
+                 
+                 const editTimeButton = $('editTimeButton');
+                 if(editTimeButton) editTimeButton.addEventListener('click', () => editManualTime(details));
+
+                 modal.classList.remove('hidden');
+                 const closeModalBtn = $('closeModal');
+                 if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            }
+
+            function editManualTime(details) {
+                const favorite = state.favorites.find(f => f.id === details.id);
+                if (!favorite) return;
+
+                const container = $('manualTimeContainer');
+                container.innerHTML = `
+                    <div class="flex-grow">
+                        <input type="text" id="timeInput" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="saveTimeButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1 px-3 rounded text-sm">Save</button>
+                        <button id="cancelTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button>
+                    </div>
+                `;
+
+                $('saveTimeButton').addEventListener('click', () => {
+                    const newTime = $('timeInput').value.trim();
+                    const favIndex = state.favorites.findIndex(f => f.id === details.id);
+                    if (favIndex > -1) {
+                        state.favorites[favIndex].manualTime = newTime;
+                    }
+                    saveDataToFirestore();
+                    renderModal(details); 
+                });
+                $('cancelTimeButton').addEventListener('click', () => renderModal(details));
+            }
+
+            function parseTimeToMinutes(timeString) {
+                if (!timeString || typeof timeString !== 'string') return 9999; 
+                const time = timeString.toLowerCase().trim();
+                let hours = 0;
+                let minutes = 0;
+                const match = time.match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/);
+                if (match) {
+                    hours = parseInt(match[1], 10);
+                    minutes = match[2] ? parseInt(match[2], 10) : 0;
+                    const period = match[3];
+                    if (period === 'pm' && hours < 12) hours += 12;
+                    if (period === 'am' && hours === 12) hours = 0;
+                }
+                return hours * 60 + minutes;
+            }
+
+            async function searchMedia(query, isLiveSearch = false) {
+                if (!query) { liveSearchResults.classList.add('hidden'); return; }
+                if(!isLiveSearch) showLoading();
+                try {
+                    const data = await apiFetch(`search/multi?query=${query}`);
+                    if (isLiveSearch) {
+                        renderLiveSearchResults(data.results);
+                    } else {
+                        renderSearchResults(data.results);
+                    }
+                } catch (error) {
+                    console.error('Search failed:', error);
+                    if (!isLiveSearch) {
+                        searchResultsMessage.textContent = "Search failed. Please try again.";
+                        searchResultsMessage.classList.remove('hidden');
+                    }
+                } finally {
+                    if(!isLiveSearch) hideLoading();
+                }
+            }
+
+            async function getMediaDetails(id, type) {
+                showLoading();
+                try {
+                    const data = await apiFetch(`${type}/${id}?append_to_response=watch/providers,credits`);
+                    renderModal(data);
+                } catch (error) {
+                    console.error('Failed to get details:', error);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            async function renderFavorites() {
+                const movieFavorites = state.favorites.filter(f => f.media_type === 'movie');
+                const tvFavorites = state.favorites.filter(f => f.media_type === 'tv');
+
+                await renderFavoriteSection('movie', movieFavorites);
+                await renderFavoriteSection('tv', tvFavorites);
+            }
+
+            async function renderFavoriteSection(type, items) {
+                const isManaging = type === 'movie' ? state.isManagingMovies : state.isManagingTvs;
+                const view = type === 'movie' ? state.movieFavoritesView : state.tvFavoritesView;
+                
+                const viewControls = $(`${type}-favorites-view-controls`);
+                const manageControls = $(`${type}-favorites-manage-controls`);
+                const messageEl = $(`${type}FavoritesMessage`);
+                const gridContainer = $(`${type}FavoritesContainer`);
+                const listContainer = $(`${type}FavoritesListContainer`);
+
+                viewControls.parentElement.classList.toggle('hidden', isManaging);
+                manageControls.classList.toggle('hidden', !isManaging);
+                
+                messageEl.classList.toggle('hidden', items.length > 0);
+                if (items.length === 0) {
+                    gridContainer.innerHTML = '';
+                    listContainer.innerHTML = '';
+                    messageEl.textContent = `You have no favorite ${type === 'movie' ? 'movies' : 'TV shows'}.`;
+                    return;
+                }
+                
+                const sortedItems = [...items].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
+
+                if (view === 'grid') {
+                    gridContainer.classList.remove('hidden');
+                    listContainer.classList.add('hidden');
+                    gridContainer.innerHTML = '';
+                    sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
+                } else {
+                    gridContainer.classList.add('hidden');
+                    listContainer.classList.remove('hidden');
+                    // Manage mode is not supported for list view; it will always show the regular list.
+                    await renderFavoritesList(sortedItems, listContainer);
+                }
+                updateSelectedCount(type);
+            }
+            
+            async function renderFavoritesList(sortedFavorites, container) {
+                container.innerHTML = '';
+                if(sortedFavorites.length === 0) return;
+
+                showLoading();
+                try {
+                    const providerPromises = sortedFavorites.map(fav => apiFetch(`${fav.media_type}/${fav.id}?append_to_response=watch/providers`));
+                    const favoritesWithDetails = await Promise.all(providerPromises);
+
+                    favoritesWithDetails.forEach(details => {
+                        const title = details.title || details.name;
+                        const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A';
+                        const providers = details['watch/providers']?.results?.US?.flatrate || [];
+                        let providersHtml = '<span class="text-zinc-400 text-sm">Not on streaming</span>';
+                        if (providers.length > 0) {
+                            providersHtml = providers.map(p => `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="h-8 w-8 rounded-md object-cover" title="${p.provider_name}">`).join('');
+                        }
+                        const listItem = document.createElement('div');
+                        listItem.className = 'flex items-center space-x-4 p-3 bg-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-700';
+                        listItem.innerHTML = `
+                            <img src="${posterUrl}" class="w-12 h-auto rounded-md flex-shrink-0">
+                            <div class="flex-grow min-w-0"><p class="font-bold truncate">${title}</p></div>
+                            <div class="flex flex-wrap gap-2 justify-end items-center flex-shrink" style="max-width: 50%;">${providersHtml}</div>
+                        `;
+                        listItem.addEventListener('click', () => getMediaDetails(details.id, details.title ? 'movie' : 'tv'));
+                        container.appendChild(listItem);
+                    });
+                } catch (error) {
+                    console.error("Error fetching favorites details:", error);
+                    container.innerHTML = `<p class="text-center text-red-400">Could not load details.</p>`;
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            function updateSelectedCount(type) {
+                const container = $(`${type}FavoritesContainer`);
+                const countEl = $(`${type}FavoritesSelectedCount`);
+                if (!container || !countEl) return;
+                const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
+                countEl.textContent = `${selected.length} selected`;
+            }
+            
+            async function fetchDashboardData() {
+                showLoading();
+                try {
+                    dashboardUserName.textContent = state.userName || 'You';
+                    const trendingPromise = apiFetch(`trending/all/day`);
+                    const upcomingPromise = apiFetch(`movie/upcoming`);
+                    const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, fetchScheduleData(true)]);
+                    
+                    renderDashboardTrending(trendingData.results);
+                    renderDashboardUpcomingMovies(upcomingData.results);
+                    renderDashboardUpcoming();
+                } catch (error) {
+                    console.error("Failed to load dashboard:", error);
+                    upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
+                    trendingContainer.innerHTML = '';
+                    upcomingMoviesContainer.innerHTML = '';
+                } finally {
+                    hideLoading();
+                }
+            }
+            
+            function renderDashboardTrending(items = []) {
+                trendingContainer.innerHTML = '';
+                if(items.length === 0) { return; }
+                items.filter(item => item.poster_path).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
+                    card.addEventListener('click', () => getMediaDetails(item.id, item.media_type));
+                    trendingContainer.appendChild(card);
+                });
+            }
+
+            function renderDashboardUpcomingMovies(items = []) {
+                upcomingMoviesContainer.innerHTML = '';
+                if(items.length === 0) { return; }
+                items.filter(item => item.poster_path).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                    const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title}</p><p class="text-xs text-zinc-300">${releaseDate}</p>`;
+                    card.addEventListener('click', () => getMediaDetails(item.id, 'movie'));
+                    upcomingMoviesContainer.appendChild(card);
+                });
+            }
+
+            function parseLocalDate(dateString) {
+                if (!dateString) return null;
+                const [year, month, day] = dateString.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+            
+            async function fetchScheduleData(isDashboard = false) {
+                const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
+                if (!isDashboard) scheduleMessage.classList.add('hidden');
+                
+                if (favoriteTvShows.length === 0) {
+                    state.scheduledEpisodes = [];
+                    return;
+                }
+
+                if (!isDashboard) showLoading();
+                try {
+                    const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
+                    
+                    const showDetailResults = await Promise.allSettled(showDetailPromises);
+                    const showDetailsList = showDetailResults
+                        .filter(result => result.status === 'fulfilled')
+                        .map(result => result.value);
+
+                    const seasonPromises = [];
+                    for (const showDetail of showDetailsList) {
+                        if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
+                            // Find the most recent season with a future air date, or the latest overall season
+                            const futureSeasons = showDetail.seasons.filter(s => s.air_date && new Date(s.air_date) > new Date());
+                            let seasonToFetch = futureSeasons.sort((a,b) => new Date(a.air_date) - new Date(b.air_date))[0];
+                            if(!seasonToFetch) {
+                                seasonToFetch = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
+                            }
+
+                            if (seasonToFetch) {
+                                seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${seasonToFetch.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
+                            }
+                        }
+                    }
+                    
+                    const seasonDetailResults = await Promise.allSettled(seasonPromises);
+                    const seasonDetailsList = seasonDetailResults
+                        .filter(result => result.status === 'fulfilled')
+                        .map(result => result.value);
+
+                    const allEpisodes = [];
+                    for (const season of seasonDetailsList) {
+                        if (season.episodes) {
+                            const us_providers = season.providers?.results?.US?.flatrate || [];
+                            const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
+                            let displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks && season.networks.length > 0 ? season.networks[0] : null);
+                            const episodesWithContext = season.episodes.filter(ep => ep.air_date).map(ep => ({ ...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork }));
+                            allEpisodes.push(...episodesWithContext);
+                        }
+                    }
+                    state.scheduledEpisodes = allEpisodes;
+
+                } catch (error) {
+                    console.error("Error fetching schedule data:", error);
+                    if (!isDashboard) {
+                        scheduleMessage.textContent = "Could not load schedule data.";
+                        scheduleMessage.classList.remove('hidden');
+                    }
+                    state.scheduledEpisodes = [];
+                } finally {
+                    if (!isDashboard) hideLoading();
+                }
+            }
+            
+            function renderDashboardUpcoming() {
+                upcomingContainer.innerHTML = '';
+                 const today = new Date(); today.setHours(0,0,0,0);
+                 let endDate = new Date(today);
+                 if (state.dashboardScheduleFilter === 'today') {} 
+                 else if (state.dashboardScheduleFilter === 'week') { endDate.setDate(today.getDate() + 6); } 
+                 else if (state.dashboardScheduleFilter === 'month') { endDate.setMonth(today.getMonth() + 1); }
+
+                 const upcoming = state.scheduledEpisodes
+                    .map(ep => {
+                        const favorite = state.favorites.find(f => f.id === ep.showId);
+                        return { ...ep, manualTime: favorite ? favorite.manualTime : null };
+                    })
+                     .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
+                     .sort((a,b) => {
+                         const dateA = parseLocalDate(a.air_date);
+                         const dateB = parseLocalDate(b.air_date);
+                         if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+                         return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
+                     });
+
+                 if (upcoming.length === 0) {
+                       upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                       return;
+                 }
+                
+                 upcoming.forEach(ep => {
+                     const el = document.createElement('div');
+                     el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
+                     const airDate = parseLocalDate(ep.air_date);
+                     const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
+                     const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                     let networkHtml = '';
+                     if (ep.displayNetwork && ep.displayNetwork.logo_path) {
+                         networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" title="${ep.displayNetwork.name}">`;
+                     } else if (ep.displayNetwork) {
+                         networkHtml = `<span class="text-xs text-zinc-400">${ep.displayNetwork.name}</span>`;
+                     }
+                     el.innerHTML = `
+                         <div class="text-center w-20 flex-shrink-0">
+                             <p class="font-bold text-xl text-zinc-300">${day}</p>
+                             <p class="text-sm text-zinc-400">${date}</p>
+                         </div>
+                         <div class="flex-grow min-w-0">
+                             <p class="font-bold">${ep.showName}</p>
+                             <p class="text-sm text-zinc-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>
+                             <p class="text-sm font-semibold text-zinc-300 mt-1">${ep.manualTime || ''}</p>
+                         </div>
+                         <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
+                             <img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md">
+                             <div class="h-6 flex items-center justify-center">${networkHtml}</div>
+                         </div>`;
+                     upcomingContainer.appendChild(el);
+                 });
+            }
+            
+            function renderSchedule() {
+                scheduleMessage.classList.add('hidden');
+                if (state.scheduledEpisodes.length === 0) {
+                    scheduleMessage.textContent = "No upcoming episodes for your favorite shows.";
+                    scheduleMessage.classList.remove('hidden');
+                    scheduleContent.innerHTML = '';
+                    return;
+                }
+                if (state.scheduleView === 'calendar') renderCalendar();
+                else renderAgenda();
+            }
+
+            function renderCalendar() {
+                const date = state.currentDate;
+                const year = date.getFullYear(), month = date.getMonth();
+                const firstDayOfMonth = new Date(year, month, 1);
+                const firstDayOfWeek = firstDayOfMonth.getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                const monthName = date.toLocaleString('default', { month: 'long' });
+                let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-zinc-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`;
+
+                for (let i = 0; i < firstDayOfWeek; i++) { html += `<div></div>`; }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayDate = new Date(year, month, day);
+                    const dayEvents = state.scheduledEpisodes.filter(ep => {
+                        const epDate = parseLocalDate(ep.air_date);
+                        return epDate && epDate.getTime() === dayDate.getTime();
+                    });
+                    html += `<div class="p-2 h-20 border border-zinc-700 rounded-md text-xs overflow-hidden ${dayEvents.length > 0 ? 'bg-zinc-900' : ''}"><div class="font-bold">${day}</div><div class="truncate">${dayEvents.map(e => e.showName).join(', ')}</div></div>`;
+                }
+                html += `</div></div>`;
+                scheduleContent.innerHTML = html;
+                $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(month - 1); renderCalendar(); });
+                $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(month + 1); renderCalendar(); });
+            }
+
+            function renderAgenda() {
+                const sortedEpisodes = [...state.scheduledEpisodes]
+                    .map(ep => {
+                        const favorite = state.favorites.find(f => f.id === ep.showId);
+                        return { ...ep, manualTime: favorite ? favorite.manualTime : null };
+                    })
+                    .sort((a,b) => {
+                        const dateA = parseLocalDate(a.air_date);
+                        const dateB = parseLocalDate(b.air_date);
+                        if (dateA && dateB && dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+                        if (!dateA) return 1;
+                        if (!dateB) return -1;
+                        return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
+                    });
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                scheduleContent.innerHTML = `<div class="space-y-4">${sortedEpisodes.map(ep => {
+                    const airDate = parseLocalDate(ep.air_date);
+                    if (!airDate) return '';
+                    const isPast = airDate < today;
+                    let networkHtml = '';
+                     if (ep.displayNetwork && ep.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" alt="${ep.displayNetwork.name}">`; } else if (ep.displayNetwork) { networkHtml = `<span class="text-sm text-zinc-400">${ep.displayNetwork.name}</span>`; }
+                    return `<div id="agenda-ep-${ep.id}" class="flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-zinc-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-zinc-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-zinc-300">${ep.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
+                }).join('')}</div>`;
+
+                const firstUpcomingIndex = sortedEpisodes.findIndex(ep => {
+                    const airDate = parseLocalDate(ep.air_date);
+                    return airDate && airDate >= today;
+                });
+
+                if (firstUpcomingIndex !== -1) {
+                    const firstUpcomingId = sortedEpisodes[firstUpcomingIndex].id;
+                    setTimeout(() => {
+                        const element = $(`agenda-ep-${firstUpcomingId}`);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                }
+            }
+
+            async function refreshCurrentView() {
+                // This function is called whenever data changes in Firestore
+                updateAccountSection();
+                renderSubscriptions();
+                dashboardUserName.textContent = state.userName || 'You';
+                
+                if (state.activeTab === 'dashboard') {
+                    await fetchScheduleData(true);
+                    renderDashboardUpcoming();
+                }
+                if (state.activeTab === 'favorites') {
+                    await renderFavorites();
+                }
+                if (state.activeTab === 'schedule') { 
+                    await fetchScheduleData(); 
+                    renderSchedule(); 
+                }
+            }
+
+
+            function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
+            function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
+            function closeModal() { modal.classList.add('hidden'); }
+            function closeSuggestionModal() { suggestionModal.classList.add('hidden'); }
+
+            function openSuggestionModal() {
+                 const title = $('suggestionModalTitle');
+                const subtitle = $('suggestionModalSubtitle');
+                const textarea = $('suggestionText');
+
+                if (state.theme === 'horror') {
+                    title.textContent = "We Have Such Sights to Show You";
+                    subtitle.textContent = "What is your pleasure, sir? Let us know what features you desire.";
+                } else if (state.theme === 'scifi') {
+                    title.textContent = "Feature Request Transmission";
+                    subtitle.textContent = "They mostly come at night. Mostly. But your suggestions can come anytime.";
+                } else if (state.theme === 'clean') {
+                    title.textContent = "This is a Tasty Burger!";
+                    subtitle.textContent = "Enjoying your app? Let us know how we can make it even better.";
+                } else {
+                    title.textContent = "Got a Suggestion?";
+                    subtitle.textContent = "We'd love to hear it. Let us know what we can do to improve your experience.";
+                }
+                suggestionModal.classList.remove('hidden');
+            }
+
+            async function initAppUI() {
+                if (!isDataLoaded) return;
+                updateAccountSection();
+                renderSubscriptions();
+                await switchTab('dashboard');
+            }
+
+            function handleFullSearch() {
+                const query = searchInput.value.trim();
+                liveSearchResults.classList.add('hidden');
+                switchTab('search-results');
+                searchMedia(query, false);
+            }
+
+            let debounceTimer;
+            function handleLiveSearch() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    searchMedia(searchInput.value.trim(), true);
+                }, 300);
+            }
+
+            function setupFavoriteSectionControls(type) {
+                const viewBtns = document.querySelectorAll(`.${type}-fav-view-btn`);
+                const manageBtn = $(`manage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
+                const cancelManageBtn = $(`cancelManage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
+                const deleteAllBtn = $(`deleteAll${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
+                const deleteSelectedBtn = $(`deleteSelected${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
+                const container = $(`${type}FavoritesContainer`);
+
+                viewBtns.forEach(btn => btn.addEventListener('click', () => {
+                    if (type === 'movie') state.movieFavoritesView = btn.dataset.view;
+                    else state.tvFavoritesView = btn.dataset.view;
+
+                    viewBtns.forEach(b => {
+                        b.classList.toggle('bg-zinc-900', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
+                    });
+                    renderFavorites();
+                }));
+
+                manageBtn.addEventListener('click', () => {
+                    if (type === 'movie') state.isManagingMovies = true;
+                    else state.isManagingTvs = true;
+                    renderFavorites();
+                });
+
+                cancelManageBtn.addEventListener('click', () => {
+                    if (type === 'movie') state.isManagingMovies = false;
+                    else state.isManagingTvs = false;
+                    renderFavorites();
+                });
+                
+                deleteAllBtn.addEventListener('click', () => {
+                    showConfirmationModal(`Are you sure you want to remove all favorite ${type === 'movie' ? 'movies' : 'TV shows'}?`, () => {
+                        state.favorites = state.favorites.filter(fav => fav.media_type !== type);
+                        saveDataToFirestore();
+                    });
+                });
+
+                deleteSelectedBtn.addEventListener('click', () => {
+                    const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
+                    if (selected.length === 0) return;
+                    const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
+                    state.favorites = state.favorites.filter(fav => !idsToDelete.includes(fav.id));
+                    saveDataToFirestore();
+                });
+            }
+
+            function initEventListeners() {
+                $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
+                
+                searchButton.addEventListener('click', handleFullSearch);
+                searchInput.addEventListener('input', handleLiveSearch);
+                searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleFullSearch(); });
+
+                tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+                
+                scheduleViewBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.scheduleView = btn.dataset.view;
+                    scheduleViewBtns.forEach(b => {
+                        b.classList.toggle('bg-zinc-900', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
+                    });
+                    renderSchedule();
+                }));
+
+                upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.dashboardScheduleFilter = btn.dataset.filter;
+                    upcomingFilterBtns.forEach(b => {
+                        b.classList.toggle('bg-zinc-900', b === btn);
+                        b.classList.toggle('text-white', b === btn);
+                        b.classList.toggle('text-zinc-300', b !== btn);
+                    });
+                    renderDashboardUpcoming();
+                }));
+
+                saveUserNameButton.addEventListener('click', () => {
+                    if(!userId) { promptForLogin('saving your name'); return; }
+                    const name = userNameInput.value.trim();
+                    state.userName = name;
+                    saveDataToFirestore();
+                    userNameMessage.textContent = 'Name saved!';
+                    userNameMessage.classList.remove('hidden');
+                    setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
+                });
+                
+                themeBtns.forEach(btn => btn.addEventListener('click', () => {
+                    state.theme = btn.dataset.theme;
+                    applyTheme(state.theme);
+                    saveDataToFirestore();
+                }));
+
+                suggestionAvatarBtn.addEventListener('click', openSuggestionModal);
+                closeSuggestionModalBtn.addEventListener('click', closeSuggestionModal);
+                suggestionModal.addEventListener('click', (e) => {
+                    if (e.target === suggestionModal) closeSuggestionModal();
+                });
+                suggestionForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const suggestion = $('suggestionText').value;
+                    if(suggestion.trim()) {
+                        window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
+                        $('suggestionText').value = '';
+                        closeSuggestionModal();
+                    }
+                });
+
+                // Setup Favorites Management for both sections
+                setupFavoriteSectionControls('movie');
+                setupFavoriteSectionControls('tv');
+
+                scrollLeftBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
+                scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
+                scrollUpcomingLeftBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
+                scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
+
+                modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+            }
+
+            initEventListeners();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeAppWithConfig);
+    </script>
+</body>
+</html>
