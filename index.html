@@ -113,6 +113,23 @@
             display: block;
         }
 
+        /* Modern Scrollbar for Schedule */
+        #scheduleContent::-webkit-scrollbar {
+            width: 12px;
+        }
+        #scheduleContent::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #scheduleContent::-webkit-scrollbar-thumb {
+            background-color: #52525b; /* zinc-600 */
+            border-radius: 20px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        #scheduleContent::-webkit-scrollbar-thumb:hover {
+            background-color: #71717a; /* zinc-500 */
+        }
+
         /* --- Default Theme --- */
         .tab-button.border-zinc-400 {
             border-color: #3b82f6; /* blue-500 */
@@ -215,8 +232,8 @@
             background-position: right -20px bottom -30px;
             background-size: 150px;
         }
-        .theme-horror #scheduleContent::-webkit-scrollbar-thumb { background-color: #b91c1c; }
-        .theme-horror #scheduleContent::-webkit-scrollbar-track { background-color: #222; }
+        .theme-horror #scheduleContent::-webkit-scrollbar-thumb { background-color: #991b1b; } /* red-800 */
+        .theme-horror #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #b91c1c; } /* red-700 */
         
         
         /* --- Sci-Fi Theme --- */
@@ -291,8 +308,8 @@
         .theme-scifi .border-zinc-700 { border-color: #24434e; }
         .theme-scifi .text-zinc-200, .theme-scifi .text-zinc-300, .theme-scifi .text-zinc-400, .theme-scifi p { color: #86efac; }
         .theme-scifi .text-zinc-500 { color: #4ade80; }
-        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb { background-color: #15803d; }
-        .theme-scifi #scheduleContent::-webkit-scrollbar-track { background-color: #1a2f38; }
+        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb { background-color: #166534; } /* green-800 */
+        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #15803d; } /* green-700 */
 
         /* --- Clean Theme --- */
         #clean-animation-container {
@@ -360,8 +377,8 @@
         .theme-clean .bg-zinc-700 { background-color: #e4e4e7; }
         .theme-clean .hover\:bg-zinc-600:hover, .theme-clean #saveUserNameButton:hover, .theme-clean .theme-btn:hover { background-color: #d4d4d8; }
         .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
-        .theme-clean #scheduleContent::-webkit-scrollbar-thumb { background-color: #a1a1aa; }
-        .theme-clean #scheduleContent::-webkit-scrollbar-track { background-color: #e4e4e7; }
+        .theme-clean #scheduleContent::-webkit-scrollbar-thumb { background-color: #a1a1aa; } /* zinc-400 */
+        .theme-clean #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #71717a; } /* zinc-500 */
         
     </style>
 </head>
@@ -2036,5 +2053,4 @@
     </script>
 </body>
 </html>
-" because it is a css question.
 
