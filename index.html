@@ -5,36 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #111827; /* gray-900 */
-            --bg-secondary-color: #1f2937; /* gray-800 */
-            --bg-tertiary-color: #374151; /* gray-700 */
-            --text-color: #f3f4f6; /* gray-100 */
-            --text-muted-color: #9ca3af; /* gray-400 */
-            --accent-color: #6366f1; /* indigo-500 */
-            --accent-hover-color: #4f46e5; /* indigo-600 */
-            --accent-text-color: #a5b4fc; /* indigo-300 */
+            --bg-color: #111827;
+            --bg-secondary-color: #1f2937;
+            --bg-tertiary-color: #374151;
+            --text-color: #f3f4f6;
+            --text-muted-color: #9ca3af;
+            --accent-color: #6366f1;
+            --accent-hover-color: #4f46e5;
+            --accent-text-color: #a5b4fc;
         }
 
         html[data-theme='light'] {
-            --bg-color: #f9fafb; /* gray-50 */
-            --bg-secondary-color: #ffffff; /* white */
-            --bg-tertiary-color: #e5e7eb; /* gray-200 */
-            --text-color: #111827; /* gray-900 */
-            --text-muted-color: #6b7280; /* gray-500 */
+            --bg-color: #f9fafb;
+            --bg-secondary-color: #ffffff;
+            --bg-tertiary-color: #e5e7eb;
+            --text-color: #111827;
+            --text-muted-color: #6b7280;
         }
-        
-        html[data-theme='ocean'] {
+
+        html[data-theme='horror'] {
+            --bg-color: #000000;
+            --bg-secondary-color: #1a0000;
+            --bg-tertiary-color: #330000;
+            --text-color: #e5e5e5;
+            --text-muted-color: #a3a3a3;
+            --accent-color: #dc2626;
+            --accent-hover-color: #b91c1c;
+            --accent-text-color: #fca5a5;
+        }
+
+        html[data-theme='sci-fi'] {
             --bg-color: #0c1427;
             --bg-secondary-color: #1a2c47;
             --bg-tertiary-color: #2e4a69;
-            --text-color: #e0f2fe; /* light blue */
-            --text-muted-color: #94a3b8; /* slate-400 */
-            --accent-color: #22d3ee; /* cyan-400 */
-            --accent-hover-color: #06b6d4; /* cyan-500 */
-            --accent-text-color: #67e8f9; /* cyan-300 */
+            --text-color: #e0f2fe;
+            --text-muted-color: #94a3b8;
+            --accent-color: #22d3ee;
+            --accent-hover-color: #06b6d4;
+            --accent-text-color: #67e8f9;
         }
 
         body {
@@ -43,49 +55,31 @@
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
         }
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-        .modal-content {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        .modal-backdrop { display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 50; }
+        .modal-content { max-height: 90vh; overflow-y: auto; }
         .themed-bg { background-color: var(--bg-secondary-color); }
         .themed-bg-tertiary { background-color: var(--bg-tertiary-color); }
-        .themed-text { color: var(--text-color); }
         .themed-text-muted { color: var(--text-muted-color); }
         .themed-accent-text { color: var(--accent-text-color); }
         .themed-accent-bg { background-color: var(--accent-color); }
         .themed-accent-bg-hover:hover { background-color: var(--accent-hover-color); }
         .themed-border { border-color: var(--bg-tertiary-color); }
         .themed-accent-border { border-color: var(--accent-color); }
-
         .scrolling-wrapper { -webkit-overflow-scrolling: touch; }
         .scrolling-wrapper::-webkit-scrollbar { display: none; }
-        
-        .theme-btn.active {
-            box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--accent-color);
-        }
+        .theme-btn.active { box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--accent-color); }
+        .tab-button { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-button .tab-text { font-size: 0.875rem; }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
 
-    <!-- Login Screen -->
     <div id="loginScreen" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col justify-center items-center z-50">
         <div class="text-center themed-bg p-8 rounded-lg shadow-2xl max-w-sm mx-auto">
             <h1 class="text-3xl font-bold themed-accent-text mb-2">Sign In Required</h1>
             <p class="themed-text-muted mb-8">Please sign in to continue</p>
             <button id="signInWithGoogleButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center w-full">
-                <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+                <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
                 Sign in with Google
             </button>
         </div>
@@ -102,7 +96,7 @@
             <div id="searchWrapper" class="relative">
                 <input type="text" id="searchInput" class="w-full themed-bg border-2 themed-border rounded-full py-3 px-6 placeholder-gray-500 focus:outline-none focus:themed-accent-border transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
                 <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 themed-accent-bg themed-accent-bg-hover rounded-full p-2 focus:outline-none transition duration-300">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <i class="ph-bold ph-magnifying-glass text-white text-2xl"></i>
                 </button>
                 <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 themed-bg themed-border border rounded-lg shadow-lg"></div>
             </div>
@@ -110,10 +104,10 @@
 
         <div class="mb-8">
             <div class="flex justify-center border-b themed-border">
-                <button data-tab="dashboard" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Dashboard</button>
-                <button data-tab="favorites" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Favorites</button>
-                <button data-tab="schedule" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Schedule</button>
-                <button data-tab="settings" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Settings</button>
+                <button data-tab="dashboard" class="tab-button p-4 border-b-2 transition-colors duration-200"><i class="ph-bold ph-house text-2xl"></i><span class="tab-text">Dashboard</span></button>
+                <button data-tab="favorites" class="tab-button p-4 border-b-2 transition-colors duration-200"><i class="ph-bold ph-heart text-2xl"></i><span class="tab-text">Favorites</span></button>
+                <button data-tab="schedule" class="tab-button p-4 border-b-2 transition-colors duration-200"><i class="ph-bold ph-calendar text-2xl"></i><span class="tab-text">Schedule</span></button>
+                <button data-tab="settings" class="tab-button p-4 border-b-2 transition-colors duration-200"><i class="ph-bold ph-gear text-2xl"></i><span class="tab-text">Settings</span></button>
             </div>
         </div>
 
@@ -136,16 +130,16 @@
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
                                 <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper themed-bg p-4 rounded-lg"></div>
-                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                                <button class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10" onclick="document.getElementById('trendingContainer').scrollBy({ left: -300, behavior: 'smooth' })">&lt;</button>
+                                <button class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10" onclick="document.getElementById('trendingContainer').scrollBy({ left: 300, behavior: 'smooth' })">&gt;</button>
                             </div>
                         </div>
                          <div>
                              <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
                             <div class="relative">
                                 <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper themed-bg p-4 rounded-lg"></div>
-                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                                <button class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10" onclick="document.getElementById('upcomingMoviesContainer').scrollBy({ left: -300, behavior: 'smooth' })">&lt;</button>
+                                <button class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10" onclick="document.getElementById('upcomingMoviesContainer').scrollBy({ left: 300, behavior: 'smooth' })">&gt;</button>
                             </div>
                         </div>
                     </div>
@@ -205,7 +199,8 @@
                         <div id="themeSelector" class="flex items-center space-x-4">
                             <button data-theme="dark" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-gray-900 rounded-md border-2 border-gray-700"></div></button>
                             <button data-theme="light" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-gray-50 rounded-md border-2 border-gray-200"></div></button>
-                            <button data-theme="ocean" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-[#0c1427] rounded-md border-2 border-[#2e4a69]"></div></button>
+                            <button data-theme="horror" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-[#000000] rounded-md border-2 border-[#330000]"></div></button>
+                            <button data-theme="sci-fi" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-[#0c1427] rounded-md border-2 border-[#2e4a69]"></div></button>
                         </div>
                     </div>
                     <div>
@@ -290,7 +285,7 @@
             const $ = (selector) => document.getElementById(selector);
             const $$ = (selector) => document.querySelectorAll(selector);
             
-            const loginScreen = $('loginScreen'), mainApp = $('app'), signInWithGoogleButton = $('signInWithGoogleButton');
+            const loginScreen = $('loginScreen'), signInWithGoogleButton = $('signInWithGoogleButton');
             const searchInput = $('searchInput'), searchButton = $('searchButton');
             const searchResultsContainer = $('searchResultsContainer'), favoritesContainer = $('favoritesContainer');
             const subscriptionList = $('subscriptionList'), loadingSpinner = $('loadingSpinner');
@@ -302,9 +297,8 @@
             const dashboardUserName = $('dashboardUserName');
             const userNameInput = $('userNameInput'), saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage');
             const upcomingFilterBtns = $$('.upcoming-filter-btn');
-            const scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'), liveSearchResults = $('liveSearchResults');
+            const liveSearchResults = $('liveSearchResults');
             const upcomingMoviesContainer = $('upcomingMoviesContainer');
-            const scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
             const tabs = $$('.tab-button'), accountSection = $('accountSection'), themeSelector = $('themeSelector');
 
             function applyTheme(theme) {
@@ -322,7 +316,7 @@
                 if (user) {
                     loginScreen.classList.add('hidden');
                     state.userId = user.uid;
-                    userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/userData`);
+                    userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/data/appData`);
                     
                     updateAccountSection(user);
                     
@@ -492,10 +486,6 @@
                 gridViewBtn.addEventListener('click', () => { if (state.favoritesView === 'grid') return; state.favoritesView = 'grid'; gridViewBtn.classList.add('themed-accent-bg', 'text-white'); listViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderFavorites(); }); 
                 listViewBtn.addEventListener('click', () => { if (state.favoritesView === 'list') return; state.favoritesView = 'list'; listViewBtn.classList.add('themed-accent-bg', 'text-white'); gridViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderFavorites(); }); 
                 upcomingFilterBtns.forEach(btn => { btn.addEventListener('click', () => { state.dashboardScheduleFilter = btn.dataset.filter; upcomingFilterBtns.forEach(b => b.classList.toggle('themed-accent-bg', b === btn)); renderDashboardUpcoming(); }); }); 
-                scrollLeftBtn.addEventListener('click', () => dashboardTrendingContainer.scrollBy({ left: -300, behavior: 'smooth' })); 
-                scrollRightBtn.addEventListener('click', () => dashboardTrendingContainer.scrollBy({ left: 300, behavior: 'smooth' })); 
-                scrollUpcomingLeftBtn.addEventListener('click', () => upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' })); 
-                scrollUpcomingRightBtn.addEventListener('click', () => upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }));
                 themeSelector.addEventListener('click', (e) => {
                     const themeBtn = e.target.closest('.theme-btn');
                     if(themeBtn) {
