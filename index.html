@@ -42,6 +42,7 @@
 </head>
 <body class="bg-gray-900 text-white">
 
+    <!-- Login Screen -->
     <div id="loginScreen" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col justify-center items-center z-50">
         <div class="text-center bg-gray-800 p-8 rounded-lg shadow-2xl max-w-sm mx-auto">
             <h1 class="text-3xl font-bold text-indigo-400 mb-2">Sign In Required</h1>
@@ -55,12 +56,14 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         
+        <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-bold text-indigo-400">Entertainment Hub</h1>
             <p class="text-gray-400 mt-2">Find where to watch your favorite shows and movies.</p>
             <p id="userIdDisplay" class="text-xs text-gray-600 mt-2"></p>
         </header>
 
+        <!-- Main Search Bar (Movies/TV) -->
         <div class="mb-8 max-w-2xl mx-auto">
             <div id="searchWrapper" class="relative">
                 <input type="text" id="searchInput" class="w-full bg-gray-800 border-2 border-gray-700 rounded-full py-3 px-6 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
@@ -71,6 +74,7 @@
             </div>
         </div>
 
+        <!-- Main Content Tabs -->
         <div class="mb-8">
             <div class="flex justify-center border-b border-gray-700">
                 <button data-tab="dashboard" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Dashboard</button>
@@ -80,7 +84,9 @@
             </div>
         </div>
 
+        <!-- Content Area -->
         <main id="content-area">
+            <!-- Dashboard -->
             <div id="dashboard" class="tab-content">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg">
@@ -93,14 +99,16 @@
                             </div>
                         </div>
                         <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                            </div>
+                            <!-- Upcoming shows will be injected here -->
+                        </div>
                     </div>
                     <div class="lg:col-span-1 space-y-8">
                         <div>
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
                                 <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg">
-                                    </div>
+                                    <!-- Trending items will be injected here -->
+                                </div>
                                 <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
                                 <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
@@ -109,7 +117,8 @@
                              <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
                             <div class="relative">
                                 <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg">
-                                    </div>
+                                    <!-- Upcoming movies will be injected here -->
+                                </div>
                                 <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
                                 <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
@@ -118,12 +127,14 @@
                 </div>
             </div>
 
+            <!-- Search Results Page (hidden by default) -->
             <div id="search-results" class="tab-content hidden">
                  <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
                 <p id="searchResultsMessage" class="text-center text-gray-500">Search for something to see results.</p>
                 <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
             </div>
 
+            <!-- Favorites -->
             <div id="favorites" class="tab-content hidden">
                 <div class="max-w-4xl mx-auto">
                     <div class="flex justify-between items-center mb-4">
@@ -139,6 +150,7 @@
                 </div>
             </div>
 
+            <!-- Schedule -->
             <div id="schedule" class="tab-content hidden">
                 <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
                     <div class="flex justify-between items-center mb-4">
@@ -149,16 +161,19 @@
                         </div>
                     </div>
                     <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2">
-                        </div>
+                        <!-- Calendar or Agenda will be rendered here -->
+                    </div>
                      <p id="scheduleMessage" class="text-center text-gray-500 mt-4 hidden"></p>
                 </div>
             </div>
 
+            <!-- Settings -->
             <div id="settings" class="tab-content hidden">
                 <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg space-y-8">
                     <div id="accountSection">
                         <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        </div>
+                        <!-- This will be populated by JS -->
+                    </div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Your Name</h2>
                         <p class="text-gray-400 mb-4">Personalize the dashboard greeting.</p>
@@ -480,8 +495,8 @@
             function createMediaCard(item) { const card = document.createElement('div'); card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 cursor-pointer'; card.dataset.id = item.id; card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv'); const title = item.title || item.name; const releaseDate = item.release_date || item.first_air_date; const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A'; const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-gray-400">${year}</p></div>`; card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type)); return card; }
             function renderModal(details) { const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A'; const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; const isFavorite = state.favorites.some(fav => fav.id === details.id); const providers = details['watch/providers']?.results?.US?.flatrate || []; let providersHtml = '<p class="text-gray-400">Not available for streaming.</p>'; if (providers.length > 0) { providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-gray-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join(''); } let manualTimeHtml = ''; if (details.seasons) { const favorite = state.favorites.find(f => f.id === details.id); if (favorite) { manualTimeHtml = `<div class="mt-4 pt-4 border-t border-gray-700"><h3 class="text-xl font-semibold mb-2">Manual Air Time</h3><div id="manualTimeContainer" class="flex items-center space-x-4"><p id="manualTimeDisplay" class="text-gray-300 flex-grow">${favorite.manualTime || 'Not set'}</p><button id="editTimeButton" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button></div></div>`; } } $('modalContent').innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-gray-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`; $('favoriteButton').addEventListener('click', () => toggleFavorite(details)); if ($('editTimeButton')) $('editTimeButton').addEventListener('click', () => editManualTime(details)); modal.classList.remove('hidden'); $('closeModal').addEventListener('click', closeModal); }
             function renderSchedule() { scheduleMessage.classList.add('hidden'); if (state.scheduledEpisodes.length === 0) { scheduleMessage.textContent = "No upcoming episodes for favorites."; scheduleMessage.classList.remove('hidden'); scheduleContent.innerHTML = ''; return; } if (state.scheduleView === 'calendar') renderCalendar(); else renderAgenda(); }
-            function renderCalendar() { const date = state.currentDate; const today = new Date(); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const monthName = date.toLocaleString('default', { month: 'long' }); let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`; for (let i = 0; i < firstDay; i++) html += `<div></div>`; for (let day = 1; day <= daysInMonth; day++) { const dayDate = new Date(year, month, day); const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear(); const dayEvents = state.scheduledEpisodes.filter(ep => { const epDate = parseLocalDate(ep.air_date); return epDate && epDate.getTime() === dayDate.getTime(); }); const uniqueShowNames = [...new Set(dayEvents.map(e => e.showName))].join(', '); let dayClasses = 'p-2 h-16 border border-gray-700 rounded-md text-xs'; if (dayEvents.length > 0) dayClasses += ' bg-indigo-900'; if (isToday) dayClasses += ' border-2 border-indigo-400'; html += `<div class="${dayClasses}"><div class="font-bold">${day}</div><div class="truncate">${uniqueShowNames}</div></div>`; } html += `</div></div>`; scheduleContent.innerHTML = html; $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(month - 1); renderCalendar(); }); $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(month + 1); renderCalendar(); }); }
-            function renderAgenda() { const sortedEpisodes = [...state.scheduledEpisodes].sort((a, b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); const today = new Date(); today.setHours(0, 0, 0, 0); const groupedByDayAndShow = sortedEpisodes.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) { acc[key] = { showId: ep.showId, showName: ep.showName, air_date: ep.air_date, poster_path: ep.poster_path, displayNetwork: ep.displayNetwork, episodes: [] }; } acc[key].episodes.push({ id: ep.id, season_number: ep.season_number, episode_number: ep.episode_number, name: ep.name }); return acc; }, {}); const agendaHtml = Object.values(groupedByDayAndShow).map(group => { const airDate = parseLocalDate(group.air_date); const isPast = airDate < today; const favorite = state.favorites.find(f => f.id === group.showId); const manualTime = favorite ? favorite.manualTime : null; let networkHtml = ''; if (group.displayNetwork && group.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" alt="${group.displayNetwork.name}">`; } else if (group.displayNetwork) { networkHtml = `<span class="text-sm text-gray-400">${group.displayNetwork.name}</span>`; } const episodeListHtml = group.episodes.map(ep => `<p class="text-sm text-gray-400 truncate" title="S${ep.season_number} E${ep.episode_number}: ${ep.name}">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); const scrollTargetId = group.episodes[0].id; return `<div id="agenda-episode-${scrollTargetId}" class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${group.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0" onerror="this.style.display='none'"><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeListHtml}</div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>${manualTime ? `<p class="text-sm text-gray-300">${manualTime}</p>` : ''}<div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`; }).join(''); scheduleContent.innerHTML = `<div class="space-y-4">${agendaHtml}</div>`; const allGroups = Object.values(groupedByDayAndShow); const firstUpcomingGroupIndex = allGroups.findIndex(group => parseLocalDate(group.air_date) >= today); if (firstUpcomingGroupIndex !== -1) { const firstUpcomingId = allGroups[firstUpcomingGroupIndex].episodes[0].id; setTimeout(() => { const element = $(`agenda-episode-${firstUpcomingId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 100); } }
+            function renderCalendar() { const date = state.currentDate; const today = new Date(); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const monthName = date.toLocaleString('default', { month: 'long' }); let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`; for (let i = 0; i < firstDay; i++) html += `<div></div>`; for (let day = 1; day <= daysInMonth; day++) { const dayDate = new Date(year, month, day); const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear(); const dayEvents = state.scheduledEpisodes.filter(ep => { const epDate = parseLocalDate(ep.air_date); return epDate && epDate.getTime() === dayDate.getTime(); }); let dayClasses = 'p-2 h-16 border border-gray-700 rounded-md text-xs'; if (dayEvents.length > 0) dayClasses += ' bg-indigo-900'; if (isToday) dayClasses += ' border-2 border-indigo-400'; html += `<div class="${dayClasses}"><div class="font-bold">${day}</div><div class="truncate">${dayEvents.map(e => e.showName).join(', ')}</div></div>`; } html += `</div></div>`; scheduleContent.innerHTML = html; $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(month - 1); renderCalendar(); }); $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(month + 1); renderCalendar(); }); }
+            function renderAgenda() { const sortedEpisodes = [...state.scheduledEpisodes].sort((a, b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); const today = new Date(); today.setHours(0, 0, 0, 0); scheduleContent.innerHTML = `<div class="space-y-4">${sortedEpisodes.map(ep => { const airDate = parseLocalDate(ep.air_date); const isPast = airDate < today; const favorite = state.favorites.find(f => f.id === ep.showId); const manualTime = favorite ? favorite.manualTime : null; let networkHtml = ''; if (ep.displayNetwork && ep.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${ep.displayNetwork.logo_path}" class="h-6 object-contain" alt="${ep.displayNetwork.name}">`; } else if (ep.displayNetwork) { networkHtml = `<span class="text-sm text-gray-400">${ep.displayNetwork.name}</span>`; } return `<div id="agenda-episode-${ep.id}" class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${ep.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0" onerror="this.style.display='none'"><div class="flex-grow"><p class="font-bold">${ep.showName}</p><p class="text-sm text-gray-400">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p></div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>${manualTime ? `<p class="text-sm text-gray-300">${manualTime}</p>` : ''}<div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`; }).join('')}</div>`; const firstUpcomingIndex = sortedEpisodes.findIndex(ep => parseLocalDate(ep.air_date) >= today); if (firstUpcomingIndex !== -1) { const firstUpcomingId = sortedEpisodes[firstUpcomingIndex].id; setTimeout(() => { const element = $(`agenda-episode-${firstUpcomingId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 100); } }
             function renderDashboardHeader() { dashboardUserName.textContent = state.userName || 'You'; }
             function renderDashboardUpcoming() { const container = dashboardUpcomingContainer; container.innerHTML = ''; const today = new Date(); today.setHours(0,0,0,0); let endDate = new Date(today); if (state.dashboardScheduleFilter === 'today') {} else if (state.dashboardScheduleFilter === 'week') { endDate.setDate(today.getDate() + 6); } else if (state.dashboardScheduleFilter === 'month') { endDate.setMonth(today.getMonth() + 1); } const upcoming = state.scheduledEpisodes.filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; }).sort((a,b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); if (upcoming.length === 0) { container.innerHTML = `<p class="text-gray-500 text-sm">No episodes airing for your favorites in this period.</p>`; return; } const grouped = upcoming.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) { acc[key] = { ...ep, episodes: [] }; } acc[key].episodes.push(ep); return acc; }, {}); Object.values(grouped).forEach(group => { const el = document.createElement('div'); el.className = 'flex items-center space-x-4 p-3 bg-gray-700 rounded-lg'; const airDate = parseLocalDate(group.air_date); const day = airDate.toLocaleDateString(undefined, { weekday: 'short' }); const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); const favorite = state.favorites.find(f => f.id === group.showId); const manualTime = favorite && favorite.manualTime ? favorite.manualTime : ''; const posterUrl = group.poster_path ? `https://image.tmdb.org/t/p/w92${group.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A'; const episodeList = group.episodes.map(ep => `<p class="text-sm text-gray-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); let networkHtml = ''; if (group.displayNetwork && group.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" title="${group.displayNetwork.name}">`; } else if (group.displayNetwork) { networkHtml = `<span class="text-xs text-gray-400">${group.displayNetwork.name}</span>`; } el.innerHTML = `<div class="text-center w-20 flex-shrink-0"><p class="font-bold text-xl text-indigo-300">${day}</p><p class="text-sm text-gray-400">${date}</p></div><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeList}<p class="text-sm font-semibold text-gray-300 mt-1">${manualTime}</p></div><div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2"><img src="${posterUrl}" class="w-12 h-auto rounded-md" onerror="this.style.display='none'"><div class="h-6 flex items-center justify-center">${networkHtml}</div></div>`; container.appendChild(el); }); }
             function renderDashboardTrending(items = []) { const container = dashboardTrendingContainer; container.innerHTML = ''; if(items.length === 0) { return; } items.filter(item => item.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'flex-shrink-0 w-32 cursor-pointer relative'; const posterUrl = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A'; const year = item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : ''; card.innerHTML = `<img src="${posterUrl}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><div class="absolute top-1 right-1 bg-gray-900 bg-opacity-75 text-white text-xs font-bold px-2 py-1 rounded-full">${rating}</div><p class="text-sm mt-2 truncate font-semibold">${item.title || item.name}</p><p class="text-xs text-gray-400">${year}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, item.media_type)); container.appendChild(card); }); }
@@ -580,3 +595,4 @@
     </script>
 </body>
 </html>
+
