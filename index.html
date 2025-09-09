@@ -207,21 +207,37 @@
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // This line is designed to work with Netlify's Snippet Injection feature.
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
+        /**
+         * Fetches the Firebase configuration from the Netlify function.
+         * @returns {Promise<object|null>} The Firebase config object or null on error.
+         */
+        async function getFirebaseConfig() {
+            try {
+                const response = await fetch('/.netlify/functions/get-firebase-config');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Failed to fetch Firebase config with status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error("Firebase config fetch error:", error);
+                return null;
+            }
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
+
+        document.addEventListener('DOMContentLoaded', async () => {
             
             // --- Configuration Check ---
+            const firebaseConfig = await getFirebaseConfig();
             if (!firebaseConfig) {
                 document.body.innerHTML = `
                     <div class="flex items-center justify-center h-screen bg-gray-900 text-white">
                         <div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4">
                             <h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1>
-                            <p class="text-gray-300">This application requires a Firebase configuration to function. Please check your Netlify Snippet Injection settings.</p>
+                            <p class="text-gray-300">Could not load Firebase configuration from the server. Check the Netlify function logs for errors.</p>
                         </div>
                     </div>
                 `;

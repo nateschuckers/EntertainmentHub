@@ -1,10 +1,7 @@
+# This is the correct, simple configuration for your site.
+# It tells Netlify where to find your files and functions.
 [build]
   command = "echo 'Running build command'"
   publish = "."
   functions = "netlify/functions/"
-
-[[redirects]]
-  from = "/"
-  to = "/test-injection.html"
-  status = 200
 
