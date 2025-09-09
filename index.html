@@ -1342,17 +1342,18 @@
                 potentialHighlights.sort((a, b) => {
                     const dateA = parseLocalDate(a.release_date);
                     const dateB = parseLocalDate(b.release_date);
-                    const diffA = Math.abs(dateA.getTime() - today.getTime());
-                    const diffB = Math.abs(dateB.getTime() - today.getTime());
-                     if (diffA !== diffB) {
-                        return diffA - diffB;
-                    }
                     return dateA - dateB;
                 });
 
-                potentialHighlights.forEach(item => {
+                let focusIndex = potentialHighlights.findIndex(item => parseLocalDate(item.release_date) >= today);
+                if (focusIndex === -1 && potentialHighlights.length > 0) {
+                    focusIndex = potentialHighlights.length - 1; // Default to last item if all are in the past
+                }
+
+                potentialHighlights.forEach((item, index) => {
                     if (!item.poster_path) return;
                     const card = document.createElement('div');
+                    card.id = `spotlight-item-${index}`;
                     card.className = 'flex-shrink-0 w-32 cursor-pointer';
                     
                     const releaseDate = parseLocalDate(item.release_date);
@@ -1375,6 +1376,20 @@
                 });
 
                 spotlightSection.classList.remove('hidden');
+
+                if (focusIndex !== -1) {
+                    setTimeout(() => {
+                        const elementToFocus = document.getElementById(`spotlight-item-${focusIndex}`);
+                        if (elementToFocus) {
+                            const containerPadding = 16; 
+                            const scrollPosition = elementToFocus.offsetLeft - containerPadding;
+                            spotlightContainer.scrollTo({
+                                left: scrollPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 100);
+                }
             }
             
             async function fetchDashboardData() {
