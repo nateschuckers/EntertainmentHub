@@ -5,10 +5,11 @@
 
 # This section enables Netlify to replace placeholders in your HTML 
 # with environment variables during the build.
-[build.processing]
+[[build.processing]]
   skip_processing = false
 [build.processing.html]
   pretty_urls = true
-[build.processing.files]
-  "index.html" = { "context" = "production" }
+[[build.processing.files]]
+  # The path should not have quotes for this to work correctly
+  path = "index.html"
 
