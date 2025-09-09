@@ -429,7 +429,7 @@
         <main id="content-area">
             <div id="dashboard" class="tab-content">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-zinc-800 p-6 rounded-lg">
+                    <div class="lg:col-span-2 bg-zinc-800 p-6 rounded-lg lg:flex lg:flex-col">
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                             <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming for <span id="dashboardUserName">You</span></h2>
                             <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
@@ -438,7 +438,7 @@
                                 <button data-filter="month" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
                             </div>
                         </div>
-                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
+                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] lg:max-h-none overflow-y-auto pr-2 lg:flex-grow"></div>
                     </div>
                     <div class="lg:col-span-1 space-y-8">
                         <div id="spotlightSection" class="hidden">
@@ -2036,4 +2036,5 @@
     </script>
 </body>
 </html>
+" because it is a css question.
 
