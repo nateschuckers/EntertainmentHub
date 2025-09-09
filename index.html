@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +7,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #111827; /* gray-900 */
+            --bg-secondary-color: #1f2937; /* gray-800 */
+            --bg-tertiary-color: #374151; /* gray-700 */
+            --text-color: #f3f4f6; /* gray-100 */
+            --text-muted-color: #9ca3af; /* gray-400 */
+            --accent-color: #6366f1; /* indigo-500 */
+            --accent-hover-color: #4f46e5; /* indigo-600 */
+            --accent-text-color: #a5b4fc; /* indigo-300 */
+        }
+
+        html[data-theme='light'] {
+            --bg-color: #f9fafb; /* gray-50 */
+            --bg-secondary-color: #ffffff; /* white */
+            --bg-tertiary-color: #e5e7eb; /* gray-200 */
+            --text-color: #111827; /* gray-900 */
+            --text-muted-color: #6b7280; /* gray-500 */
+        }
+        
+        html[data-theme='ocean'] {
+            --bg-color: #0c1427;
+            --bg-secondary-color: #1a2c47;
+            --bg-tertiary-color: #2e4a69;
+            --text-color: #e0f2fe; /* light blue */
+            --text-muted-color: #94a3b8; /* slate-400 */
+            --accent-color: #22d3ee; /* cyan-400 */
+            --accent-hover-color: #06b6d4; /* cyan-500 */
+            --accent-text-color: #67e8f9; /* cyan-300 */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         .modal-backdrop {
             position: fixed;
@@ -26,17 +59,21 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        .calendar-day.has-event {
-            background-color: #4f46e5; /* Indigo 600 */
-            border-radius: 50%;
-            color: white;
-        }
-        /* For horizontal scrolling */
-        .scrolling-wrapper {
-            -webkit-overflow-scrolling: touch;
-        }
-        .scrolling-wrapper::-webkit-scrollbar {
-            display: none;
+        .themed-bg { background-color: var(--bg-secondary-color); }
+        .themed-bg-tertiary { background-color: var(--bg-tertiary-color); }
+        .themed-text { color: var(--text-color); }
+        .themed-text-muted { color: var(--text-muted-color); }
+        .themed-accent-text { color: var(--accent-text-color); }
+        .themed-accent-bg { background-color: var(--accent-color); }
+        .themed-accent-bg-hover:hover { background-color: var(--accent-hover-color); }
+        .themed-border { border-color: var(--bg-tertiary-color); }
+        .themed-accent-border { border-color: var(--accent-color); }
+
+        .scrolling-wrapper { -webkit-overflow-scrolling: touch; }
+        .scrolling-wrapper::-webkit-scrollbar { display: none; }
+        
+        .theme-btn.active {
+            box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--accent-color);
         }
     </style>
 </head>
@@ -44,9 +81,9 @@
 
     <!-- Login Screen -->
     <div id="loginScreen" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col justify-center items-center z-50">
-        <div class="text-center bg-gray-800 p-8 rounded-lg shadow-2xl max-w-sm mx-auto">
-            <h1 class="text-3xl font-bold text-indigo-400 mb-2">Sign In Required</h1>
-            <p class="text-gray-400 mb-8">Please sign in to continue</p>
+        <div class="text-center themed-bg p-8 rounded-lg shadow-2xl max-w-sm mx-auto">
+            <h1 class="text-3xl font-bold themed-accent-text mb-2">Sign In Required</h1>
+            <p class="themed-text-muted mb-8">Please sign in to continue</p>
             <button id="signInWithGoogleButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center w-full">
                 <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
                 Sign in with Google
@@ -56,27 +93,23 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         
-        <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-indigo-400">Entertainment Hub</h1>
-            <p class="text-gray-400 mt-2">Find where to watch your favorite shows and movies.</p>
-            <p id="userIdDisplay" class="text-xs text-gray-600 mt-2"></p>
+            <h1 class="text-4xl md:text-5xl font-bold themed-accent-text">Entertainment Hub</h1>
+            <p class="themed-text-muted mt-2">Find where to watch your favorite shows and movies.</p>
         </header>
 
-        <!-- Main Search Bar (Movies/TV) -->
         <div class="mb-8 max-w-2xl mx-auto">
             <div id="searchWrapper" class="relative">
-                <input type="text" id="searchInput" class="w-full bg-gray-800 border-2 border-gray-700 rounded-full py-3 px-6 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
-                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 focus:outline-none transition duration-300">
+                <input type="text" id="searchInput" class="w-full themed-bg border-2 themed-border rounded-full py-3 px-6 placeholder-gray-500 focus:outline-none focus:themed-accent-border transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
+                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 themed-accent-bg themed-accent-bg-hover rounded-full p-2 focus:outline-none transition duration-300">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
-                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg"></div>
+                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 themed-bg themed-border border rounded-lg shadow-lg"></div>
             </div>
         </div>
 
-        <!-- Main Content Tabs -->
         <div class="mb-8">
-            <div class="flex justify-center border-b border-gray-700">
+            <div class="flex justify-center border-b themed-border">
                 <button data-tab="dashboard" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Dashboard</button>
                 <button data-tab="favorites" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Favorites</button>
                 <button data-tab="schedule" class="tab-button py-2 px-4 border-b-2 transition-colors duration-200">Schedule</button>
@@ -84,31 +117,25 @@
             </div>
         </div>
 
-        <!-- Content Area -->
         <main id="content-area">
-            <!-- Dashboard -->
             <div id="dashboard" class="tab-content">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg">
+                    <div class="lg:col-span-2 themed-bg p-6 rounded-lg">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-bold">Upcoming for <span id="dashboardUserName">You</span></h2>
-                            <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
-                                <button id="upcomingTodayBtn" data-filter="today" class="upcoming-filter-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
-                                <button id="upcomingWeekBtn" data-filter="week" class="upcoming-filter-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
-                                <button id="upcomingMonthBtn" data-filter="month" class="upcoming-filter-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
+                            <div class="flex space-x-1 themed-bg-tertiary p-1 rounded-lg">
+                                <button data-filter="today" class="upcoming-filter-btn themed-accent-bg text-white px-3 py-1 rounded-md text-sm font-medium">Today</button>
+                                <button data-filter="week" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
+                                <button data-filter="month" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
                             </div>
                         </div>
-                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                            <!-- Upcoming shows will be injected here -->
-                        </div>
+                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
                     </div>
                     <div class="lg:col-span-1 space-y-8">
                         <div>
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
-                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg">
-                                    <!-- Trending items will be injected here -->
-                                </div>
+                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper themed-bg p-4 rounded-lg"></div>
                                 <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
                                 <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
@@ -116,9 +143,7 @@
                          <div>
                              <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
                             <div class="relative">
-                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-gray-800 p-4 rounded-lg">
-                                    <!-- Upcoming movies will be injected here -->
-                                </div>
+                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper themed-bg p-4 rounded-lg"></div>
                                 <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
                                 <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
@@ -127,65 +152,65 @@
                 </div>
             </div>
 
-            <!-- Search Results Page (hidden by default) -->
             <div id="search-results" class="tab-content hidden">
                  <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
-                <p id="searchResultsMessage" class="text-center text-gray-500">Search for something to see results.</p>
+                <p id="searchResultsMessage" class="text-center themed-text-muted">Search for something to see results.</p>
                 <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
             </div>
 
-            <!-- Favorites -->
             <div id="favorites" class="tab-content hidden">
                 <div class="max-w-4xl mx-auto">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">My Favorites</h2>
-                        <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
-                            <button id="gridViewBtn" class="fav-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium">Grid</button>
-                            <button id="listViewBtn" class="fav-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">List</button>
+                        <div class="flex space-x-1 themed-bg-tertiary p-1 rounded-lg">
+                            <button id="gridViewBtn" class="fav-view-btn themed-accent-bg text-white px-3 py-1 rounded-md text-sm font-medium">Grid</button>
+                            <button id="listViewBtn" class="fav-view-btn px-3 py-1 rounded-md text-sm font-medium">List</button>
                         </div>
                     </div>
-                    <p id="favoritesMessage" class="text-center text-gray-500">Your favorite shows and movies will appear here.</p>
+                    <p id="favoritesMessage" class="text-center themed-text-muted">Your favorite shows and movies will appear here.</p>
                     <div id="favoritesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
                     <div id="favoritesListContainer" class="hidden space-y-3"></div>
                 </div>
             </div>
 
-            <!-- Schedule -->
             <div id="schedule" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div class="max-w-4xl mx-auto themed-bg p-6 rounded-lg shadow-lg">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">Upcoming Episodes</h2>
-                        <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
-                            <button id="calendarViewBtn" class="schedule-view-btn text-gray-300 px-3 py-1 rounded-md text-sm font-medium">Calendar</button>
-                            <button id="agendaViewBtn" class="schedule-view-btn bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium">Agenda</button>
+                        <div class="flex space-x-1 themed-bg-tertiary p-1 rounded-lg">
+                            <button id="calendarViewBtn" class="schedule-view-btn px-3 py-1 rounded-md text-sm font-medium">Calendar</button>
+                            <button id="agendaViewBtn" class="schedule-view-btn themed-accent-bg text-white px-3 py-1 rounded-md text-sm font-medium">Agenda</button>
                         </div>
                     </div>
-                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2">
-                        <!-- Calendar or Agenda will be rendered here -->
-                    </div>
-                     <p id="scheduleMessage" class="text-center text-gray-500 mt-4 hidden"></p>
+                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
+                     <p id="scheduleMessage" class="text-center themed-text-muted mt-4 hidden"></p>
                 </div>
             </div>
 
-            <!-- Settings -->
             <div id="settings" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg space-y-8">
-                    <div id="accountSection">
-                        <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        <!-- This will be populated by JS -->
-                    </div>
+                <div class="max-w-4xl mx-auto themed-bg p-6 rounded-lg shadow-lg space-y-8">
+                    <div id="accountSection"></div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Your Name</h2>
-                        <p class="text-gray-400 mb-4">Personalize the dashboard greeting.</p>
+                        <p class="themed-text-muted mb-4">Personalize the dashboard greeting.</p>
                         <div class="flex flex-col sm:flex-row sm:space-x-2">
-                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-gray-700 border border-gray-600 rounded-md py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500" placeholder="Enter your name">
-                            <button id="saveUserNameButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
+                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 themed-bg-tertiary border themed-border rounded-md py-2 px-4 focus:outline-none focus:themed-accent-border" placeholder="Enter your name">
+                            <button id="saveUserNameButton" class="themed-accent-bg themed-accent-bg-hover text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
                         </div>
                          <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
                     </div>
+                     <div>
+                        <h2 class="text-2xl font-bold mb-4">Theme</h2>
+                        <p class="themed-text-muted mb-4">Choose your look.</p>
+                        <div id="themeSelector" class="flex items-center space-x-4">
+                            <button data-theme="dark" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-gray-900 rounded-md border-2 border-gray-700"></div></button>
+                            <button data-theme="light" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-gray-50 rounded-md border-2 border-gray-200"></div></button>
+                            <button data-theme="ocean" class="theme-btn p-2 rounded-lg border-2 border-transparent"><div class="w-8 h-8 bg-[#0c1427] rounded-md border-2 border-[#2e4a69]"></div></button>
+                        </div>
+                    </div>
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Manage Your Streaming Services</h2>
-                        <p class="text-gray-400 mb-6">Select the services you subscribe to for a personalized experience.</p>
+                        <p class="themed-text-muted mb-6">Select the services you subscribe to for a personalized experience.</p>
                         <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                     </div>
                 </div>
@@ -193,32 +218,27 @@
         </main>
         
         <div id="loadingSpinner" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 themed-accent-border"></div>
         </div>
     </div>
 
     <div id="detailsModal" class="modal-backdrop hidden">
-        <div id="modalContent" class="modal-content bg-gray-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
+        <div id="modalContent" class="modal-content themed-bg text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
     </div>
 
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        /**
-         * Fetches the Firebase configuration from the Netlify function.
-         * @returns {Promise<object|null>} The Firebase config object or null on error.
-         */
         async function getFirebaseConfig() {
             try {
                 const response = await fetch('/.netlify/functions/get-firebase-config');
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || `Failed to fetch Firebase config with status: ${response.status}`);
+                    throw new Error(errorData.error || `Status: ${response.status}`);
                 }
                 return await response.json();
             } catch (error) {
@@ -227,24 +247,14 @@
             }
         }
 
-
         document.addEventListener('DOMContentLoaded', async () => {
             
-            // --- Configuration Check ---
             const firebaseConfig = await getFirebaseConfig();
             if (!firebaseConfig) {
-                document.body.innerHTML = `
-                    <div class="flex items-center justify-center h-screen bg-gray-900 text-white">
-                        <div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4">
-                            <h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1>
-                            <p class="text-gray-300">Could not load Firebase configuration from the server. Check the Netlify function logs for errors.</p>
-                        </div>
-                    </div>
-                `;
-                return; // Stop further execution
+                document.body.innerHTML = `<div class="flex items-center justify-center h-screen bg-gray-900 text-white"><div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4"><h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1><p class="text-gray-300">Could not load Firebase configuration. Check Netlify function logs for errors.</p></div></div>`;
+                return;
             }
 
-            // --- Firebase Initialization ---
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
@@ -252,10 +262,10 @@
             let userDocRef = null;
             let unsubscribeUserDoc = null; 
 
-            // --- App State ---
             const state = {
                 userId: null,
                 userName: null,
+                theme: 'dark',
                 activeTab: 'dashboard',
                 favoritesView: 'grid',
                 scheduleView: 'agenda',
@@ -278,56 +288,41 @@
             };
 
             const $ = (selector) => document.getElementById(selector);
+            const $$ = (selector) => document.querySelectorAll(selector);
             
-            // --- Element Selectors ---
-            const loginScreen = $('loginScreen');
-            const mainApp = $('app');
-            const signInWithGoogleButton = $('signInWithGoogleButton');
+            const loginScreen = $('loginScreen'), mainApp = $('app'), signInWithGoogleButton = $('signInWithGoogleButton');
             const searchInput = $('searchInput'), searchButton = $('searchButton');
             const searchResultsContainer = $('searchResultsContainer'), favoritesContainer = $('favoritesContainer');
             const subscriptionList = $('subscriptionList'), loadingSpinner = $('loadingSpinner');
             const searchResultsMessage = $('searchResultsMessage'), favoritesMessage = $('favoritesMessage');
-            const modal = $('detailsModal');
-            const scheduleContent = $('scheduleContent');
-            const calendarViewBtn = $('calendarViewBtn'), agendaViewBtn = $('agendaViewBtn');
-            const scheduleMessage = $('scheduleMessage');
-            const gridViewBtn = $('gridViewBtn'), listViewBtn = $('listViewBtn');
-            const favoritesListContainer = $('favoritesListContainer');
-            const dashboardUpcomingContainer = $('upcomingContainer');
-            const dashboardTrendingContainer = $('trendingContainer');
+            const modal = $('detailsModal'), scheduleContent = $('scheduleContent');
+            const calendarViewBtn = $('calendarViewBtn'), agendaViewBtn = $('agendaViewBtn'), scheduleMessage = $('scheduleMessage');
+            const gridViewBtn = $('gridViewBtn'), listViewBtn = $('listViewBtn'), favoritesListContainer = $('favoritesListContainer');
+            const dashboardUpcomingContainer = $('upcomingContainer'), dashboardTrendingContainer = $('trendingContainer');
             const dashboardUserName = $('dashboardUserName');
             const userNameInput = $('userNameInput'), saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage');
-            const upcomingFilterBtns = document.querySelectorAll('.upcoming-filter-btn');
-            const scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn');
-            const liveSearchResults = $('liveSearchResults');
+            const upcomingFilterBtns = $$('.upcoming-filter-btn');
+            const scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'), liveSearchResults = $('liveSearchResults');
             const upcomingMoviesContainer = $('upcomingMoviesContainer');
             const scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
-            const tabs = document.querySelectorAll('.tab-button');
-            const userIdDisplay = $('userIdDisplay');
-            const accountSection = $('accountSection');
+            const tabs = $$('.tab-button'), accountSection = $('accountSection'), themeSelector = $('themeSelector');
 
-            // --- Helper Functions ---
-            function promptLogin(reason = 'Please sign in to use this feature.') {
-                const loginMessage = loginScreen.querySelector('p');
-                if (loginMessage) {
-                    loginMessage.textContent = reason;
-                }
-                loginScreen.classList.remove('hidden');
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                $$('.theme-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.theme === theme);
+                });
             }
-
-            // --- Firebase Auth & Data Handling ---
             
             onAuthStateChanged(auth, (user) => {
                 if (unsubscribeUserDoc) {
                     unsubscribeUserDoc();
                     unsubscribeUserDoc = null;
                 }
-
                 if (user) {
-                    // User is signed in.
                     loginScreen.classList.add('hidden');
                     state.userId = user.uid;
-                    userDocRef = doc(db, `/artifacts/${appId}/users/${user.uid}/data/appData`);
+                    userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/userData`);
                     
                     updateAccountSection(user);
                     
@@ -336,56 +331,33 @@
                             loadDataFromFirestore(docSnap.data());
                         } else {
                             console.log("Creating document for new user.");
-                            loadDataFromFirestore({}); // Ensure state is clean before saving
+                            loadDataFromFirestore({ theme: 'dark', favorites: [], subscriptions: [], userName: user.displayName }); 
                             saveDataToFirestore(); 
                         }
                         await fetchScheduleData();
                         initAppUI();
-                    }, (error) => {
-                        console.error("Error with Firestore snapshot listener:", error);
-                    });
+                    }, (error) => console.error("Firestore snapshot error:", error));
                 } else {
-                    // No user is signed in.
                     state.userId = null;
                     userDocRef = null;
-                    
                     loadDataFromFirestore({});
-                    
                     if(dashboardUpcomingContainer) dashboardUpcomingContainer.innerHTML = '';
                     if(favoritesContainer) favoritesContainer.innerHTML = '';
                     if(favoritesListContainer) favoritesListContainer.innerHTML = '';
                     if(scheduleContent) scheduleContent.innerHTML = '';
-                    
                     updateAccountSection(null);
                     initAppUI();
                 }
             });
 
-            function handleGoogleSignIn() {
-                signInWithPopup(auth, googleProvider).catch((error) => {
-                    console.error("Error during sign-in with Google", error);
-                });
-            }
+            function handleGoogleSignIn() { signInWithPopup(auth, googleProvider).catch(err => console.error("Google sign-in error", err)); }
 
             function updateAccountSection(user) {
                 if (user) {
-                     accountSection.innerHTML = `
-                        <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        <p class="text-gray-400 mb-4">Signed in as ${user.displayName || user.email}</p>
-                        <p class="text-xs text-gray-500 mb-4">User ID: ${user.uid}</p>
-                        <button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">Sign Out</button>
-                    `;
+                     accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="themed-text-muted mb-4">Signed in as ${user.displayName || user.email}</p><p class="text-xs text-gray-500 mb-4">User ID: ${user.uid}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">Sign Out</button>`;
                     $('signOutButton').addEventListener('click', () => signOut(auth));
                 } else {
-                    // Logged-out user view
-                    accountSection.innerHTML = `
-                        <h2 class="text-2xl font-bold mb-4">Account</h2>
-                        <p class="text-gray-400 mb-4">Sign in with your Google account to save your favorites and preferences across devices.</p>
-                        <button id="settingsSignInButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center">
-                            <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
-                            Sign in with Google
-                        </button>
-                    `;
+                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="themed-text-muted mb-4">Sign in with Google to save your favorites and preferences.</p><button id="settingsSignInButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"><svg class="w-5 h-5 mr-2" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>Sign in with Google</button>`;
                     $('settingsSignInButton').addEventListener('click', handleGoogleSignIn);
                 }
             }
@@ -395,136 +367,85 @@
                 const dataToSave = {
                     userName: state.userName,
                     subscriptions: state.subscriptions,
-                    favorites: state.favorites
+                    favorites: state.favorites,
+                    theme: state.theme,
                 };
                 try {
                     await setDoc(userDocRef, dataToSave, { merge: true });
-                } catch (e) {
-                    console.error("Error writing document: ", e);
-                }
+                } catch (e) { console.error("Error writing document: ", e); }
             }
             
             function loadDataFromFirestore(data) {
                 state.userName = data.userName || null;
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
-                state.scheduledEpisodes = []; // Always clear schedule on data load.
-
-                if (userNameInput) {
-                    userNameInput.value = state.userName || '';
-                }
+                state.theme = data.theme || 'dark';
+                state.scheduledEpisodes = []; 
+                applyTheme(state.theme);
+                if (userNameInput) userNameInput.value = state.userName || '';
             }
 
-
-            // --- Core App Logic ---
             function parseLocalDate(dateString) { if (!dateString) return null; const [year, month, day] = dateString.split('-').map(Number); return new Date(year, month - 1, day); }
             
             async function apiFetch(endpoint) {
-                const url = `/.netlify/functions/tmdb?endpoint=${encodeURIComponent(endpoint)}`;
-                const response = await fetch(url);
+                const response = await fetch(`/.netlify/functions/tmdb?endpoint=${encodeURIComponent(endpoint)}`);
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Network response was not ok');
+                    const err = await response.json();
+                    throw new Error(err.error || 'Network response was not ok');
                 }
                 return response.json();
             }
 
-            async function searchMedia(query, isLiveSearch = false) { if (!query) { liveSearchResults.classList.add('hidden'); return; } if(!isLiveSearch) showLoading(); try { const data = await apiFetch(`search/multi?query=${query}`); if (isLiveSearch) { renderLiveSearchResults(data.results); } else { renderSearchResults(data.results); } } catch (error) { console.error('Search failed:', error); if (!isLiveSearch) { searchResultsMessage.textContent = error.message; searchResultsMessage.classList.remove('hidden'); } } finally { if(!isLiveSearch) hideLoading(); } }
+            async function searchMedia(query, isLiveSearch = false) { if (!query) { liveSearchResults.classList.add('hidden'); return; } if(!isLiveSearch) showLoading(); try { const data = await apiFetch(`search/multi?query=${query}`); if (isLiveSearch) renderLiveSearchResults(data.results); else renderSearchResults(data.results); } catch (error) { console.error('Search failed:', error); if (!isLiveSearch) { searchResultsMessage.textContent = error.message; searchResultsMessage.classList.remove('hidden'); } } finally { if(!isLiveSearch) hideLoading(); } }
             async function getMediaDetails(id, type) { showLoading(); try { const data = await apiFetch(`${type}/${id}?append_to_response=watch/providers,credits`); renderModal(data); } catch (error) { console.error('Failed to get details:', error); } finally { hideLoading(); } }
             
             async function fetchScheduleData() {
                 const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
                 if (favoriteTvShows.length === 0) {
                     state.scheduledEpisodes = [];
-                    return; // Exit early if no favorites
-                }
-
-                try {
-                    const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
-                    
-                    const showDetailResults = await Promise.allSettled(showDetailPromises);
-                    const showDetailsList = showDetailResults
-                        .filter(result => {
-                            if (result.status === 'rejected') console.error("Failed to fetch show details:", result.reason);
-                            return result.status === 'fulfilled';
-                        })
-                        .map(result => result.value);
-
-                    const seasonPromises = [];
-                    for (const showDetail of showDetailsList) {
-                        if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
-                            const latestSeason = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
-                            if (latestSeason) {
-                                seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${latestSeason.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
-                            }
-                        }
-                    }
-                    
-                    const seasonDetailResults = await Promise.allSettled(seasonPromises);
-                    const seasonDetailsList = seasonDetailResults
-                        .filter(result => {
-                            if (result.status === 'rejected') console.error("Failed to fetch season details:", result.reason);
-                            return result.status === 'fulfilled';
-                        })
-                        .map(result => result.value);
-
-                    const allEpisodes = [];
-                    for (const season of seasonDetailsList) {
-                        if (season.episodes) {
-                            const us_providers = season.providers?.results?.US?.flatrate || [];
-                            const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
-                            let displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks && season.networks.length > 0 ? season.networks[0] : null);
-                            const episodesWithContext = season.episodes.filter(ep => ep.air_date).map(ep => ({ ...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork }));
-                            allEpisodes.push(...episodesWithContext);
-                        }
-                    }
-                    state.scheduledEpisodes = allEpisodes;
-
-                } catch (error) {
-                    console.error("Error during schedule data processing:", error);
-                    state.scheduledEpisodes = []; // Ensure schedule is empty on error
-                }
-            }
-
-            async function fetchDashboardPublicData() { 
-                showLoading(); 
-                try { 
-                    const trendingPromise = apiFetch(`trending/all/day`); 
-                    const upcomingPromise = apiFetch(`movie/upcoming`); 
-                    const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise]); 
-                    renderDashboardTrending(trendingData.results); 
-                    renderDashboardUpcomingMovies(upcomingData.results); 
-                } catch (error) { 
-                    console.error("Failed to load public dashboard data:", error); 
-                    dashboardTrendingContainer.innerHTML = `<p class="text-gray-500 text-sm">Could not load trending content.</p>`; 
-                    upcomingMoviesContainer.innerHTML = `<p class="text-gray-500 text-sm">Could not load upcoming movies.</p>`;
-                } finally { 
-                    hideLoading(); 
-                } 
-            }
-            function renderSearchResults(mediaResults = []) { const validMedia = mediaResults.filter(item => item.media_type !== 'person' && item.poster_path); searchResultsContainer.innerHTML = ''; searchResultsMessage.classList.add('hidden'); if (validMedia.length === 0) { searchResultsMessage.textContent = 'No results found.'; searchResultsMessage.classList.remove('hidden'); return; } validMedia.forEach(item => searchResultsContainer.appendChild(createMediaCard(item))); }
-            function renderLiveSearchResults(results = []) { liveSearchResults.innerHTML = ''; const validResults = results.filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5); if (validResults.length === 0) { liveSearchResults.classList.add('hidden'); return; } validResults.forEach(item => { const title = item.title || item.name; const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://placehold.co/40x60/374151/FFFFFF?text=N/A'; const el = document.createElement('div'); el.className = 'flex items-center space-x-3 p-3 hover:bg-gray-700 cursor-pointer'; el.innerHTML = `<img src="${posterUrl}" class="w-10 h-auto rounded-md" onerror="this.style.display='none'"><span>${title}</span>`; el.addEventListener('click', () => { getMediaDetails(item.id, item.media_type); liveSearchResults.classList.add('hidden'); searchInput.value = ''; }); liveSearchResults.appendChild(el); }); const seeMore = document.createElement('div'); seeMore.className = 'text-center p-3 bg-gray-900 hover:bg-gray-700 cursor-pointer font-semibold text-indigo-400'; seeMore.textContent = 'See all results'; seeMore.addEventListener('click', handleFullSearch); liveSearchResults.appendChild(seeMore); liveSearchResults.classList.remove('hidden'); }
-            async function renderFavorites() { favoritesMessage.classList.toggle('hidden', state.favorites.length > 0); if (state.favorites.length === 0) { favoritesContainer.innerHTML = ''; favoritesListContainer.innerHTML = ''; return; } const sortedFavorites = [...state.favorites].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name)); if (state.favoritesView === 'grid') { favoritesContainer.classList.remove('hidden'); favoritesListContainer.classList.add('hidden'); favoritesContainer.innerHTML = ''; sortedFavorites.forEach(item => favoritesContainer.appendChild(createMediaCard(item))); } else { favoritesContainer.classList.add('hidden'); favoritesListContainer.classList.remove('hidden'); await renderFavoritesList(sortedFavorites); } }
-            async function renderFavoritesList(sortedFavorites) { const container = favoritesListContainer; container.innerHTML = ''; showLoading(); try { const providerPromises = sortedFavorites.map(fav => apiFetch(`${fav.media_type}/${fav.id}?append_to_response=watch/providers`)); const favoritesWithDetails = await Promise.all(providerPromises); favoritesWithDetails.forEach(details => { const title = details.title || details.name; const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A'; const providers = details['watch/providers']?.results?.US?.flatrate || []; let providersHtml = '<span class="text-gray-400 text-sm">Not on streaming</span>'; if (providers.length > 0) { providersHtml = providers.map(p => `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="h-8 w-8 rounded-md object-cover" title="${p.provider_name}">`).join(''); } const listItem = document.createElement('div'); listItem.className = 'flex items-center space-x-4 p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700'; listItem.innerHTML = `<img src="${posterUrl}" class="w-12 h-auto rounded-md flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/92x138/374151/FFFFFF?text=N/A';"><div class="flex-grow min-w-0"><p class="font-bold truncate">${title}</p></div><div class="flex flex-wrap gap-2 justify-end items-center flex-shrink" style="max-width: 50%;">${providersHtml}</div>`; listItem.addEventListener('click', () => getMediaDetails(details.id, details.title ? 'movie' : 'tv')); container.appendChild(listItem); }); } catch (error) { console.error("Error fetching favorites details:", error); container.innerHTML = `<p class="text-center text-red-400">Could not load details.</p>`; } finally { hideLoading(); } }
-            function renderSubscriptions() { subscriptionList.innerHTML = ''; state.streamingServices.forEach(service => { const isChecked = state.subscriptions.includes(service.id); const logoUrl = `https://image.tmdb.org/t/p/w92${service.logo}`; const item = document.createElement('div'); item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300 ${isChecked ? 'bg-indigo-600' : 'bg-gray-700 hover:bg-gray-600'}`; item.dataset.serviceId = service.id; item.innerHTML = `<img src="${logoUrl}" alt="${service.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${service.name}</span>`; item.addEventListener('click', () => toggleSubscription(service.id)); subscriptionList.appendChild(item); }); }
-            function createMediaCard(item) { const card = document.createElement('div'); card.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 cursor-pointer'; card.dataset.id = item.id; card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv'); const title = item.title || item.name; const releaseDate = item.release_date || item.first_air_date; const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A'; const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-gray-400">${year}</p></div>`; card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type)); return card; }
-            function renderModal(details) { const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A'; const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; const isFavorite = state.favorites.some(fav => fav.id === details.id); const providers = details['watch/providers']?.results?.US?.flatrate || []; let providersHtml = '<p class="text-gray-400">Not available for streaming.</p>'; if (providers.length > 0) { providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-gray-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join(''); } let manualTimeHtml = ''; if (details.seasons) { const favorite = state.favorites.find(f => f.id === details.id); if (favorite) { manualTimeHtml = `<div class="mt-4 pt-4 border-t border-gray-700"><h3 class="text-xl font-semibold mb-2">Manual Air Time</h3><div id="manualTimeContainer" class="flex items-center space-x-4"><p id="manualTimeDisplay" class="text-gray-300 flex-grow">${favorite.manualTime || 'Not set'}</p><button id="editTimeButton" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button></div></div>`; } } $('modalContent').innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-gray-400 mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`; $('favoriteButton').addEventListener('click', () => toggleFavorite(details)); if ($('editTimeButton')) $('editTimeButton').addEventListener('click', () => editManualTime(details)); modal.classList.remove('hidden'); $('closeModal').addEventListener('click', closeModal); }
-            function renderSchedule() { scheduleMessage.classList.add('hidden'); if (state.scheduledEpisodes.length === 0) { scheduleMessage.textContent = "No upcoming episodes for favorites."; scheduleMessage.classList.remove('hidden'); scheduleContent.innerHTML = ''; return; } if (state.scheduleView === 'calendar') renderCalendar(); else renderAgenda(); }
-            function renderCalendar() { const date = state.currentDate; const today = new Date(); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const monthName = date.toLocaleString('default', { month: 'long' }); let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`; for (let i = 0; i < firstDay; i++) html += `<div></div>`; for (let day = 1; day <= daysInMonth; day++) { const dayDate = new Date(year, month, day); const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear(); const dayEvents = state.scheduledEpisodes.filter(ep => { const epDate = parseLocalDate(ep.air_date); return epDate && epDate.getTime() === dayDate.getTime(); }); const uniqueShowNames = [...new Set(dayEvents.map(e => e.showName))].join(', '); let dayClasses = 'p-2 h-16 border border-gray-700 rounded-md text-xs'; if (dayEvents.length > 0) dayClasses += ' bg-indigo-900'; if (isToday) dayClasses += ' border-2 border-indigo-400'; html += `<div class="${dayClasses}"><div class="font-bold">${day}</div><div class="truncate">${uniqueShowNames}</div></div>`; } html += `</div></div>`; scheduleContent.innerHTML = html; $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(month - 1); renderCalendar(); }); $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(month + 1); renderCalendar(); }); }
-            function renderAgenda() { const sortedEpisodes = [...state.scheduledEpisodes].sort((a, b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); const today = new Date(); today.setHours(0, 0, 0, 0); const groupedByDayAndShow = sortedEpisodes.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) { acc[key] = { showId: ep.showId, showName: ep.showName, air_date: ep.air_date, poster_path: ep.poster_path, displayNetwork: ep.displayNetwork, episodes: [] }; } acc[key].episodes.push({ id: ep.id, season_number: ep.season_number, episode_number: ep.episode_number, name: ep.name }); return acc; }, {}); const agendaHtml = Object.values(groupedByDayAndShow).map(group => { const airDate = parseLocalDate(group.air_date); const isPast = airDate < today; const favorite = state.favorites.find(f => f.id === group.showId); const manualTime = favorite ? favorite.manualTime : null; let networkHtml = ''; if (group.displayNetwork && group.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" alt="${group.displayNetwork.name}">`; } else if (group.displayNetwork) { networkHtml = `<span class="text-sm text-gray-400">${group.displayNetwork.name}</span>`; } const episodeListHtml = group.episodes.map(ep => `<p class="text-sm text-gray-400 truncate" title="S${ep.season_number} E${ep.episode_number}: ${ep.name}">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); const scrollTargetId = group.episodes[0].id; return `<div id="agenda-episode-${scrollTargetId}" class="flex items-center space-x-4 p-3 bg-gray-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${group.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0" onerror="this.style.display='none'"><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeListHtml}</div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-indigo-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>${manualTime ? `<p class="text-sm text-gray-300">${manualTime}</p>` : ''}<div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`; }).join(''); scheduleContent.innerHTML = `<div class="space-y-4">${agendaHtml}</div>`; const allGroups = Object.values(groupedByDayAndShow); const firstUpcomingGroupIndex = allGroups.findIndex(group => parseLocalDate(group.air_date) >= today); if (firstUpcomingGroupIndex !== -1) { const firstUpcomingId = allGroups[firstUpcomingGroupIndex].episodes[0].id; setTimeout(() => { const element = $(`agenda-episode-${firstUpcomingId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 100); } }
-            function renderDashboardHeader() { dashboardUserName.textContent = state.userName || 'You'; }
-            function renderDashboardUpcoming() { const container = dashboardUpcomingContainer; container.innerHTML = ''; const today = new Date(); today.setHours(0,0,0,0); let endDate = new Date(today); if (state.dashboardScheduleFilter === 'today') {} else if (state.dashboardScheduleFilter === 'week') { endDate.setDate(today.getDate() + 6); } else if (state.dashboardScheduleFilter === 'month') { endDate.setMonth(today.getMonth() + 1); } const upcoming = state.scheduledEpisodes.filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; }).sort((a,b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); if (upcoming.length === 0) { container.innerHTML = `<p class="text-gray-500 text-sm">No episodes airing for your favorites in this period.</p>`; return; } const grouped = upcoming.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) { acc[key] = { ...ep, episodes: [] }; } acc[key].episodes.push(ep); return acc; }, {}); Object.values(grouped).forEach(group => { const el = document.createElement('div'); el.className = 'flex items-center space-x-4 p-3 bg-gray-700 rounded-lg'; const airDate = parseLocalDate(group.air_date); const day = airDate.toLocaleDateString(undefined, { weekday: 'short' }); const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); const favorite = state.favorites.find(f => f.id === group.showId); const manualTime = favorite && favorite.manualTime ? favorite.manualTime : ''; const posterUrl = group.poster_path ? `https://image.tmdb.org/t/p/w92${group.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A'; const episodeList = group.episodes.map(ep => `<p class="text-sm text-gray-400 truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); let networkHtml = ''; if (group.displayNetwork && group.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" title="${group.displayNetwork.name}">`; } else if (group.displayNetwork) { networkHtml = `<span class="text-xs text-gray-400">${group.displayNetwork.name}</span>`; } el.innerHTML = `<div class="text-center w-20 flex-shrink-0"><p class="font-bold text-xl text-indigo-300">${day}</p><p class="text-sm text-gray-400">${date}</p></div><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeList}<p class="text-sm font-semibold text-gray-300 mt-1">${manualTime}</p></div><div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2"><img src="${posterUrl}" class="w-12 h-auto rounded-md" onerror="this.style.display='none'"><div class="h-6 flex items-center justify-center">${networkHtml}</div></div>`; container.appendChild(el); }); }
-            function renderDashboardTrending(items = []) { const container = dashboardTrendingContainer; container.innerHTML = ''; if(items.length === 0) { return; } items.filter(item => item.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'flex-shrink-0 w-32 cursor-pointer relative'; const posterUrl = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A'; const year = item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : ''; card.innerHTML = `<img src="${posterUrl}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><div class="absolute top-1 right-1 bg-gray-900 bg-opacity-75 text-white text-xs font-bold px-2 py-1 rounded-full">${rating}</div><p class="text-sm mt-2 truncate font-semibold">${item.title || item.name}</p><p class="text-xs text-gray-400">${year}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, item.media_type)); container.appendChild(card); }); }
-            function renderDashboardUpcomingMovies(items = []) { const container = upcomingMoviesContainer; container.innerHTML = ''; if(items.length === 0) { return; } items.filter(item => item.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'flex-shrink-0 w-32 cursor-pointer relative'; const posterUrl = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); card.innerHTML = `<img src="${posterUrl}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><p class="text-sm mt-2 truncate font-semibold">${item.title}</p><p class="text-xs text-indigo-300">${releaseDate}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, 'movie')); container.appendChild(card); }); }
-            function handleFullSearch() { const query = searchInput.value.trim(); liveSearchResults.classList.add('hidden'); switchTab('search-results'); searchMedia(query, false); }
-            let debounceTimer; function handleLiveSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { searchMedia(searchInput.value.trim(), true); }, 300); }
-            async function switchTab(tabName) { state.activeTab = tabName; document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if ($(tabName)) $(tabName).classList.remove('hidden'); tabs.forEach(tab => { const isCurrentTab = tab.dataset.tab === tabName; tab.classList.toggle('text-indigo-400', isCurrentTab); tab.classList.toggle('border-indigo-400', isCurrentTab); tab.classList.toggle('font-medium', isCurrentTab); tab.classList.toggle('text-gray-500', !isCurrentTab); tab.classList.toggle('border-transparent', !isCurrentTab); }); if (tabName === 'dashboard') { renderDashboardUpcoming(); renderDashboardHeader(); } if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') { renderSchedule(); } }
-            
-            function toggleSubscription(serviceId) {
-                if (!auth.currentUser) {
-                    promptLogin('Please sign in to manage your subscriptions.');
                     return;
                 }
+                try {
+                    const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
+                    const showDetailResults = await Promise.allSettled(showDetailPromises);
+                    const showDetailsList = showDetailResults.filter(r => r.status === 'fulfilled').map(r => r.value);
+                    const seasonPromises = showDetailsList.flatMap(show => {
+                        const latestSeason = show.seasons?.filter(s => s.season_number > 0).sort((a,b) => b.season_number - a.season_number)[0];
+                        return latestSeason ? [apiFetch(`tv/${show.id}/season/${latestSeason.season_number}`).then(data => ({...data, showId: show.id, showName: show.name, showPoster: show.poster_path, networks: show.networks, providers: show['watch/providers'] }))] : [];
+                    });
+                    const seasonDetailResults = await Promise.allSettled(seasonPromises);
+                    const allEpisodes = seasonDetailResults.filter(r => r.status === 'fulfilled').flatMap(r => {
+                        const season = r.value;
+                        const us_providers = season.providers?.results?.US?.flatrate || [];
+                        const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
+                        let displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks?.[0] || null);
+                        return season.episodes?.filter(ep => ep.air_date).map(ep => ({...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork })) || [];
+                    });
+                    state.scheduledEpisodes = allEpisodes;
+                } catch (error) { console.error("Error processing schedule data:", error); state.scheduledEpisodes = []; }
+            }
+
+            async function fetchDashboardPublicData() { showLoading(); try { const [trendingData, upcomingData] = await Promise.all([apiFetch(`trending/all/day`), apiFetch(`movie/upcoming`)]); renderDashboardTrending(trendingData.results); renderDashboardUpcomingMovies(upcomingData.results); } catch (error) { console.error("Failed to load public dashboard data:", error); dashboardTrendingContainer.innerHTML = `<p class="themed-text-muted text-sm">Could not load trending content.</p>`; upcomingMoviesContainer.innerHTML = `<p class="themed-text-muted text-sm">Could not load upcoming movies.</p>`; } finally { hideLoading(); } }
+            function renderSearchResults(media = []) { const valid = media.filter(i => i.media_type !== 'person' && i.poster_path); searchResultsContainer.innerHTML = ''; searchResultsMessage.classList.toggle('hidden', valid.length > 0); if (valid.length === 0) { searchResultsMessage.textContent = 'No results found.'; return; } valid.forEach(item => searchResultsContainer.appendChild(createMediaCard(item))); }
+            function renderLiveSearchResults(results = []) { liveSearchResults.innerHTML = ''; const valid = results.filter(i => i.media_type !== 'person' && i.poster_path).slice(0, 5); if (valid.length === 0) { liveSearchResults.classList.add('hidden'); return; } valid.forEach(item => { const title = item.title || item.name; const poster = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://placehold.co/40x60/374151/FFFFFF?text=N/A'; const el = document.createElement('div'); el.className = 'flex items-center space-x-3 p-3 hover:bg-gray-700 cursor-pointer'; el.innerHTML = `<img src="${poster}" class="w-10 h-auto rounded-md" onerror="this.style.display='none'"><span>${title}</span>`; el.addEventListener('click', () => { getMediaDetails(item.id, item.media_type); liveSearchResults.classList.add('hidden'); searchInput.value = ''; }); liveSearchResults.appendChild(el); }); const seeMore = document.createElement('div'); seeMore.className = 'text-center p-3 bg-gray-900 hover:bg-gray-700 cursor-pointer font-semibold themed-accent-text'; seeMore.textContent = 'See all results'; seeMore.addEventListener('click', handleFullSearch); liveSearchResults.appendChild(seeMore); liveSearchResults.classList.remove('hidden'); }
+            function renderFavorites() { favoritesMessage.classList.toggle('hidden', state.favorites.length > 0); const sorted = [...state.favorites].sort((a,b) => (a.title || a.name).localeCompare(b.title || b.name)); if (state.favoritesView === 'grid') { favoritesContainer.classList.remove('hidden'); favoritesListContainer.classList.add('hidden'); favoritesContainer.innerHTML = ''; sorted.forEach(item => favoritesContainer.appendChild(createMediaCard(item))); } else { favoritesContainer.classList.add('hidden'); favoritesListContainer.classList.remove('hidden'); renderFavoritesList(sorted); } }
+            async function renderFavoritesList(sorted) { const container = favoritesListContainer; container.innerHTML = ''; showLoading(); try { const details = await Promise.all(sorted.map(fav => apiFetch(`${fav.media_type}/${fav.id}?append_to_response=watch/providers`))); details.forEach(d => { const title = d.title || d.name; const poster = d.poster_path ? `https://image.tmdb.org/t/p/w92${d.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A'; const providers = d['watch/providers']?.results?.US?.flatrate || []; let providersHtml = `<span class="themed-text-muted text-sm">Not on streaming</span>`; if (providers.length > 0) providersHtml = providers.map(p => `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="h-8 w-8 rounded-md object-cover" title="${p.provider_name}">`).join(''); const li = document.createElement('div'); li.className = 'flex items-center space-x-4 p-3 themed-bg rounded-lg cursor-pointer hover:bg-gray-700'; li.innerHTML = `<img src="${poster}" class="w-12 h-auto rounded-md shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/92x138/374151/FFFFFF?text=N/A';"><div class="flex-grow min-w-0"><p class="font-bold truncate">${title}</p></div><div class="flex flex-wrap gap-2 justify-end items-center shrink" style="max-width: 50%;">${providersHtml}</div>`; li.addEventListener('click', () => getMediaDetails(d.id, d.title ? 'movie' : 'tv')); container.appendChild(li); }); } catch (error) { console.error("Error fetching favorites details:", error); container.innerHTML = `<p class="text-center text-red-400">Could not load details.</p>`; } finally { hideLoading(); } }
+            function renderSubscriptions() { subscriptionList.innerHTML = ''; state.streamingServices.forEach(s => { const isChecked = state.subscriptions.includes(s.id); const logo = `https://image.tmdb.org/t/p/w92${s.logo}`; const item = document.createElement('div'); item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition ${isChecked ? 'themed-accent-bg' : 'themed-bg-tertiary hover:bg-gray-600'}`; item.dataset.serviceId = s.id; item.innerHTML = `<img src="${logo}" alt="${s.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${s.name}</span>`; item.addEventListener('click', () => toggleSubscription(s.id)); subscriptionList.appendChild(item); }); }
+            function createMediaCard(item) { const card = document.createElement('div'); card.className = 'themed-bg rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 cursor-pointer'; card.dataset.id = item.id; card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv'); const title = item.title || item.name; const date = item.release_date || item.first_air_date; const year = date ? new Date(date).getFullYear() : 'N/A'; const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; card.innerHTML = `<img src="${poster}" alt="${title}" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm themed-text-muted">${year}</p></div>`; card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type)); return card; }
+            function renderModal(details) { const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A'; const poster = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image'; const isFavorite = state.favorites.some(fav => fav.id === details.id); const providers = details['watch/providers']?.results?.US?.flatrate || []; let providersHtml = '<p class="themed-text-muted">Not available for streaming.</p>'; if (providers.length > 0) providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'themed-bg-tertiary'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join(''); let manualTimeHtml = ''; if (details.seasons) { const favorite = state.favorites.find(f => f.id === details.id); if (favorite) manualTimeHtml = `<div class="mt-4 pt-4 border-t themed-border"><h3 class="text-xl font-semibold mb-2">Manual Air Time</h3><div id="manualTimeContainer" class="flex items-center space-x-4"><p class="themed-text-muted flex-grow">${favorite.manualTime || 'Not set'}</p><button id="editTimeButton" class="themed-bg-tertiary hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button></div></div>`; } $('modalContent').innerHTML = `<button id="closeModal" class="absolute top-4 right-4 themed-text-muted hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 shrink-0"><img src="${poster}" alt="${title}" class="w-full rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/500x750/374151/FFFFFF?text=No+Image';"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="themed-text-muted mb-4 text-sm">${details.overview || 'No overview.'}</p><button id="favoriteButton" class="w-full mb-6 ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'themed-accent-bg themed-accent-bg-hover'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`; $('favoriteButton').addEventListener('click', () => toggleFavorite(details)); if ($('editTimeButton')) $('editTimeButton').addEventListener('click', () => editManualTime(details)); modal.classList.remove('hidden'); $('closeModal').addEventListener('click', closeModal); }
+            function renderSchedule() { scheduleMessage.classList.add('hidden'); if (state.scheduledEpisodes.length === 0) { scheduleMessage.textContent = "No upcoming episodes for favorites."; scheduleMessage.classList.remove('hidden'); scheduleContent.innerHTML = ''; return; } if (state.scheduleView === 'calendar') renderCalendar(); else renderAgenda(); }
+            function renderCalendar() { const date = state.currentDate, today = new Date(); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const monthName = date.toLocaleString('default', { month: 'long' }); let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs themed-text-muted"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`; for (let i = 0; i < firstDay; i++) html += `<div></div>`; for (let day = 1; day <= daysInMonth; day++) { const dayDate = new Date(year, month, day); const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear(); const dayEvents = state.scheduledEpisodes.filter(ep => parseLocalDate(ep.air_date)?.getTime() === dayDate.getTime()); const uniqueShowNames = [...new Set(dayEvents.map(e => e.showName))].join(', '); let dayClasses = 'p-2 h-16 themed-border border rounded-md text-xs'; if (dayEvents.length > 0) dayClasses += ' themed-accent-bg'; if (isToday) dayClasses += ' border-2 themed-accent-border'; html += `<div class="${dayClasses}"><div class="font-bold">${day}</div><div class="truncate">${uniqueShowNames}</div></div>`; } html += `</div></div>`; scheduleContent.innerHTML = html; $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() - 1); renderCalendar(); }); $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() + 1); renderCalendar(); }); }
+            function renderAgenda() { const sorted = [...state.scheduledEpisodes].sort((a,b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); const today = new Date(); today.setHours(0,0,0,0); const grouped = sorted.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) acc[key] = {...ep, episodes: []}; acc[key].episodes.push(ep); return acc; }, {}); const agendaHtml = Object.values(grouped).map(group => { const airDate = parseLocalDate(group.air_date); const isPast = airDate < today; const favorite = state.favorites.find(f => f.id === group.showId); const manualTime = favorite?.manualTime || ''; let networkHtml = ''; if (group.displayNetwork?.logo_path) networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" alt="${group.displayNetwork.name}">`; else if (group.displayNetwork) networkHtml = `<span class="text-sm themed-text-muted">${group.displayNetwork.name}</span>`; const episodeList = group.episodes.map(ep => `<p class="text-sm themed-text-muted truncate" title="S${ep.season_number} E${ep.episode_number}: ${ep.name}">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); return `<div id="agenda-ep-${group.episodes[0].id}" class="flex items-center space-x-4 p-3 themed-bg-tertiary rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${group.poster_path}" class="w-12 h-auto rounded-md shrink-0" onerror="this.style.display='none'"><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeList}</div><div class="text-right shrink-0 w-32"><p class="font-bold themed-accent-text text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>${manualTime ? `<p class="text-sm themed-text-muted">${manualTime}</p>` : ''}<div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`; }).join(''); scheduleContent.innerHTML = `<div class="space-y-4">${agendaHtml}</div>`; const firstUpcoming = Object.values(grouped).find(g => parseLocalDate(g.air_date) >= today); if (firstUpcoming) setTimeout(() => $(`agenda-ep-${firstUpcoming.episodes[0].id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }
+            function renderDashboardHeader() { dashboardUserName.textContent = state.userName || 'You'; }
+            function renderDashboardUpcoming() { const container = dashboardUpcomingContainer; container.innerHTML = ''; const today = new Date(); today.setHours(0,0,0,0); let endDate = new Date(today); if (state.dashboardScheduleFilter === 'week') endDate.setDate(today.getDate() + 6); else if (state.dashboardScheduleFilter === 'month') endDate.setMonth(today.getMonth() + 1); const upcoming = state.scheduledEpisodes.filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; }).sort((a,b) => parseLocalDate(a.air_date) - parseLocalDate(b.air_date)); if (upcoming.length === 0) { container.innerHTML = `<p class="themed-text-muted text-sm">No episodes for your favorites in this period.</p>`; return; } const grouped = upcoming.reduce((acc, ep) => { const key = `${ep.showId}-${ep.air_date}`; if (!acc[key]) acc[key] = {...ep, episodes: []}; acc[key].episodes.push(ep); return acc; }, {}); Object.values(grouped).forEach(group => { const el = document.createElement('div'); el.className = 'flex items-center space-x-4 p-3 themed-bg-tertiary rounded-lg'; const airDate = parseLocalDate(group.air_date); const day = airDate.toLocaleDateString(undefined, { weekday: 'short' }); const dateStr = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); const manualTime = state.favorites.find(f => f.id === group.showId)?.manualTime || ''; const poster = group.poster_path ? `https://image.tmdb.org/t/p/w92${group.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A'; const episodeList = group.episodes.map(ep => `<p class="text-sm themed-text-muted truncate">S${ep.season_number} E${ep.episode_number}: ${ep.name}</p>`).join(''); let networkHtml = ''; if (group.displayNetwork?.logo_path) networkHtml = `<img src="https://image.tmdb.org/t/p/w92${group.displayNetwork.logo_path}" class="h-6 object-contain" title="${group.displayNetwork.name}">`; else if (group.displayNetwork) networkHtml = `<span class="text-xs themed-text-muted">${group.displayNetwork.name}</span>`; el.innerHTML = `<div class="text-center w-20 shrink-0"><p class="font-bold text-xl themed-accent-text">${day}</p><p class="text-sm themed-text-muted">${dateStr}</p></div><div class="flex-grow min-w-0"><p class="font-bold">${group.showName}</p>${episodeList}<p class="text-sm font-semibold themed-text-muted mt-1">${manualTime}</p></div><div class="flex flex-col items-center justify-center w-16 shrink-0 space-y-2"><img src="${poster}" class="w-12 h-auto rounded-md" onerror="this.style.display='none'"><div class="h-6 flex items-center justify-center">${networkHtml}</div></div>`; container.appendChild(el); }); }
+            function renderDashboardTrending(items = []) { dashboardTrendingContainer.innerHTML = ''; items.filter(i => i.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'shrink-0 w-32 cursor-pointer relative'; const poster = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const rating = item.vote_average?.toFixed(1) || 'N/A'; const year = item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : ''; card.innerHTML = `<img src="${poster}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><div class="absolute top-1 right-1 bg-gray-900 bg-opacity-75 text-white text-xs font-bold px-2 py-1 rounded-full">${rating}</div><p class="text-sm mt-2 truncate font-semibold">${item.title || item.name}</p><p class="text-xs themed-text-muted">${year}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, item.media_type)); dashboardTrendingContainer.appendChild(card); }); }
+            function renderDashboardUpcomingMovies(items = []) { upcomingMoviesContainer.innerHTML = ''; items.filter(i => i.poster_path).forEach(item => { const card = document.createElement('div'); card.className = 'shrink-0 w-32 cursor-pointer relative'; const poster = `https://image.tmdb.org/t/p/w342${item.poster_path}`; const date = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); card.innerHTML = `<img src="${poster}" class="rounded-lg w-full h-auto" onerror="this.style.display='none'"><p class="text-sm mt-2 truncate font-semibold">${item.title}</p><p class="text-xs themed-accent-text">${date}</p>`; card.addEventListener('click', () => getMediaDetails(item.id, 'movie')); upcomingMoviesContainer.appendChild(card); }); }
+            function handleFullSearch() { const q = searchInput.value.trim(); liveSearchResults.classList.add('hidden'); switchTab('search-results'); searchMedia(q, false); }
+            let debounceTimer; function handleLiveSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => searchMedia(searchInput.value.trim(), true), 300); }
+            function switchTab(tabName) { state.activeTab = tabName; $$('.tab-content').forEach(c => c.classList.add('hidden')); $(tabName)?.classList.remove('hidden'); tabs.forEach(tab => { const isCurrent = tab.dataset.tab === tabName; tab.classList.toggle('themed-accent-text', isCurrent); tab.classList.toggle('themed-accent-border', isCurrent); tab.classList.toggle('font-medium', isCurrent); tab.classList.toggle('themed-text-muted', !isCurrent); tab.classList.toggle('border-transparent', !isCurrent); }); if (tabName === 'dashboard') { renderDashboardUpcoming(); renderDashboardHeader(); } if (tabName === 'favorites') renderFavorites(); if (tabName === 'schedule') renderSchedule(); }
+            
+            function toggleSubscription(serviceId) {
+                if (!auth.currentUser) { promptLogin('Please sign in to manage subscriptions.'); return; }
                 const index = state.subscriptions.indexOf(serviceId);
                 if (index > -1) state.subscriptions.splice(index, 1);
                 else state.subscriptions.push(serviceId);
@@ -532,73 +453,63 @@
                 renderSubscriptions();
             }
 
-            function toggleFavorite(mediaItem) {
-                if (!auth.currentUser) {
-                    promptLogin('Please sign in to save favorites.');
-                    return;
-                }
-                const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
-                if (index > -1) {
-                    state.favorites.splice(index, 1);
-                } else {
-                    state.favorites.push({ id: mediaItem.id, name: mediaItem.name, title: mediaItem.title, poster_path: mediaItem.poster_path, first_air_date: mediaItem.first_air_date, release_date: mediaItem.release_date, media_type: mediaItem.title ? 'movie' : 'tv', manualTime: null });
-                }
+            function toggleFavorite(media) {
+                if (!auth.currentUser) { promptLogin('Please sign in to save favorites.'); return; }
+                const index = state.favorites.findIndex(fav => fav.id === media.id);
+                if (index > -1) state.favorites.splice(index, 1);
+                else state.favorites.push({ id: media.id, name: media.name, title: media.title, poster_path: media.poster_path, first_air_date: media.first_air_date, release_date: media.release_date, media_type: media.title ? 'movie' : 'tv', manualTime: null });
                 saveDataToFirestore(); 
-                renderModal(mediaItem);
+                renderModal(media);
                 fetchScheduleData().then(() => {
                     if (state.activeTab === 'dashboard') renderDashboardUpcoming();
                     if (state.activeTab === 'schedule') renderSchedule();
                 });
-                if (state.activeTab === 'favorites') {
-                    renderFavorites();
-                }
+                if (state.activeTab === 'favorites') renderFavorites();
             }
             function editManualTime(details) { 
-                if (!auth.currentUser) {
-                    promptLogin('Please sign in to edit air times.');
-                    closeModal();
-                    return;
-                }
-                const favorite = state.favorites.find(f => f.id === details.id); if (!favorite) return; const container = $('manualTimeContainer'); container.innerHTML = `<div class="flex-grow"><input type="text" id="timeInput" class="w-full bg-gray-700 border border-gray-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST"></div><div class="flex space-x-2"><button id="saveTimeButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-sm">Save</button><button id="cancelTimeButton" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button></div>`; $('saveTimeButton').addEventListener('click', () => { const newTime = $('timeInput').value.trim(); favorite.manualTime = newTime; saveDataToFirestore(); renderModal(details); }); $('cancelTimeButton').addEventListener('click', () => renderModal(details)); }
+                if (!auth.currentUser) { promptLogin('Please sign in to edit air times.'); closeModal(); return; }
+                const favorite = state.favorites.find(f => f.id === details.id); if (!favorite) return; const container = $('manualTimeContainer'); container.innerHTML = `<div class="flex-grow"><input type="text" id="timeInput" class="w-full themed-bg-tertiary border themed-border rounded-md py-1 px-2" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST"></div><div class="flex space-x-2"><button id="saveTimeButton" class="themed-accent-bg themed-accent-bg-hover text-white font-bold py-1 px-3 rounded text-sm">Save</button><button id="cancelTimeButton" class="themed-bg-tertiary hover:bg-gray-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button></div>`; $('saveTimeButton').addEventListener('click', () => { favorite.manualTime = $('timeInput').value.trim(); saveDataToFirestore(); renderModal(details); }); $('cancelTimeButton').addEventListener('click', () => renderModal(details)); }
             function closeModal() { modal.classList.add('hidden'); }
             function showLoading() { loadingSpinner.classList.remove('hidden'); }
             function hideLoading() { loadingSpinner.classList.add('hidden'); }
             
-            function initAppUI() { 
-                renderSubscriptions();
-                switchTab(state.activeTab); 
-            }
+            function initAppUI() { renderSubscriptions(); switchTab(state.activeTab); }
 
             function initEventListeners() {
                 signInWithGoogleButton.addEventListener('click', handleGoogleSignIn);
                 searchButton.addEventListener('click', handleFullSearch); 
                 searchInput.addEventListener('input', handleLiveSearch); 
-                searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { handleFullSearch(); } }); 
-                document.addEventListener('click', (e) => { if (!$('searchWrapper').contains(e.target)) { liveSearchResults.classList.add('hidden'); } }); 
+                searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleFullSearch(); }); 
+                document.addEventListener('click', e => { if (!$('searchWrapper').contains(e.target)) liveSearchResults.classList.add('hidden'); }); 
                 tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab))); 
-                modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }); 
-                loginScreen.addEventListener('click', (e) => { if (e.target === loginScreen || e.target.classList.contains('modal-backdrop')) loginScreen.classList.add('hidden'); });
+                modal.addEventListener('click', e => { if (e.target === modal) closeModal(); }); 
+                loginScreen.addEventListener('click', e => { if (e.target === loginScreen) loginScreen.classList.add('hidden'); });
                 saveUserNameButton.addEventListener('click', () => { 
-                    if (!auth.currentUser) {
-                        promptLogin('Please sign in to save your name.');
-                        return;
+                    if (!auth.currentUser) { promptLogin('Please sign in to save your name.'); return; }
+                    state.userName = userNameInput.value.trim(); saveDataToFirestore(); userNameMessage.textContent = 'Name saved!'; userNameMessage.classList.remove('hidden'); setTimeout(() => userNameMessage.classList.add('hidden'), 3000); }); 
+                calendarViewBtn.addEventListener('click', () => { state.scheduleView = 'calendar'; calendarViewBtn.classList.add('themed-accent-bg', 'text-white'); agendaViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderSchedule(); }); 
+                agendaViewBtn.addEventListener('click', () => { state.scheduleView = 'agenda'; agendaViewBtn.classList.add('themed-accent-bg', 'text-white'); calendarViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderSchedule(); }); 
+                gridViewBtn.addEventListener('click', () => { if (state.favoritesView === 'grid') return; state.favoritesView = 'grid'; gridViewBtn.classList.add('themed-accent-bg', 'text-white'); listViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderFavorites(); }); 
+                listViewBtn.addEventListener('click', () => { if (state.favoritesView === 'list') return; state.favoritesView = 'list'; listViewBtn.classList.add('themed-accent-bg', 'text-white'); gridViewBtn.classList.remove('themed-accent-bg', 'text-white'); renderFavorites(); }); 
+                upcomingFilterBtns.forEach(btn => { btn.addEventListener('click', () => { state.dashboardScheduleFilter = btn.dataset.filter; upcomingFilterBtns.forEach(b => b.classList.toggle('themed-accent-bg', b === btn)); renderDashboardUpcoming(); }); }); 
+                scrollLeftBtn.addEventListener('click', () => dashboardTrendingContainer.scrollBy({ left: -300, behavior: 'smooth' })); 
+                scrollRightBtn.addEventListener('click', () => dashboardTrendingContainer.scrollBy({ left: 300, behavior: 'smooth' })); 
+                scrollUpcomingLeftBtn.addEventListener('click', () => upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' })); 
+                scrollUpcomingRightBtn.addEventListener('click', () => upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }));
+                themeSelector.addEventListener('click', (e) => {
+                    const themeBtn = e.target.closest('.theme-btn');
+                    if(themeBtn) {
+                        state.theme = themeBtn.dataset.theme;
+                        applyTheme(state.theme);
+                        if(auth.currentUser) {
+                            saveDataToFirestore();
+                        }
                     }
-                    const name = userNameInput.value.trim(); state.userName = name; saveDataToFirestore(); userNameMessage.textContent = 'Name saved!'; userNameMessage.classList.remove('hidden'); setTimeout(() => userNameMessage.classList.add('hidden'), 3000); }); 
-                calendarViewBtn.addEventListener('click', () => { state.scheduleView = 'calendar'; calendarViewBtn.classList.add('bg-indigo-600', 'text-white'); agendaViewBtn.classList.remove('bg-indigo-600', 'text-white'); agendaViewBtn.classList.add('text-gray-300'); renderSchedule(); }); 
-                agendaViewBtn.addEventListener('click', () => { state.scheduleView = 'agenda'; agendaViewBtn.classList.add('bg-indigo-600', 'text-white'); calendarViewBtn.classList.remove('bg-indigo-600', 'text-white'); calendarViewBtn.classList.add('text-gray-300'); renderSchedule(); }); 
-                gridViewBtn.addEventListener('click', () => { if (state.favoritesView === 'grid') return; state.favoritesView = 'grid'; gridViewBtn.classList.add('bg-indigo-600', 'text-white'); listViewBtn.classList.remove('bg-indigo-600', 'text-white'); listViewBtn.classList.add('text-gray-300'); renderFavorites(); }); 
-                listViewBtn.addEventListener('click', () => { if (state.favoritesView === 'list') return; state.favoritesView = 'list'; listViewBtn.classList.add('bg-indigo-600', 'text-white'); gridViewBtn.classList.remove('bg-indigo-600', 'text-white'); gridViewBtn.classList.add('text-gray-300'); renderFavorites(); }); 
-                upcomingFilterBtns.forEach(btn => { btn.addEventListener('click', () => { state.dashboardScheduleFilter = btn.dataset.filter; upcomingFilterBtns.forEach(b => { b.classList.toggle('bg-indigo-600', b === btn); b.classList.toggle('text-white', b === btn); b.classList.toggle('text-gray-300', b !== btn); }); renderDashboardUpcoming(); }); }); 
-                scrollLeftBtn.addEventListener('click', () => { dashboardTrendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); }); 
-                scrollRightBtn.addEventListener('click', () => { dashboardTrendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); }); 
-                scrollUpcomingLeftBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' }); }); 
-                scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); }); 
+                });
             }
             
-            // --- App Entry Point ---
             initEventListeners();
             fetchDashboardPublicData();
-
         });
     </script>
 </body>
