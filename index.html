@@ -441,10 +441,12 @@
                         <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
                     </div>
                     <div class="lg:col-span-1 space-y-8">
-                        <div id="highlightsSection" class="hidden">
-                            <h2 class="text-2xl font-bold mb-4">Highlight</h2>
-                            <div id="highlightsContainer">
-                                <!-- JS will populate this -->
+                        <div id="spotlightSection" class="hidden">
+                            <h2 class="text-2xl font-bold mb-4">Spotlight</h2>
+                             <div class="relative">
+                                <div id="spotlightContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
+                                <button id="spotlightScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="spotlightScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
                         </div>
                         <div>
@@ -1291,11 +1293,11 @@
                 countEl.textContent = `${selected.length} selected`;
             }
 
-            async function renderHighlights(upcomingMovies) {
-                const highlightsSection = $('highlightsSection');
-                const highlightsContainer = $('highlightsContainer');
-                highlightsContainer.innerHTML = '';
-                highlightsSection.classList.add('hidden');
+            async function renderSpotlight(upcomingMovies) {
+                const spotlightSection = $('spotlightSection');
+                const spotlightContainer = $('spotlightContainer');
+                spotlightContainer.innerHTML = '';
+                spotlightSection.classList.add('hidden');
 
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -1311,7 +1313,7 @@
                 }).map(m => ({...m, media_type: 'movie'}));
 
                 const favoriteShowIds = new Set(state.favorites.filter(f => f.media_type === 'tv').map(f => f.id));
-                 const groupedEpisodes = state.scheduledEpisodes.reduce((acc, ep) => {
+                const groupedEpisodes = state.scheduledEpisodes.reduce((acc, ep) => {
                     if (!favoriteShowIds.has(ep.showId)) return acc;
                     const key = `${ep.showId}-${ep.air_date}`;
                     if (!acc[key]) {
@@ -1342,53 +1344,37 @@
                     const dateB = parseLocalDate(b.release_date);
                     const diffA = Math.abs(dateA.getTime() - today.getTime());
                     const diffB = Math.abs(dateB.getTime() - today.getTime());
-                    return diffA - diffB;
+                     if (diffA !== diffB) {
+                        return diffA - diffB;
+                    }
+                    return dateA - dateB;
                 });
 
-                const highlightItem = potentialHighlights[0];
-                
-                try {
-                    const details = await apiFetch(`${highlightItem.media_type}/${highlightItem.id}`);
-                    if (!details.backdrop_path) {
-                        return;
-                    }
-
-                    const backdropUrl = `https://image.tmdb.org/t/p/w780${details.backdrop_path}`;
-                    const releaseDate = parseLocalDate(highlightItem.release_date);
+                potentialHighlights.forEach(item => {
+                    if (!item.poster_path) return;
+                    const card = document.createElement('div');
+                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                    
+                    const releaseDate = parseLocalDate(item.release_date);
                     const diffDays = Math.round((releaseDate - today) / (1000 * 60 * 60 * 24));
                     
                     let releaseText = '';
-                    if (diffDays === 0) {
-                        releaseText = 'Airing Today';
-                    } else if (diffDays === 1) {
-                        releaseText = 'Airs Tomorrow';
-                    } else if (diffDays > 1) {
-                        releaseText = `Airs in ${diffDays} days`;
-                    } else if (diffDays === -1) {
-                        releaseText = 'Aired Yesterday';
-                    } else {
-                        releaseText = `Aired ${Math.abs(diffDays)} days ago`;
-                    }
+                    if (diffDays === 0) releaseText = 'Today';
+                    else if (diffDays === 1) releaseText = 'Tomorrow';
+                    else if (diffDays > 1) releaseText = `In ${diffDays} days`;
+                    else if (diffDays === -1) releaseText = 'Yesterday';
+                    else releaseText = `${Math.abs(diffDays)} days ago`;
 
-                    const title = details.title || details.name;
-
-                    highlightsContainer.innerHTML = `
-                        <div class="relative rounded-lg overflow-hidden cursor-pointer group bg-zinc-800" id="highlightCard">
-                            <img src="${backdropUrl}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 p-4 text-white">
-                                <span class="block text-sm font-bold uppercase tracking-widest text-red-400">${releaseText}</span>
-                                <h3 class="text-xl font-bold">${title}</h3>
-                            </div>
-                        </div>
+                    card.innerHTML = `
+                        <img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg">
+                        <p class="text-sm mt-2 truncate font-bold">${item.title || item.name}</p>
+                        <p class="text-xs text-red-400 font-semibold">${releaseText}</p>
                     `;
+                    card.addEventListener('click', () => getMediaDetails(item.id, item.media_type));
+                    spotlightContainer.appendChild(card);
+                });
 
-                    highlightsSection.classList.remove('hidden');
-                    $('highlightCard').addEventListener('click', () => getMediaDetails(highlightItem.id, highlightItem.media_type));
-
-                } catch (error) {
-                    console.error("Failed to render highlight:", error);
-                }
+                spotlightSection.classList.remove('hidden');
             }
             
             async function fetchDashboardData() {
@@ -1402,7 +1388,7 @@
                     renderDashboardTrending(trendingData.results);
                     renderDashboardUpcomingMovies(upcomingData.results);
                     renderDashboardUpcoming();
-                    await renderHighlights(upcomingData.results);
+                    await renderSpotlight(upcomingData.results);
                 } catch (error) {
                     console.error("Failed to load dashboard:", error);
                     upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
@@ -1906,6 +1892,8 @@
                 scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
                 scrollUpcomingLeftBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
                 scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
+                $('spotlightScrollLeftBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
+                $('spotlightScrollRightBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
 
                 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             }
