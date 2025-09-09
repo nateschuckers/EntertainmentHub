@@ -208,17 +208,16 @@
         import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // This firebaseConfig object will be populated by Netlify's build process.
-        // The placeholders like '{{ .Env.VITE_FIREBASE_API_KEY }}' will be replaced.
+        // The placeholders now match your environment variables in Netlify.
         const firebaseConfig = {
-            apiKey: "{{ .Env.VITE_FIREBASE_API_KEY }}",
-            authDomain: "{{ .Env.VITE_FIREBASE_AUTH_DOMAIN }}",
-            projectId: "{{ .Env.VITE_FIREBASE_PROJECT_ID }}",
-            storageBucket: "{{ .Env.VITE_FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "{{ .Env.VITE_FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "{{ .Env.VITE_FIREBASE_APP_ID }}"
+            apiKey: "{{ .Env.FIREBASE_API_KEY }}",
+            authDomain: "{{ .Env.FIREBASE_AUTH_DOMAIN }}",
+            projectId: "{{ .Env.FIREBASE_PROJECT_ID }}",
+            storageBucket: "{{ .Env.FIREBASE_STORAGE_BUCKET }}",
+            messagingSenderId: "{{ .Env.FIREBASE_MESSAGING_SENDER_ID }}",
+            appId: "{{ .Env.FIREBASE_APP_ID }}"
         };
         
-        // This was the original, working method for appId. Let's restore it.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 
