@@ -441,6 +441,12 @@
                         <div id="upcomingContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
                     </div>
                     <div class="lg:col-span-1 space-y-8">
+                        <div id="highlightsSection" class="hidden">
+                            <h2 class="text-2xl font-bold mb-4">Highlight</h2>
+                            <div id="highlightsContainer">
+                                <!-- JS will populate this -->
+                            </div>
+                        </div>
                         <div>
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
@@ -1284,6 +1290,106 @@
                 const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
                 countEl.textContent = `${selected.length} selected`;
             }
+
+            async function renderHighlights(upcomingMovies) {
+                const highlightsSection = $('highlightsSection');
+                const highlightsContainer = $('highlightsContainer');
+                highlightsContainer.innerHTML = '';
+                highlightsSection.classList.add('hidden');
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const sevenDaysAgo = new Date(today);
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                const sevenDaysHence = new Date(today);
+                sevenDaysHence.setDate(today.getDate() + 7);
+
+                const favoriteMovieIds = new Set(state.favorites.filter(f => f.media_type === 'movie').map(f => f.id));
+                const upcomingFavoriteMovies = upcomingMovies.filter(movie => {
+                    const releaseDate = parseLocalDate(movie.release_date);
+                    return favoriteMovieIds.has(movie.id) && releaseDate >= sevenDaysAgo && releaseDate <= sevenDaysHence;
+                }).map(m => ({...m, media_type: 'movie'}));
+
+                const favoriteShowIds = new Set(state.favorites.filter(f => f.media_type === 'tv').map(f => f.id));
+                 const groupedEpisodes = state.scheduledEpisodes.reduce((acc, ep) => {
+                    if (!favoriteShowIds.has(ep.showId)) return acc;
+                    const key = `${ep.showId}-${ep.air_date}`;
+                    if (!acc[key]) {
+                        acc[key] = { ...ep };
+                    }
+                    return acc;
+                }, {});
+
+                const upcomingFavoriteShows = Object.values(groupedEpisodes).filter(show => {
+                    const airDate = parseLocalDate(show.air_date);
+                    return airDate >= sevenDaysAgo && airDate <= sevenDaysHence;
+                }).map(s => ({
+                    id: s.showId,
+                    title: s.showName,
+                    release_date: s.air_date,
+                    poster_path: s.poster_path,
+                    media_type: 'tv'
+                }));
+
+                const potentialHighlights = [...upcomingFavoriteMovies, ...upcomingFavoriteShows];
+
+                if (potentialHighlights.length === 0) {
+                    return;
+                }
+
+                potentialHighlights.sort((a, b) => {
+                    const dateA = parseLocalDate(a.release_date);
+                    const dateB = parseLocalDate(b.release_date);
+                    const diffA = Math.abs(dateA.getTime() - today.getTime());
+                    const diffB = Math.abs(dateB.getTime() - today.getTime());
+                    return diffA - diffB;
+                });
+
+                const highlightItem = potentialHighlights[0];
+                
+                try {
+                    const details = await apiFetch(`${highlightItem.media_type}/${highlightItem.id}`);
+                    if (!details.backdrop_path) {
+                        return;
+                    }
+
+                    const backdropUrl = `https://image.tmdb.org/t/p/w780${details.backdrop_path}`;
+                    const releaseDate = parseLocalDate(highlightItem.release_date);
+                    const diffDays = Math.round((releaseDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    let releaseText = '';
+                    if (diffDays === 0) {
+                        releaseText = 'Airing Today';
+                    } else if (diffDays === 1) {
+                        releaseText = 'Airs Tomorrow';
+                    } else if (diffDays > 1) {
+                        releaseText = `Airs in ${diffDays} days`;
+                    } else if (diffDays === -1) {
+                        releaseText = 'Aired Yesterday';
+                    } else {
+                        releaseText = `Aired ${Math.abs(diffDays)} days ago`;
+                    }
+
+                    const title = details.title || details.name;
+
+                    highlightsContainer.innerHTML = `
+                        <div class="relative rounded-lg overflow-hidden cursor-pointer group bg-zinc-800" id="highlightCard">
+                            <img src="${backdropUrl}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 p-4 text-white">
+                                <span class="block text-sm font-bold uppercase tracking-widest text-red-400">${releaseText}</span>
+                                <h3 class="text-xl font-bold">${title}</h3>
+                            </div>
+                        </div>
+                    `;
+
+                    highlightsSection.classList.remove('hidden');
+                    $('highlightCard').addEventListener('click', () => getMediaDetails(highlightItem.id, highlightItem.media_type));
+
+                } catch (error) {
+                    console.error("Failed to render highlight:", error);
+                }
+            }
             
             async function fetchDashboardData() {
                 showLoading();
@@ -1296,6 +1402,7 @@
                     renderDashboardTrending(trendingData.results);
                     renderDashboardUpcomingMovies(upcomingData.results);
                     renderDashboardUpcoming();
+                    await renderHighlights(upcomingData.results);
                 } catch (error) {
                     console.error("Failed to load dashboard:", error);
                     upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
@@ -1614,7 +1721,7 @@
                 dashboardUserName.textContent = state.userName || 'You';
                 
                 if (state.activeTab === 'dashboard') {
-                    await fetchScheduleData(true);
+                    await fetchDashboardData(true);
                     renderDashboardUpcoming();
                 }
                 if (state.activeTab === 'favorites') {
@@ -1810,3 +1917,4 @@
     </script>
 </body>
 </html>
+
