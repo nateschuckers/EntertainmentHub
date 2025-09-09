@@ -449,6 +449,14 @@
                                 <button id="spotlightScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
                             </div>
                         </div>
+                        <div id="recommendationsSection" class="hidden">
+                            <h2 id="recommendationsTitle" class="text-2xl font-bold mb-4">Recommended for You</h2>
+                            <div class="relative">
+                                <div id="recommendationsContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
+                                <button id="recommendationsScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
+                                <button id="recommendationsScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
+                            </div>
+                        </div>
                         <div>
                              <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
                             <div class="relative">
@@ -1392,6 +1400,42 @@
                 }
             }
             
+            async function renderRecommendations() {
+                const recommendationsSection = $('recommendationsSection');
+                const recommendationsTitle = $('recommendationsTitle');
+                const recommendationsContainer = $('recommendationsContainer');
+
+                recommendationsSection.classList.add('hidden');
+                recommendationsContainer.innerHTML = '';
+
+                if (state.favorites.length === 0) {
+                    return; 
+                }
+
+                try {
+                    const randomFavorite = state.favorites[Math.floor(Math.random() * state.favorites.length)];
+                    const recommendationsData = await apiFetch(`${randomFavorite.media_type}/${randomFavorite.id}/recommendations`);
+
+                    const validRecommendations = recommendationsData.results.filter(item => item.poster_path);
+
+                    if (validRecommendations.length > 0) {
+                        recommendationsTitle.innerHTML = `Because you like <span class="text-zinc-400">${randomFavorite.title || randomFavorite.name}</span>`;
+
+                        validRecommendations.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = 'flex-shrink-0 w-32 cursor-pointer';
+                            card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
+                            card.addEventListener('click', () => getMediaDetails(item.id, item.media_type || (item.title ? 'movie' : 'tv')));
+                            recommendationsContainer.appendChild(card);
+                        });
+
+                        recommendationsSection.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error("Failed to load recommendations:", error);
+                }
+            }
+
             async function fetchDashboardData() {
                 showLoading();
                 try {
@@ -1404,6 +1448,7 @@
                     renderDashboardUpcomingMovies(upcomingData.results);
                     renderDashboardUpcoming();
                     await renderSpotlight(upcomingData.results);
+                    await renderRecommendations();
                 } catch (error) {
                     console.error("Failed to load dashboard:", error);
                     upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
@@ -1428,8 +1473,25 @@
 
             function renderDashboardUpcomingMovies(items = []) {
                 upcomingMoviesContainer.innerHTML = '';
-                if(items.length === 0) { return; }
-                items.filter(item => item.poster_path).forEach(item => {
+                if (items.length === 0) { return; }
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const sevenDaysAgo = new Date(today);
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                const fourteenDaysHence = new Date(today);
+                fourteenDaysHence.setDate(today.getDate() + 14);
+
+                const filteredAndSortedMovies = items
+                    .filter(item => {
+                        const releaseDate = parseLocalDate(item.release_date);
+                        return item.poster_path && releaseDate && releaseDate >= sevenDaysAgo && releaseDate <= fourteenDaysHence;
+                    })
+                    .sort((a, b) => parseLocalDate(a.release_date) - parseLocalDate(b.release_date));
+
+                if (filteredAndSortedMovies.length === 0) return;
+
+                filteredAndSortedMovies.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'flex-shrink-0 w-32 cursor-pointer';
                     const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -1438,6 +1500,7 @@
                     upcomingMoviesContainer.appendChild(card);
                 });
             }
+
 
             function parseLocalDate(dateString) {
                 if (!dateString) return null;
@@ -1909,6 +1972,9 @@
                 scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
                 $('spotlightScrollLeftBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
                 $('spotlightScrollRightBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
+                $('recommendationsScrollLeftBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
+                $('recommendationsScrollRightBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
+
 
                 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             }
