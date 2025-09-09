@@ -1408,20 +1408,70 @@
                 recommendationsSection.classList.add('hidden');
                 recommendationsContainer.innerHTML = '';
 
-                if (state.favorites.length === 0) {
+                if (state.favorites.length < 3) { // Require a few favorites for a good profile
                     return; 
                 }
 
                 try {
-                    const randomFavorite = state.favorites[Math.floor(Math.random() * state.favorites.length)];
-                    const recommendationsData = await apiFetch(`${randomFavorite.media_type}/${randomFavorite.id}/recommendations`);
+                    // Step 1: Fetch details for all favorites to get genres and keywords
+                    const detailPromises = state.favorites.map(fav => 
+                        apiFetch(`${fav.media_type}/${fav.id}?append_to_response=keywords`)
+                    );
+                    const detailResults = await Promise.allSettled(detailPromises);
+                    const favoriteDetails = detailResults
+                        .filter(result => result.status === 'fulfilled')
+                        .map(result => result.value);
 
-                    const validRecommendations = recommendationsData.results.filter(item => item.poster_path);
+                    if (favoriteDetails.length === 0) return;
 
-                    if (validRecommendations.length > 0) {
-                        recommendationsTitle.innerHTML = `Because you like <span class="text-zinc-400">${randomFavorite.title || randomFavorite.name}</span>`;
+                    // Step 2: Create a taste profile
+                    const genreCounts = new Map();
+                    const keywordCounts = new Map();
 
-                        validRecommendations.forEach(item => {
+                    favoriteDetails.forEach(detail => {
+                        (detail.genres || []).forEach(genre => {
+                            genreCounts.set(genre.id, (genreCounts.get(genre.id) || 0) + 1);
+                        });
+                        const keywords = detail.keywords?.keywords || detail.keywords?.results || [];
+                        keywords.forEach(keyword => {
+                            keywordCounts.set(keyword.id, (keywordCounts.get(keyword.id) || 0) + 1);
+                        });
+                    });
+
+                    // Step 3: Identify top genres and keywords
+                    const sortedGenres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]);
+                    const sortedKeywords = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]);
+
+                    const topGenreIds = sortedGenres.slice(0, 2).map(g => g[0]).join('|');
+                    const topKeywordIds = sortedKeywords.slice(0, 5).map(k => k[0]).join('|');
+
+                    if (!topGenreIds && !topKeywordIds) return;
+
+                    // Step 4: Fetch recommendations based on the profile
+                    let movieRecommendations = [];
+                    let tvRecommendations = [];
+
+                    if (topGenreIds || topKeywordIds) {
+                        const discoverMoviePromise = apiFetch(`discover/movie?with_genres=${topGenreIds}&with_keywords=${topKeywordIds}&sort_by=popularity.desc`);
+                        const discoverTvPromise = apiFetch(`discover/tv?with_genres=${topGenreIds}&with_keywords=${topKeywordIds}&sort_by=popularity.desc`);
+                        
+                        const [movieResults, tvResults] = await Promise.allSettled([discoverMoviePromise, discoverTvPromise]);
+
+                        if (movieResults.status === 'fulfilled') movieRecommendations = movieResults.value.results;
+                        if (tvResults.status === 'fulfilled') tvRecommendations = tvResults.value.results;
+                    }
+                   
+                    // Step 5: Filter and combine results
+                    const favoriteIds = new Set(state.favorites.map(f => f.id));
+                    const combined = [...movieRecommendations, ...tvRecommendations]
+                        .filter(item => item.poster_path && !favoriteIds.has(item.id)) // Filter out existing favorites and items without posters
+                        .sort((a, b) => b.popularity - a.popularity) // Sort by popularity
+                        .slice(0, 20); // Limit to 20 results
+
+                    if (combined.length > 0) {
+                        recommendationsTitle.textContent = `Recommended for You`;
+
+                        combined.forEach(item => {
                             const card = document.createElement('div');
                             card.className = 'flex-shrink-0 w-32 cursor-pointer';
                             card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
