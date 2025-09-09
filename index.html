@@ -207,16 +207,8 @@
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // This firebaseConfig object will be populated by Netlify's build process.
-        // The placeholders now match your environment variables in Netlify.
-        const firebaseConfig = {
-            apiKey: "{{ .Env.FIREBASE_API_KEY }}",
-            authDomain: "{{ .Env.FIREBASE_AUTH_DOMAIN }}",
-            projectId: "{{ .Env.FIREBASE_PROJECT_ID }}",
-            storageBucket: "{{ .Env.FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "{{ .Env.FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "{{ .Env.FIREBASE_APP_ID }}"
-        };
+        // Use environment variables for Firebase config
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -224,13 +216,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             
             // --- Configuration Check ---
-            // This check now verifies if the replacement happened.
-            if (!firebaseConfig || firebaseConfig.apiKey.startsWith("{{")) {
+            if (!firebaseConfig) {
                 document.body.innerHTML = `
                     <div class="flex items-center justify-center h-screen bg-gray-900 text-white">
                         <div class="text-center p-8 bg-gray-800 rounded-lg shadow-lg max-w-lg mx-4">
                             <h1 class="text-3xl font-bold text-red-500 mb-4">Firebase Configuration Missing</h1>
-                            <p class="text-gray-300">The Firebase environment variables are not configured correctly in your Netlify deployment.</p>
+                            <p class="text-gray-300">This application requires a Firebase configuration to function. Please check your Netlify Snippet Injection settings.</p>
                         </div>
                     </div>
                 `;
@@ -311,6 +302,7 @@
             // --- Firebase Auth & Data Handling ---
             
             onAuthStateChanged(auth, (user) => {
+                // BUG FIX: Detach the old listener before doing anything else.
                 if (unsubscribeUserDoc) {
                     unsubscribeUserDoc();
                     unsubscribeUserDoc = null;
@@ -332,8 +324,6 @@
                             loadDataFromFirestore({}); // Ensure state is clean before saving
                             saveDataToFirestore(); 
                         }
-                        // BUG FIX: Explicitly wait for schedule data to be fetched
-                        // before updating the UI to prevent race conditions.
                         await fetchScheduleData();
                         initAppUI();
                     }, (error) => {
@@ -344,8 +334,13 @@
                     state.userId = null;
                     userDocRef = null;
                     
-                    // BUG FIX: Fully reset all user-related state upon logout.
                     loadDataFromFirestore({});
+                    
+                    // BUG FIX: Explicitly clear UI containers to prevent errors/flashing
+                    if(dashboardUpcomingContainer) dashboardUpcomingContainer.innerHTML = '';
+                    if(favoritesContainer) favoritesContainer.innerHTML = '';
+                    if(favoritesListContainer) favoritesListContainer.innerHTML = '';
+                    if(scheduleContent) scheduleContent.innerHTML = '';
                     
                     updateAccountSection(null);
                     initAppUI();
