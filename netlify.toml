@@ -3,3 +3,8 @@
   publish = "."
   functions = "netlify/functions/"
 
+[[redirects]]
+  from = "/"
+  to = "/test-injection.html"
+  status = 200
+
