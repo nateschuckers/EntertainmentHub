@@ -9,417 +9,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&family=Orbitron:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
+    
+    <!-- ADDED: Scripts for React -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        zinc: {
-                            50:"#fafafa",100:"#f4f4f5",200:"#e4e4e7",300:"#d4d4d8",400:"#a1a1aa",500:"#71717a",600:"#52525b",700:"#3f3f46",800:"#27272a",900:"#18181b",950:"#09090b"
-                        }
-                    },
-                    fontFamily: {
-                        'script': ['Caveat', 'cursive'],
-                        'horror': ['Creepster', 'cursive'],
-                        'scifi': ['Orbitron', 'sans-serif'],
-                        'clean': ['Poppins', 'sans-serif']
-                    }
-                }
-            }
+            // ... existing tailwind config ...
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex; justify-content: center; align-items: center; z-index: 50;
-        }
-        .modal-content { max-height: 90vh; overflow-y: auto; }
-        .calendar-day.has-event { background-color: #3f3f46; border-radius: 50%; color: white; }
-        .scrolling-wrapper { -webkit-overflow-scrolling: touch; }
-        .scrolling-wrapper::-webkit-scrollbar { display: none; }
-        .config-error-screen {
-            display: flex; align-items: center; justify-content: center;
-            position: fixed; inset: 0; background-color: #09090b; z-index: 100;
-        }
-        .config-error-box {
-            background-color: #18181b; color: white; padding: 2rem; border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            text-align: center; max-width: 500px;
-        }
-        .config-error-box h1 { font-size: 1.5rem; font-weight: bold; color: #ef4444; margin-bottom: 1rem; }
-        .config-error-box p { color: #d4d4d8; margin-bottom: 1.5rem; font-family: monospace; font-size: 0.875rem; text-align: left; background-color: #3f3f46; padding: 1rem; border-radius: 0.25rem;}
-        
-        .favorite-card-manage-overlay {
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background-color: rgba(0,0,0,0.5);
-            cursor: pointer;
-            border-radius: 0.5rem; /* Match card rounding */
-            transition: all 0.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .favorite-card-manage-checkbox {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0; /* Hide the actual checkbox */
-            cursor: pointer;
-        }
-        .x-mark-svg {
-            display: none; /* Hidden by default */
-            width: 4rem;
-            height: 4rem;
-            color: white;
-        }
-        .favorite-card.selected .favorite-card-manage-overlay {
-            background-color: rgba(39, 39, 42, 0.7);
-        }
-        .favorite-card.selected .x-mark-svg {
-            display: block;
-        }
-        .favorite-card.selected img {
-            filter: grayscale(80%) brightness(50%);
-        }
-
-        #suggestion-avatar-btn {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 40;
-            transition: transform 0.2s ease-in-out;
-        }
-        #suggestion-avatar-btn:hover {
-            transform: scale(1.1);
-        }
-        #suggestion-avatar-btn svg {
-            display: none;
-            width: 100%;
-            height: 100%;
-        }
-        body:not(.theme-horror):not(.theme-scifi):not(.theme-clean) #default-avatar,
-        .theme-horror #pinhead-avatar,
-        .theme-scifi #alien-avatar,
-        .theme-clean #pulp-fiction-avatar {
-            display: block;
-        }
-
-        /* Modern Scrollbar for Schedule */
-        #scheduleContent::-webkit-scrollbar {
-            width: 12px;
-        }
-        #scheduleContent::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #scheduleContent::-webkit-scrollbar-thumb {
-            background-color: #52525b; /* zinc-600 */
-            border-radius: 20px;
-            border: 3px solid transparent;
-            background-clip: content-box;
-        }
-        #scheduleContent::-webkit-scrollbar-thumb:hover {
-            background-color: #71717a; /* zinc-500 */
-        }
-
-        /* --- Default Theme --- */
-        .tab-button.border-zinc-400 {
-            border-color: #3b82f6; /* blue-500 */
-            color: #3b82f6;
-        }
-        .upcoming-filter-btn, .fav-view-btn, .schedule-view-btn, .theme-btn {
-            background-color: #fafafa;
-            color: #27272a;
-        }
-        .upcoming-filter-btn.bg-zinc-900, .fav-view-btn.bg-zinc-900, .schedule-view-btn.bg-zinc-900, .theme-btn.bg-zinc-900 {
-            background-color: #3b82f6; /* blue-500 */
-            color: #fafafa;
-        }
-        #saveUserNameButton {
-            background-color: #3b82f6;
-            color: #fafafa;
-        }
-        #subscriptionList div {
-            background-color: #fafafa;
-            color: #27272a;
-        }
-        #subscriptionList div.bg-zinc-900 {
-             background-color: #3b82f6;
-            color: #fafafa;
-        }
-
-
-        /* --- Horror Theme --- */
-        @keyframes flicker {
-            0%, 100% { text-shadow: 0 0 2px #ef4444, 0 0 5px #ef4444, 0 0 10px #b91c1c; opacity: 1; }
-            50% { text-shadow: 0 0 2px #ef4444; opacity: 0.8; }
-        }
-
-        #horror-animation-container {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 200%;
-            z-index: -1;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        .theme-horror #horror-animation-container {
-            display: block;
-        }
-        @media (min-width: 768px) {
-            #horror-animation-container {
-                left: calc(50% + 300px);
-                width: 200px;
-                height: 200px;
-            }
-        }
-
-
-        .theme-horror .font-script {
-            position: relative;
-            font-family: 'Creepster', cursive !important;
-            animation: flicker 2.5s infinite alternate;
-        }
-        
-        .theme-horror h2 { color: #ef4444; }
-        .theme-horror .tab-button.border-zinc-400 {
-            border-color: #ef4444;
-            color: #f87171;
-            animation: red-pulse 2s infinite;
-        }
-        .theme-horror .upcoming-filter-btn,
-        .theme-horror .fav-view-btn,
-        .theme-horror .schedule-view-btn,
-        .theme-horror .theme-btn,
-        .theme-horror #subscriptionList div {
-            background-color: #222;
-            color: #fafafa;
-        }
-        .theme-horror #deleteAccountBtn,
-        .theme-horror #saveUserNameButton,
-        .theme-horror .upcoming-filter-btn.bg-zinc-900,
-        .theme-horror .fav-view-btn.bg-zinc-900,
-        .theme-horror .schedule-view-btn.bg-zinc-900,
-        .theme-horror .theme-btn.bg-zinc-900,
-        .theme-horror #subscriptionList div.bg-zinc-900 {
-            background-color: #b91c1c;
-            color: #fafafa;
-        }
-        .theme-horror #deleteAccountBtn { animation: red-pulse 2s infinite; }
-        body.theme-horror { background-color: #000; }
-        .theme-horror .bg-zinc-900 { background-color: #000; }
-        .theme-horror .bg-zinc-800 { background-color: #111; }
-        .theme-horror .bg-zinc-700 { background-color: #222; }
-        .theme-horror .hover\:bg-zinc-600:hover, .theme-horror #saveUserNameButton:hover, .theme-horror .theme-btn:hover { background-color: #333; }
-        .theme-horror .border-zinc-700 { border-color: #444; }
-        .theme-horror .text-zinc-400, .theme-horror .text-zinc-300, .theme-horror .text-zinc-200, .theme-horror p { color: #d4d4d8; }
-        .theme-horror #searchInput::placeholder { color: #b91c1c; }
-        .theme-horror #danger-zone {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C60 10, 70 15, 60 25 C50 35, 40 40, 50 50 C60 60, 70 65, 60 75 C50 85, 40 90, 50 100" fill="%23991b1b" opacity="0.1" transform="rotate(20 50 50)"/><path d="M20 10 C30 20, 40 25, 30 35 C20 45, 10 50, 20 60 C30 70, 40 75, 30 85" fill="%237f1d1d" opacity="0.1" transform="rotate(-15 50 50)"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right -20px bottom -30px;
-            background-size: 150px;
-        }
-        .theme-horror #scheduleContent::-webkit-scrollbar-thumb { background-color: #991b1b; } /* red-800 */
-        .theme-horror #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #b91c1c; } /* red-700 */
-        
-        
-        /* --- Sci-Fi Theme --- */
-        @keyframes stars {
-            from { background-position: 0 0; }
-            to { background-position: 0 1000px; }
-        }
-        body.theme-scifi {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-size="10" fill="rgba(74, 222, 128, 0.05)">01</text><text x="60" y="80" font-size="10" fill="rgba(74, 222, 128, 0.05)">1</text><text x="30" y="90" font-size="10" fill="rgba(74, 222, 128, 0.05)">0</text><text x="80" y="50" font-size="10" fill="rgba(74, 222, 128, 0.05)">10</text></svg>');
-            animation: stars 60s linear infinite;
-        }
-
-        #scifi-animation-container {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            max-width: 500px;
-            z-index: -1;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        .theme-scifi #scifi-animation-container {
-            display: block;
-        }
-        @media (min-width: 768px) {
-            #scifi-animation-container {
-                left: calc(50% + 300px);
-                width: 200px;
-                height: 200px;
-                max-width: none;
-            }
-        }
-
-
-        .theme-scifi .font-script {
-            font-family: 'Orbitron', sans-serif !important;
-            text-shadow: 0 0 5px #4ade80, 0 0 10px #4ade80;
-            position: relative;
-        }
-
-        .theme-scifi h2 { color: #4ade80; }
-        .theme-scifi #searchInput::placeholder { color: #4ade80; }
-        .theme-scifi .tab-button.border-zinc-400 {
-            border-color: #4ade80;
-            color: #86efac;
-        }
-        .theme-scifi .upcoming-filter-btn,
-        .theme-scifi .fav-view-btn,
-        .theme-scifi .schedule-view-btn,
-        .theme-scifi .theme-btn,
-        .theme-scifi #subscriptionList div {
-            background-color: #1a2f38;
-            color: #86efac;
-        }
-        .theme-scifi #saveUserNameButton,
-        .theme-scifi .upcoming-filter-btn.bg-zinc-900,
-        .theme-scifi .fav-view-btn.bg-zinc-900,
-        .theme-scifi .schedule-view-btn.bg-zinc-900,
-        .theme-scifi .theme-btn.bg-zinc-900,
-        .theme-scifi #subscriptionList div.bg-zinc-900 {
-            background-color: #15803d;
-            color: #fafafa;
-        }
-
-        .theme-scifi .bg-zinc-900, .theme-scifi body.bg-zinc-900 { background-color: #0c1417; }
-        .theme-scifi .bg-zinc-800 { background-color: #111e24; }
-        .theme-scifi .bg-zinc-700 { background-color: #1a2f38; }
-        .theme-scifi .hover\:bg-zinc-600:hover, .theme-scifi #saveUserNameButton:hover, .theme-scifi .theme-btn:hover { background-color: #24434e; }
-        .theme-scifi .border-zinc-700 { border-color: #24434e; }
-        .theme-scifi .text-zinc-200, .theme-scifi .text-zinc-300, .theme-scifi .text-zinc-400, .theme-scifi p { color: #86efac; }
-        .theme-scifi .text-zinc-500 { color: #4ade80; }
-        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb { background-color: #166534; } /* green-800 */
-        .theme-scifi #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #15803d; } /* green-700 */
-
-        /* --- Clean Theme --- */
-        #clean-animation-container {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            max-width: 500px;
-            z-index: -1;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-        .theme-clean #clean-animation-container {
-            display: block;
-        }
-        @media (min-width: 768px) {
-            #clean-animation-container {
-                left: calc(50% + 300px);
-                width: 200px;
-                height: 200px;
-                max-width: none;
-            }
-        }
-
-        body.theme-clean { background-color: #f8fafc; color: #18181b; }
-        .theme-clean .font-script { font-family: 'Poppins', sans-serif !important; color: #0ea5e9; }
-        
-        .theme-clean h2 { color: #18181b; }
-        .theme-clean #userNameInput { color: #27272a; }
-        .theme-clean #searchInput::placeholder { color: #a1a1aa; }
-        .theme-clean .text-zinc-200, .theme-clean .text-zinc-300, .theme-clean .text-zinc-400, .theme-clean .text-zinc-500, .theme-clean p { color: #52525b; }
-        
-        .theme-clean .tab-button.border-zinc-400 {
-            border-color: transparent;
-        }
-        .theme-clean .tab-button {
-            color: #52525b;
-        }
-        .theme-clean .upcoming-filter-btn,
-        .theme-clean .fav-view-btn,
-        .theme-clean .schedule-view-btn,
-        .theme-clean .theme-btn,
-        .theme-clean #subscriptionList div {
-            background-color: #e4e4e7;
-            color: #18181b;
-        }
-        .theme-clean #saveUserNameButton,
-        .theme-clean .upcoming-filter-btn.bg-zinc-900,
-        .theme-clean .fav-view-btn.bg-zinc-900,
-        .theme-clean .schedule-view-btn.bg-zinc-900,
-        .theme-clean .theme-btn.bg-zinc-900,
-        .theme-clean #subscriptionList div.bg-zinc-900 {
-            background-color: #52525b;
-            color: #fafafa;
-        }
-        .theme-clean .tab-button.border-zinc-400 {
-            background-color: #52525b;
-            color: #fafafa;
-        }
-
-        .theme-clean .bg-zinc-900 { background-color: #f8fafc; }
-        .theme-clean .bg-zinc-800, .theme-clean .modal-content { background-color: #fff; }
-        .theme-clean .bg-zinc-700 { background-color: #e4e4e7; }
-        .theme-clean .hover\:bg-zinc-600:hover, .theme-clean #saveUserNameButton:hover, .theme-clean .theme-btn:hover { background-color: #d4d4d8; }
-        .theme-clean .border-zinc-700 { border-color: #e4e4e7; }
-        .theme-clean #scheduleContent::-webkit-scrollbar-thumb { background-color: #a1a1aa; } /* zinc-400 */
-        .theme-clean #scheduleContent::-webkit-scrollbar-thumb:hover { background-color: #71717a; } /* zinc-500 */
-        
+        /* ... existing styles ... */
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
     <div id="configErrorScreen" class="config-error-screen hidden"></div>
 
     <div id="loginScreen" class="fixed inset-0 bg-zinc-900 flex flex-col justify-center items-center z-50">
-        <div class="text-center p-4">
-            <h1 id="loginTitle" class="text-5xl sm:text-6xl font-script text-zinc-400 mb-4">Entertainment Hub</h1>
-            <p class="text-zinc-400 mb-8">Please sign in to continue</p>
-            <button id="signInWithGoogleButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center mx-auto">
-                <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.618-3.319-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 35.238 44 30.025 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
-                Sign in with Google
-            </button>
-        </div>
+        <!-- ... existing login screen ... -->
     </div>
 
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
         
         <header class="text-center mb-8 relative md:px-8">
-            <div id="horror-animation-container">
-                 <dotlottie-wc src="https://lottie.host/ffe5b7bd-7e2c-48a0-abd5-a0e069bb5f86/255wXmv06r.lottie" style="width: 100%; height: 100%;" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <div id="scifi-animation-container">
-                <dotlottie-wc src="https://lottie.host/d54b467c-11c2-447e-b901-b56c4eab5d53/kYg7v2uYg1.lottie" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <div id="clean-animation-container">
-                <dotlottie-wc src="https://lottie.host/e2771b7a-7d6f-4a71-93bc-59260fc50c18/bcEIrfHDKq.lottie" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <h1 id="mainTitle" class="text-5xl sm:text-6xl font-script text-zinc-400 relative">Entertainment Hub</h1>
-            <p id="mainSubtitle" class="text-zinc-400 mt-2 relative">Find where to watch your favorite shows and movies.</p>
+             <!-- ... existing header ... -->
         </header>
 
         <div class="mb-8 max-w-2xl mx-auto">
-            <div id="searchWrapper" class="relative">
-                <input type="text" id="searchInput" class="w-full bg-zinc-800 border-2 border-zinc-700 rounded-full py-3 px-6 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
-                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-zinc-700 hover:bg-zinc-600 rounded-full p-2 focus:outline-none transition duration-300">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </button>
-                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg"></div>
-            </div>
+            <!-- ... existing search wrapper ... -->
         </div>
 
         <div class="mb-8">
@@ -436,6 +55,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     <span class="hidden md:inline">Schedule</span>
                 </button>
+                <!-- ADDED: New Tab for Horror Tracker -->
+                <button data-tab="horror-tracker" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 12h8"></path><path d="M8 16h8"></path></svg>
+                    <span class="hidden md:inline">31 Nights</span>
+                </button>
                 <button data-tab="settings" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                     <span class="hidden md:inline">Settings</span>
@@ -445,258 +69,288 @@
 
         <main id="content-area">
             <div id="dashboard" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-zinc-800 p-6 rounded-lg lg:flex lg:flex-col">
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                            <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming for <span id="dashboardUserName">You</span></h2>
-                            <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                <button data-filter="today" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">Today</button>
-                                <button data-filter="week" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
-                                <button data-filter="month" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
-                            </div>
-                        </div>
-                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] lg:max-h-none overflow-y-auto pr-2 lg:flex-grow"></div>
-                    </div>
-                    <div class="lg:col-span-1 space-y-8">
-                        <div id="spotlightSection" class="hidden">
-                            <h2 class="text-2xl font-bold mb-4">Spotlight</h2>
-                             <div class="relative">
-                                <div id="spotlightContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="spotlightScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="spotlightScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                        <div id="recommendationsSection" class="hidden">
-                            <h2 id="recommendationsTitle" class="text-2xl font-bold mb-4">Recommended for You</h2>
-                            <div class="relative">
-                                <div id="recommendationsContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="recommendationsScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="recommendationsScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                        <div>
-                             <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
-                            <div class="relative">
-                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                         <div>
-                             <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
-                            <div class="relative">
-                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                 <!-- ... existing dashboard content ... -->
             </div>
 
             <div id="search-results" class="tab-content hidden">
-                 <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
-                <p id="searchResultsMessage" class="text-center text-zinc-500">Search for something to see results.</p>
-                <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+                 <!-- ... existing search results content ... -->
             </div>
 
             <div id="favorites" class="tab-content hidden">
-                <div class="max-w-5xl mx-auto">
-                    <details class="mb-8 group" open>
-                        <summary class="list-none flex items-center justify-between cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite Movies</h2>
-                            <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="mt-4">
-                            <div id="movie-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
-                                <div id="movie-favorites-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn movie-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
-                                        <button class="fav-view-btn movie-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
-                                    </div>
-                                    <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
-                            </div>
-                             <div id="movie-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="movieFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                     <button id="deleteAllMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
-                                     <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                            <p id="movieFavoritesMessage" class="text-center text-zinc-500"></p>
-                            <div id="movieFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="movieFavoritesListContainer" class="hidden space-y-3"></div>
-                        </div>
-                    </details>
-                    
-                    <details class="group" open>
-                        <summary class="list-none flex items-center justify-between cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite TV Shows</h2>
-                             <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                         <div class="mt-4">
-                            <div id="tv-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
-                                <div id="tv-favorites-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn tv-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
-                                        <button class="fav-view-btn tv-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
-                                    </div>
-                                    <button id="manageTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
-                            </div>
-                             <div id="tv-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="tvFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                     <button id="deleteAllTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
-                                     <button id="cancelManageTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                             <p id="tvFavoritesMessage" class="text-center text-zinc-500"></p>
-                            <div id="tvFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="tvFavoritesListContainer" class="hidden space-y-3"></div>
-                        </div>
-                    </details>
-                </div>
+                 <!-- ... existing favorites content ... -->
             </div>
 
             <div id="schedule" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                        <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming Episodes</h2>
-                        <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                            <button class="schedule-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
-                            <button class="schedule-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
-                        </div>
-                    </div>
-                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
-                     <p id="scheduleMessage" class="text-center text-zinc-500 mt-4 hidden"></p>
-                </div>
+                 <!-- ... existing schedule content ... -->
+            </div>
+            
+            <!-- ADDED: Container for the Horror Tracker App -->
+            <div id="horror-tracker" class="tab-content hidden">
+                <div id="horror-tracker-root"></div>
             </div>
 
             <div id="settings" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg space-y-8">
-                    <div id="accountSection"></div>
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">What's Your Name, Man?</h2>
-                        <p class="text-zinc-400 mb-4">Personalize your dashboard greeting, lest you be known as "The Dude".</p>
-                        <div class="flex flex-col sm:flex-row sm:space-x-2">
-                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500" placeholder="Enter your name">
-                            <button id="saveUserNameButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
-                        </div>
-                         <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
-                    </div>
-                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Choose Your Destiny</h2>
-                        <div id="themeSelector" class="flex space-x-2">
-                            <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
-                            <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
-                            <button data-theme="scifi" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Sci-Fi</button>
-                            <button data-theme="clean" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Clean</button>
-                        </div>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">The Fellowship of the Stream</h2>
-                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience. One does not simply watch all of them.</p>
-                        <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
-                    </div>
-                    <div id="danger-zone" class="border-t border-red-900/50 pt-6">
-                        <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
-                        <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
-                            <div>
-                                <h3 class="font-bold">This is the Way... Out</h3>
-                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data. I have spoken.</p>
-                            </div>
-                             <button id="deleteAccountBtn" class="mt-4 sm:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Delete Account</button>
-                        </div>
-                    </div>
-                </div>
+                 <!-- ... existing settings content ... -->
             </div>
         </main>
         
-        <div id="loadingSpinner" class="hidden fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-50">
-             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-500"></div>
-        </div>
+        <!-- ... existing loading spinner, modals, etc. ... -->
     </div>
+    
+    <!-- ADDED: This script contains your React component and renders it. -->
+    <script type="text/babel">
+        // The HorrorTracker component code is placed here directly.
+        // --- Helper for CSV Parsing ---
+        const Papa = (() => {
+            function parse(csv, config) {
+                config = config || {};
+                const header = config.header;
+                const newline = config.newline || '\n';
+                const lines = csv.trim().split(newline);
+                let results = [];
+                const headers = header ? lines[0].split(',') : [];
 
-    <div id="detailsModal" class="modal-backdrop hidden">
-        <div id="modalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
-    </div>
+                for (let i = header ? 1 : 0; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    let values = lines[i].split(',');
+                    if (header) {
+                        let obj = {};
+                        for (let j = 0; j < headers.length; j++) {
+                            obj[headers[j].trim()] = values[j] ? values[j].trim() : '';
+                        }
+                        results.push(obj);
+                    } else {
+                        results.push(values.map(v => v.trim()));
+                    }
+                }
+                return { data: results };
+            }
+            return { parse };
+        })();
 
-    <div id="suggestion-avatar-btn">
-        <svg id="default-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="#3b82f6" stroke="#fafafa" stroke-width="4"/>
-            <text x="50" y="65" font-size="50" fill="#fafafa" text-anchor="middle" font-family="Arial, sans-serif">?</text>
-        </svg>
-        <svg id="pinhead-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="#111" stroke="#b91c1c" stroke-width="4"/>
-            <circle cx="50" cy="50" r="40" fill="#222"/>
-            <path d="M50 10 V 90 M10 50 H 90 M22 22 L 78 78 M22 78 L 78 22" stroke="#555" stroke-width="2"/>
-            <circle cx="50" cy="50" r="3" fill="#b91c1c"/>
-        </svg>
-        <svg id="alien-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="50" fill="#1a2f38"/>
-            <path d="M50 15 C 65 15, 85 30, 85 50 C 85 80, 65 95, 50 95 C 35 95, 15 80, 15 50 C 15 30, 35 15, 50 15 Z" fill="#111e24"/>
-            <path d="M50 20 C 70 20, 80 35, 80 50 C 80 70, 70 85, 50 90 C 30 85, 20 70, 20 50 C 20 35, 30 20, 50 20 Z" fill="#15803d" opacity="0.3"/>
-            <path d="M40 75 Q 50 65, 60 75" stroke="#86efac" stroke-width="2" fill="none"/>
-        </svg>
-        <svg id="pulp-fiction-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="50" fill="#e4e4e7"/>
-            <path d="M 50,30 A 20,15 0 0 0 50,60" fill="#18181b"/>
-            <rect x="30" y="30" width="40" height="10" fill="#18181b"/>
-            <rect x="48" y="60" width="4" height="10" fill="#18181b" />
-        </svg>
-    </div>
+        // --- SVG Icons ---
+        const FilmIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm2 2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1H6zm5 0a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1h-2zM6 12a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1H6zm5 0a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1h-2z" clipRule="evenodd" /></svg>;
+        const ListIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>;
+        const ChartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 110 2H8a1 1 0 01-1-1zm5 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" /><path d="M2 5a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>;
+        const UploadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>;
+        const SearchIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>;
 
-     <div id="suggestionModal" class="modal-backdrop hidden">
-        <div id="suggestionModalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
-            <button id="closeSuggestionModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button>
-            <h2 id="suggestionModalTitle" class="text-2xl font-bold mb-2">Got a Suggestion?</h2>
-            <p id="suggestionModalSubtitle" class="text-zinc-400 mb-4">We'd love to hear it. Let us know what we can do to improve your experience.</p>
-            <form id="suggestionForm">
-                <textarea id="suggestionText" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 h-32" placeholder="Your suggestion..."></textarea>
-                <button type="submit" class="w-full mt-4 bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded-lg transition">Send It</button>
-            </form>
-        </div>
-    </div>
+        // --- Reusable Movie Card Component ---
+        const MovieCard = ({ movie, onAction, actionText, actionIcon }) => (
+            <div className="bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col">
+                <img 
+                    src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://placehold.co/500x750/1f2937/9ca3af?text=No+Image'} 
+                    alt={`Poster for ${movie.title}`} 
+                    className="w-full h-auto object-cover"
+                    onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/500x750/1f2937/9ca3af?text=No+Image'; }}
+                />
+                <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-bold text-lg text-white mb-2 truncate">{movie.title}</h3>
+                    <p className="text-zinc-400 text-sm mb-2">{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
+                    <p className="text-zinc-300 text-xs flex-grow overflow-y-auto max-h-20">{movie.overview}</p>
+                    {onAction && (
+                        <button
+                            onClick={() => onAction(movie)}
+                            className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                            {actionIcon}
+                            {actionText}
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+
+        // --- Main Horror Tracker Component ---
+        function HorrorTracker({ db, userId, firestore }) {
+            const [activeTab, setActiveTab] = React.useState('watched');
+            const [watchedMovies, setWatchedMovies] = React.useState([]);
+            const [watchlist, setWatchlist] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState(null);
+
+            React.useEffect(() => {
+                if (!userId || !db) { setLoading(false); return; }
+                setLoading(true);
+                const unsubWatched = firestore.onSnapshot(firestore.collection(db, `users/${userId}/watched`), (snapshot) => {
+                    setWatchedMovies(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                });
+                const unsubWatchlist = firestore.onSnapshot(firestore.collection(db, `users/${userId}/watchlist`), (snapshot) => {
+                    setWatchlist(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                });
+                setLoading(false);
+                return () => { unsubWatched(); unsubWatchlist(); };
+            }, [userId, db]);
+            
+            const handleAddToWatchlist = async (movie) => {
+                if (!userId || !db) return;
+                if (watchlist.some(m => m.tmdb_id === movie.id)) { alert(`${movie.title} is already on your watchlist.`); return; }
+                await firestore.addDoc(firestore.collection(db, `users/${userId}/watchlist`), {
+                    tmdb_id: movie.id, title: movie.title, poster_path: movie.poster_path, release_date: movie.release_date, overview: movie.overview, added_at: firestore.Timestamp.now()
+                });
+            };
+
+            const handleMoveToWatched = async (movieFromWatchlist) => {
+                if (!userId || !db) return;
+                const watchDateStr = prompt("When did you watch this? (YYYY-MM-DD)", new Date().toISOString().split('T')[0]);
+                if (!watchDateStr || !/^\d{4}-\d{2}-\d{2}$/.test(watchDateStr)) { alert("Invalid date format. Please use YYYY-MM-DD."); return; }
+                const watchDate = new Date(watchDateStr);
+                const batch = firestore.writeBatch(db);
+                batch.set(firestore.doc(firestore.collection(db, `users/${userId}/watched`)), {
+                    tmdb_id: movieFromWatchlist.tmdb_id, title: movieFromWatchlist.title, poster_path: movieFromWatchlist.poster_path, release_date: movieFromWatchlist.release_date, overview: movieFromWatchlist.overview, watchedDate: firestore.Timestamp.fromDate(watchDate),
+                });
+                batch.delete(firestore.doc(db, `users/${userId}/watchlist`, movieFromWatchlist.id));
+                await batch.commit();
+            };
+
+            const handleImportCsv = async (file) => {
+                if (!file || !userId || !db) return;
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const parsed = Papa.parse(event.target.result, { header: true, skipEmptyLines: true });
+                    if (!parsed.data.length || !parsed.data[0].tmdb_id || !parsed.data[0].watchedDate) { setError("Invalid CSV. Required headers: 'tmdb_id', 'title', 'watchedDate' (YYYY-MM-DD)."); return; }
+                    const batch = firestore.writeBatch(db);
+                    parsed.data.forEach(row => {
+                        if (row.tmdb_id && row.title && row.watchedDate) {
+                            batch.set(firestore.doc(firestore.collection(db, `users/${userId}/watched`)), {
+                                tmdb_id: parseInt(row.tmdb_id, 10), title: row.title, watchedDate: firestore.Timestamp.fromDate(new Date(row.watchedDate)), poster_path: row.poster_path || null, release_date: row.release_date || null, overview: row.overview || '',
+                            });
+                        }
+                    });
+                    await batch.commit();
+                    alert(`${parsed.data.length} movies imported successfully!`);
+                };
+                reader.readAsText(file);
+            };
+
+            const WatchedTab = () => {
+                const octoberMovies = watchedMovies.filter(m => m.watchedDate.toDate().getMonth() === 9);
+                const progress = Math.min((octoberMovies.length / 31) * 100, 100);
+                const groupedByDay = octoberMovies.reduce((acc, movie) => {
+                    const dateStr = movie.watchedDate.toDate().toISOString().split('T')[0];
+                    if (!acc[dateStr]) acc[dateStr] = [];
+                    acc[dateStr].push(movie);
+                    return acc;
+                }, {});
+                const sortedDays = Object.keys(groupedByDay).sort((a, b) => new Date(b) - new Date(a));
+                return (
+                    <div>
+                        <div className="bg-zinc-800 p-4 rounded-lg mb-6 shadow-md">
+                            <h2 className="text-xl font-bold text-white mb-2">October Progress</h2>
+                            <p className="text-zinc-300 mb-4">{octoberMovies.length} of 31 movies watched</p>
+                            <div className="w-full bg-zinc-700 rounded-full h-4"><div className="bg-red-600 h-4 rounded-full" style={{ width: `${progress}%` }}></div></div>
+                        </div>
+                        {sortedDays.map(date => (
+                            <div key={date} className="mb-8">
+                                <h3 className="text-2xl font-semibold text-red-500 mb-4 border-b-2 border-zinc-700 pb-2">
+                                Watched on: {new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                                </h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    {groupedByDay[date].map(movie => <MovieCard key={movie.id} movie={movie} />)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            const WatchlistTab = () => {
+                const [searchTerm, setSearchTerm] = React.useState('');
+                const [searchResults, setSearchResults] = React.useState([]);
+                const [isSearching, setIsSearching] = React.useState(false);
+                const handleSearch = async (e) => {
+                    e.preventDefault();
+                    if (!searchTerm) return;
+                    setIsSearching(true);
+                    try {
+                        const response = await fetch(`/.netlify/functions/tmdb?endpoint=${encodeURIComponent(`search/movie?query=${searchTerm}`)}`);
+                        if (!response.ok) throw new Error('Search request failed');
+                        const data = await response.json();
+                        if (data.error) throw new Error(data.error);
+                        setSearchResults(data.results || []);
+                    } catch (err) { console.error("Search Error:", err); setError(`Could not search: ${err.message}`); } 
+                    finally { setIsSearching(false); }
+                };
+                return (
+                    <div>
+                        <form onSubmit={handleSearch} className="mb-8 flex">
+                            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search for a horror movie..." className="flex-grow bg-zinc-700 text-white p-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-red-500"/>
+                            <button type="submit" className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-r-lg" disabled={isSearching}>{isSearching ? '...' : <SearchIcon />}</button>
+                        </form>
+                        {searchResults.length > 0 && (<div className="mb-8"><h3 className="text-2xl font-semibold text-red-500 mb-4">Search Results</h3><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{searchResults.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleAddToWatchlist} actionText="Add to Watchlist" actionIcon={<ListIcon/>}/>))}</div></div>)}
+                        <h3 className="text-2xl font-semibold text-red-500 mb-4 mt-8 border-t-2 border-zinc-700 pt-4">My Watchlist</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{watchlist.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleMoveToWatched} actionText="I Watched This!" actionIcon={<FilmIcon />}/>))}</div>
+                    </div>
+                );
+            };
+            
+            const MetricsTab = () => {
+                const watchCounts = watchedMovies.reduce((acc, movie) => { acc[movie.tmdb_id] = (acc[movie.tmdb_id] || 0) + 1; return acc; }, {});
+                const moviesWithCounts = Object.entries(watchCounts).map(([tmdb_id, count]) => ({ ...watchedMovies.find(m => m.tmdb_id == tmdb_id), count })).sort((a, b) => b.count - a.count);
+                return (
+                    <div>
+                        <h2 className="text-2xl font-semibold text-red-500 mb-4">All-Time Watch Metrics</h2>
+                        <div className="bg-zinc-800 rounded-lg shadow-md overflow-hidden"><table className="min-w-full"><thead className="bg-zinc-700"><tr><th className="text-left py-3 px-4 font-semibold text-white">Movie Title</th><th className="text-left py-3 px-4 font-semibold text-white">Release Year</th><th className="text-left py-3 px-4 font-semibold text-white">Total Watches</th></tr></thead><tbody className="text-zinc-300">{moviesWithCounts.map((movie, index) => (<tr key={movie.tmdb_id} className={`border-t border-zinc-700 ${index % 2 === 0 ? 'bg-zinc-800' : 'bg-zinc-900/50'}`}><td className="py-3 px-4">{movie.title}</td><td className="py-3 px-4">{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</td><td className="py-3 px-4 text-center font-bold text-red-500">{movie.count}</td></tr>))}</tbody></table></div>
+                    </div>
+                );
+            };
+
+            const ImportTab = () => {
+                const [file, setFile] = React.useState(null);
+                return (
+                    <div className="bg-zinc-800 p-6 rounded-lg shadow-md">
+                        <h2 className="text-xl font-bold text-white mb-4">Import Previous Years</h2>
+                        <p className="text-zinc-400 mb-4">Upload a CSV file from a Google Sheet. Required columns: <strong>tmdb_id, title, watchedDate (YYYY-MM-DD)</strong>. Optional: poster_path, release_date, overview.</p>
+                        <div className="flex items-center space-x-4">
+                            <label className="w-full flex items-center px-4 py-2 bg-zinc-700 text-white rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-red-700 hover:text-white">
+                                <UploadIcon /><span className="ml-2 text-base leading-normal">{file ? file.name : "Select a CSV file"}</span>
+                                <input type='file' accept=".csv" className="hidden" onChange={(e) => setFile(e.target.files[0])}/>
+                            </label>
+                            <button onClick={() => file && handleImportCsv(file)} disabled={!file} className="bg-red-600 text-white font-bold py-2 px-6 rounded-lg disabled:bg-zinc-500 disabled:cursor-not-allowed hover:bg-red-700 transition-colors">Import</button>
+                        </div>
+                    </div>
+                )
+            }
+
+            if (!userId || !db) return <div className="text-center text-zinc-400 p-8">Please log in to use the Horror Movie Tracker.</div>;
+            if (loading) return <div className="text-center text-zinc-300 p-8">Loading movie history...</div>;
+            if (error) return <div className="bg-red-900 text-white p-4 rounded-lg text-center">{error}</div>;
+
+            return (
+                <div className="bg-black text-white font-sans w-full -m-4 md:-m-8">
+                    <header className="bg-zinc-900 shadow-lg p-4"><div className="container mx-auto"><h1 className="text-3xl font-bold text-red-600 tracking-wider">31 Nights of Horror</h1></div></header>
+                    <nav className="bg-zinc-800"><div className="container mx-auto flex justify-center items-center space-x-2 md:space-x-4 p-2 text-sm md:text-base">
+                        <button onClick={() => setActiveTab('watched')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watched' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><FilmIcon /> Watched</button>
+                        <button onClick={() => setActiveTab('watchlist')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watchlist' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><ListIcon /> Watchlist</button>
+                        <button onClick={() => setActiveTab('metrics')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'metrics' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><ChartIcon /> Metrics</button>
+                        <button onClick={() => setActiveTab('import')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'import' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><UploadIcon/> Import</button>
+                    </div></nav>
+                    <main className="container mx-auto p-4 md:p-6">
+                        {activeTab === 'watched' && <WatchedTab />}
+                        {activeTab === 'watchlist' && <WatchlistTab />}
+                        {activeTab === 'metrics' && <MetricsTab />}
+                        {activeTab === 'import' && <ImportTab />}
+                    </main>
+                </div>
+            );
+        }
+
+        // This function will be called from your main script to render the app
+        function renderHorrorTracker(db, userId, firestore) {
+            const container = document.getElementById('horror-tracker-root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<HorrorTracker db={db} userId={userId} firestore={firestore} />);
+        }
+    </script>
 
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         async function initializeAppWithConfig() {
-            function renderConfigError(message) {
-                const errorScreen = document.getElementById('configErrorScreen');
-                errorScreen.innerHTML = `<div class="config-error-box"><h1>Application Error</h1><p>${message}</p></div>`;
-                errorScreen.classList.remove('hidden');
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('app').classList.add('hidden');
-            }
-
-            try {
-                const response = await fetch('/.netlify/functions/get-firebase-config');
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Server returned status ${response.status}. Response: ${errorText.substring(0, 200)}...`);
-                }
-                const firebaseConfig = await response.json();
-                
-                if (!firebaseConfig.apiKey) {
-                        throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
-                }
-                runApp(firebaseConfig);
-
-            } catch (error) {
-                let errorMessage = error.message;
-                if (error instanceof SyntaxError) {
-                    errorMessage = "The server returned an invalid response (likely HTML instead of JSON). This is a routing issue. Please ensure your netlify.toml redirect rule is correct.";
-                }
-                renderConfigError(errorMessage);
-            }
+            // ... existing initializeAppWithConfig function ...
         }
 
         function runApp(firebaseConfig) {
@@ -709,87 +363,12 @@
             let isDataLoaded = false;
             let userId = null;
 
-            const themeContent = {
-                default: {
-                    title: "Entertainment Hub",
-                    subtitle: "Find where to watch your favorite shows and movies."
-                },
-                horror: {
-                    title: "The Overlook",
-                    subtitle: "All play and no work makes for a great watchlist."
-                },
-                scifi: {
-                    title: "Game Over, Man!",
-                    subtitle: "Find your next great watch before it's too late."
-                },
-                clean: {
-                    title: "There Will Be Shows",
-                    subtitle: "Find the next series you can really sink your teeth into."
-                }
+            // ... existing state object and helper functions ...
+            
+            // MODIFIED: Pass all firestore functions to the React component
+            const firestoreFunctions = {
+                collection, addDoc, writeBatch, Timestamp, doc, onSnapshot, setDoc, deleteDoc
             };
-
-            function updateHeaderText(theme) {
-                const content = themeContent[theme] || themeContent.default;
-                const loginTitle = document.getElementById('loginTitle');
-                const mainTitle = document.getElementById('mainTitle');
-                const mainSubtitle = document.getElementById('mainSubtitle');
-
-                if (loginTitle) loginTitle.textContent = content.title;
-                if (mainTitle) mainTitle.textContent = content.title;
-                if (mainSubtitle) mainSubtitle.textContent = content.subtitle;
-            }
-
-            const state = {
-                userName: null,
-                theme: 'default',
-                activeTab: 'dashboard',
-                movieFavoritesView: 'grid',
-                tvFavoritesView: 'grid',
-                scheduleView: 'agenda',
-                dashboardScheduleFilter: 'today',
-                isManagingMovies: false,
-                isManagingTvs: false,
-                currentDate: new Date(),
-                subscriptions: [],
-                favorites: [],
-                scheduledEpisodes: [],
-                streamingServices: [
-                    { id: 528, name: 'AMC+', logo: 'l4g1BT502p1H42a3j1s2lG9nK.jpg' },
-                    { id: 9, name: 'Amazon Prime', logo: '68MNdJkIZ1hqhGPY3e4L2MSuD1I.jpg' },
-                    { id: 2, name: 'Apple TV+', logo: '3oTfWy5TAmY5822b53eKwL1xS2z.jpg' },
-                    { id: 26, name: 'Criterion Channel', logo: 'hFCiMC5st22wV3weHl15qj7N0v1.jpg' },
-                    { id: 337, name: 'Disney+', logo: '7rwgEs15tFwyR9NPQ5vpzxTj1Ae.jpg' },
-                    { id: 257, name: 'FuboTV', logo: 'fVjXoJkU1H_2p7iN1b1g2p1fOUl.jpg' },
-                    { id: 15, name: 'Hulu', logo: 'uJ2w33J32O2h05Iu1CjC7mGn4T.jpg' },
-                    { id: 1899, name: 'Max', logo: '2a0aJqjuiD5ytdcZz2uISeidU8C.jpg' },
-                    { id: 8, name: 'Netflix', logo: 'ar4pMQERJSYppG3Qfo9ltM4S2sM.jpg' },
-                    { id: 531, name: 'Paramount+', logo: 'zBv2r2k2sV3E9s08i0lBq4vIZy.jpg' },
-                    { id: 387, name: 'Peacock', logo: 'pZGE52Lz17c38gNT7P7y0B0iC4.jpg' },
-                    { id: 37, name: 'Showtime', logo: 'oF4enqrXXsFRU3aG2I32vpsbQv.jpg' },
-                    { id: 43, name: 'Starz', logo: 'crFbxgG3JSddT2DAorfOqdfE5s9.jpg' }
-                ]
-            };
-            
-            const $ = (selector) => document.getElementById(selector);
-            
-            const loginScreen = $('loginScreen'), mainApp = $('app'), accountSection = $('accountSection'), modal = $('detailsModal'), modalContent = $('modalContent'),
-            searchInput = $('searchInput'), searchButton = $('searchButton'), liveSearchResults = $('liveSearchResults'), searchResultsContainer = $('searchResultsContainer'), 
-            searchResultsMessage = $('searchResultsMessage'), 
-            movieFavoritesContainer = $('movieFavoritesContainer'), movieFavoritesListContainer = $('movieFavoritesListContainer'), movieFavoritesMessage = $('movieFavoritesMessage'),
-            tvFavoritesContainer = $('tvFavoritesContainer'), tvFavoritesListContainer = $('tvFavoritesListContainer'), tvFavoritesMessage = $('tvFavoritesMessage'),
-            scheduleContent = $('scheduleContent'), scheduleMessage = $('scheduleMessage'), subscriptionList = $('subscriptionList'), userNameInput = $('userNameInput'), 
-            saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage'), dashboardUserName = $('dashboardUserName'), upcomingContainer = $('upcomingContainer'),
-            trendingContainer = $('trendingContainer'), upcomingMoviesContainer = $('upcomingMoviesContainer'), scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'),
-            scrollUpcomingLeftBtn = $('scrollUpcomingLeftBtn'), scrollUpcomingRightBtn = $('scrollUpcomingRightBtn');
-            
-            const tabs = document.querySelectorAll('.tab-button');
-            const scheduleViewBtns = document.querySelectorAll('.schedule-view-btn');
-            const upcomingFilterBtns = document.querySelectorAll('.upcoming-filter-btn');
-            const themeBtns = document.querySelectorAll('.theme-btn');
-            const suggestionAvatarBtn = $('suggestion-avatar-btn');
-            const suggestionModal = $('suggestionModal');
-            const closeSuggestionModalBtn = $('closeSuggestionModal');
-            const suggestionForm = $('suggestionForm');
 
             onAuthStateChanged(auth, (user) => {
                 if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -801,180 +380,31 @@
                     loginScreen.classList.add('hidden');
                     mainApp.classList.remove('hidden');
                     suggestionAvatarBtn.classList.remove('hidden');
+
+                    // ADDED: Render the React component once the user is logged in
+                    renderHorrorTracker(db, userId, firestoreFunctions);
                     
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
-                        const wasAlreadyLoaded = isDataLoaded;
-                        if (docSnap.exists()) {
-                            loadDataFromFirestore(docSnap.data());
-                        } else {
-                            if(isDataLoaded) return;
-                            saveDataToFirestore();
-                            return; 
-                        }
-                        
-                        applyTheme(state.theme);
-
-                        if (!wasAlreadyLoaded) {
-                           isDataLoaded = true;
-                           initAppUI(); 
-                        } else {
-                            refreshCurrentView();
-                        }
+                        // ... existing onSnapshot logic ...
                     });
                 } else {
-                    userId = null;
-                    userDocRef = null;
-                    applyTheme('default'); // Reset to default on logout
-                    loginScreen.classList.remove('hidden');
-                    mainApp.classList.add('hidden');
-                    suggestionAvatarBtn.classList.add('hidden');
-                    state.favorites = [];
-                    state.subscriptions = [];
-                    state.userName = null;
+                    // ... existing sign-out logic ...
                 }
             });
 
-            function handleGoogleSignIn() {
-                signInWithPopup(auth, googleProvider).catch(console.error);
-            }
-
-            function updateAccountSection() {
-                const user = auth.currentUser;
-                if (user) {
-                    accountSection.innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-zinc-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
-                    const signOutButton = $('signOutButton');
-                    if(signOutButton) signOutButton.addEventListener('click', () => signOut(auth));
-                    const deleteAccountBtn = $('deleteAccountBtn');
-                    if(deleteAccountBtn) deleteAccountBtn.addEventListener('click', handleDeleteAccount);
-                }
-            }
-
-            function handleDeleteAccount() {
-                showConfirmationModal("Are you sure you want to delete your account and all data? This action cannot be undone.", async () => {
-                    if (userDocRef) {
-                        try {
-                            await deleteDoc(userDocRef);
-                            await signOut(auth);
-                        } catch (e) {
-                            console.error("Error deleting document: ", e);
-                        }
-                    }
-                });
-            }
-
-            function showConfirmationModal(message, onConfirm) {
-                const confirmModalContent = `
-                    <div class="text-center p-6">
-                        <h2 class="text-2xl font-bold mb-4 text-red-400">Are you sure?</h2>
-                        <p class="text-zinc-300 mb-6">${message}</p>
-                        <div class="flex justify-center space-x-4">
-                            <button id="confirmCancel" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-2 px-6 rounded-lg transition">Cancel</button>
-                            <button id="confirmAction" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">Confirm</button>
-                        </div>
-                    </div>`;
-                modalContent.innerHTML = confirmModalContent;
-                modal.classList.remove('hidden');
-                
-                $('confirmAction').addEventListener('click', () => {
-                    onConfirm();
-                    closeModal();
-                });
-                $('confirmCancel').addEventListener('click', closeModal);
-            }
-            
-            async function saveDataToFirestore() {
-                if (!userDocRef) return;
-                const dataToSave = {
-                    userName: state.userName,
-                    subscriptions: state.subscriptions,
-                    favorites: state.favorites,
-                    theme: state.theme,
-                    dashboardScheduleFilter: state.dashboardScheduleFilter
-                };
-                try {
-                    await setDoc(userDocRef, dataToSave, { merge: true });
-                } catch (e) {
-                    console.error("Error writing document: ", e);
-                }
-            }
-
-            function loadDataFromFirestore(data) {
-                state.userName = data.userName || null;
-                state.subscriptions = data.subscriptions || [];
-                state.favorites = data.favorites || [];
-                state.theme = data.theme || 'default';
-                state.dashboardScheduleFilter = data.dashboardScheduleFilter || 'today';
-                if (userNameInput && state.userName) userNameInput.value = state.userName;
-            }
-
-            function applyTheme(theme) {
-                document.body.className = 'bg-zinc-900 text-zinc-200'; // Reset body classes
-                if(theme === 'horror' || theme === 'scifi' || theme === 'clean') {
-                    document.body.classList.add(`theme-${theme}`);
-                }
-                
-                updateHeaderText(theme);
-
-                themeBtns.forEach(btn => {
-                    const isSelected = btn.dataset.theme === theme;
-                    btn.classList.toggle('bg-zinc-900', isSelected); // Used as a "selected" marker by CSS
-                    btn.classList.toggle('text-white', isSelected);
-                    btn.classList.toggle('bg-zinc-700', !isSelected);
-                    btn.classList.toggle('text-zinc-300', !isSelected);
-                });
-            }
-
-            async function apiFetch(endpoint) {
-                const url = `/.netlify/functions/tmdb?endpoint=${encodeURIComponent(endpoint)}`;
-                const response = await fetch(url);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Network response was not ok');
-                }
-                return response.json();
-            }
-            
-            function promptForLogin(feature = 'this feature') {
-                 modalContent.innerHTML = `<div class="text-center p-4"><h2 class="text-2xl font-bold mb-4">Please Sign In</h2><p class="text-zinc-400 mb-6">To use ${feature}, you need to be signed in.</p><button id="modalSignInButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-6 rounded-lg transition">Sign in with Google</button><button id="modalCloseButton" class="mt-4 text-zinc-400 hover:text-white">Cancel</button></div>`;
-                 modal.classList.remove('hidden');
-                 $('modalSignInButton').addEventListener('click', () => { handleGoogleSignIn(); closeModal(); });
-                 $('modalCloseButton').addEventListener('click', closeModal);
-            }
-            
-            function toggleSubscription(serviceId) {
-                if (!userId) { promptForLogin('managing subscriptions'); return; }
-                const index = state.subscriptions.indexOf(serviceId);
-                if (index > -1) state.subscriptions.splice(index, 1);
-                else state.subscriptions.push(serviceId);
-                saveDataToFirestore();
-            }
-
-            function toggleFavorite(mediaItem) {
-                if (!userId) { promptForLogin('saving favorites'); return; }
-                const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
-                if (index > -1) {
-                    state.favorites.splice(index, 1);
-                } else {
-                    state.favorites.push({
-                        id: mediaItem.id,
-                        name: mediaItem.name || null,
-                        title: mediaItem.title || null,
-                        poster_path: mediaItem.poster_path, 
-                        first_air_date: mediaItem.first_air_date || null,
-                        release_date: mediaItem.release_date || null, 
-                        media_type: mediaItem.title ? 'movie' : 'tv',
-                        manualTime: null
-                    });
-                }
-                saveDataToFirestore();
-                renderModal(mediaItem);
-            }
+            // ... other functions (handleGoogleSignIn, etc.) ...
             
             async function switchTab(tabName) {
                 state.activeTab = tabName;
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                 const tabEl = $(tabName);
-                if (tabEl) tabEl.classList.remove('hidden');
+                
+                // MODIFIED: Use horror-tracker ID for the new tab
+                if (tabName === 'horror-tracker') {
+                    $('horror-tracker').classList.remove('hidden');
+                } else if (tabEl) {
+                    tabEl.classList.remove('hidden');
+                }
                 
                 tabs.forEach(tab => {
                     const isCurrentTab = tab.dataset.tab === tabName;
@@ -990,1063 +420,13 @@
                 if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); }
             }
 
-            function createMediaCard(item, isManageMode = false) {
-                const cardWrapper = document.createElement('div');
-                cardWrapper.className = 'relative favorite-card';
-
-                const card = document.createElement('div');
-                card.className = 'bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
-                card.dataset.id = item.id;
-                card.dataset.type = item.media_type || (item.title ? 'movie' : 'tv');
-                const title = item.title || item.name;
-                const releaseDate = item.release_date || item.first_air_date;
-                const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
-                const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
-                card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover transition-all duration-300"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
-                
-                if (isManageMode) {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'favorite-card-manage-overlay';
-                    overlay.innerHTML = `
-                        <svg class="x-mark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                            <circle cx="26" cy="26" r="25" fill="rgba(239, 68, 68, 0.7)"/>
-                            <path stroke="white" stroke-width="5" d="M16 16 36 36 M36 16 16 36" />
-                        </svg>
-                    `;
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'favorite-card-manage-checkbox w-full h-full absolute top-0 left-0';
-                    checkbox.value = item.id;
-                    overlay.appendChild(checkbox);
-                    cardWrapper.appendChild(overlay);
-
-                    cardWrapper.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        checkbox.checked = !checkbox.checked;
-                        cardWrapper.classList.toggle('selected');
-                        updateSelectedCount(card.dataset.type);
-                    });
-                } else {
-                        card.classList.add('cursor-pointer');
-                        card.addEventListener('click', () => getMediaDetails(item.id, card.dataset.type));
-                }
-
-                cardWrapper.appendChild(card);
-                return cardWrapper;
-            }
-
-            function renderSearchResults(mediaResults = []) {
-                const validMedia = mediaResults.filter(item => item.media_type !== 'person' && item.poster_path);
-                searchResultsContainer.innerHTML = '';
-                searchResultsMessage.classList.add('hidden');
-                if (validMedia.length === 0) {
-                    searchResultsMessage.textContent = 'No results found.';
-                    searchResultsMessage.classList.remove('hidden');
-                    return;
-                }
-                validMedia.forEach(item => searchResultsContainer.appendChild(createMediaCard(item)));
-            }
-            
-            function renderLiveSearchResults(results = []) {
-                liveSearchResults.innerHTML = '';
-                const validResults = results.filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5);
-                if (validResults.length === 0) {
-                    liveSearchResults.classList.add('hidden');
-                    return;
-                }
-                validResults.forEach(item => {
-                    const title = item.title || item.name;
-                    const el = document.createElement('div');
-                    el.className = 'flex items-center space-x-3 p-3 hover:bg-zinc-700 cursor-pointer';
-                    el.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-10 h-auto rounded-md"><span>${title}</span>`;
-                    el.addEventListener('click', () => {
-                        getMediaDetails(item.id, item.media_type);
-                        liveSearchResults.classList.add('hidden');
-                        searchInput.value = '';
-                    });
-                    liveSearchResults.appendChild(el);
-                });
-                liveSearchResults.classList.remove('hidden');
-            }
-
-
-            function renderSubscriptions() {
-                subscriptionList.innerHTML = '';
-                state.streamingServices.forEach(service => {
-                    const isChecked = state.subscriptions.includes(service.id);
-                    const logoUrl = `https://image.tmdb.org/t/p/w92/${service.logo}`;
-                    const item = document.createElement('div');
-                    item.className = `flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition duration-300`;
-                    item.classList.toggle('bg-zinc-900', isChecked);
-                    item.classList.toggle('bg-zinc-700', !isChecked);
-                    item.dataset.serviceId = service.id;
-                    item.innerHTML = `<img src="${logoUrl}" alt="${service.name}" class="w-10 h-10 rounded-md object-cover" onerror="this.style.display='none'"><span class="font-medium text-sm">${service.name}</span>`;
-                    item.addEventListener('click', () => toggleSubscription(service.id));
-                    subscriptionList.appendChild(item);
-                });
-            }
-
-            function renderModal(details) {
-                const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
-                const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
-                const isFavorite = state.favorites.some(fav => fav.id === details.id);
-                const providers = details['watch/providers']?.results?.US?.flatrate || [];
-                const mediaType = details.title ? 'movie' : 'tv';
-
-                let providersHtml = '<p class="text-zinc-400">Not available for streaming.</p>';
-                if (providers.length > 0) {
-                        providersHtml = providers.map(p => `<div class="flex items-center space-x-2 p-2 rounded ${state.subscriptions.includes(p.provider_id) ? 'bg-green-800' : 'bg-zinc-700'}"><img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="w-8 h-8 rounded" alt="${p.provider_name}"><span>${p.provider_name} ${state.subscriptions.includes(p.provider_id) ? '<span class="text-xs text-green-300">(Subscribed)</span>' : ''}</span></div>`).join('');
-                }
-
-                let scoreHtml = '';
-                if (details.vote_average && details.vote_count > 10) {
-                    const score = Math.round(details.vote_average * 10);
-                    let scoreColor = 'bg-zinc-600';
-                    let borderColor = 'border-zinc-500';
-                    
-                    if (score >= 70) {
-                        scoreColor = 'bg-green-600';
-                        borderColor = 'border-green-400';
-                    } else if (score >= 40) {
-                        scoreColor = 'bg-yellow-600';
-                        borderColor = 'border-yellow-400';
-                    } else if (score > 0) {
-                        scoreColor = 'bg-red-600';
-                        borderColor = 'border-red-400';
-                    }
-
-                    scoreHtml = `
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center ${scoreColor} text-white font-bold text-lg border-2 ${borderColor}">
-                                ${score}<span class="text-xs">%</span>
-                            </div>
-                            <span class="font-semibold text-lg">User Score</span>
-                        </div>
-                    `;
-                }
-                
-                let manualTimeHtml = '';
-                if (mediaType === 'tv') {
-                    const favorite = state.favorites.find(f => f.id === details.id);
-                    if (favorite) {
-                        manualTimeHtml = `
-                            <div class="mt-4 pt-4 border-t border-zinc-700">
-                                <h3 class="text-xl font-semibold mb-2">Manual Air Time</h3>
-                                <p class="text-zinc-400 text-sm mb-2">Set a time to help sort your schedule (e.g., "9:00 PM EST").</p>
-                                <div id="manualTimeContainer" class="flex items-center space-x-4">
-                                    <p id="manualTimeDisplay" class="text-zinc-300 flex-grow">${favorite.manualTime || 'Not set'}</p>
-                                    <button id="editTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button>
-                                </div>
-                            </div>`;
-                    }
-                }
-                
-                modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p>${scoreHtml}<div class="flex gap-4 mb-6"><button id="favoriteButton" class="w-full ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><a href="https://www.themoviedb.org/${mediaType}/${details.id}" target="_blank" rel="noopener noreferrer" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition text-center">See More</a></div><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
-                
-                const favoriteButton = $('favoriteButton');
-                if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
-                
-                const editTimeButton = $('editTimeButton');
-                if(editTimeButton) editTimeButton.addEventListener('click', () => editManualTime(details));
-
-                modal.classList.remove('hidden');
-                const closeModalBtn = $('closeModal');
-                if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-            }
-
-            function editManualTime(details) {
-                const favorite = state.favorites.find(f => f.id === details.id);
-                if (!favorite) return;
-
-                const container = $('manualTimeContainer');
-                container.innerHTML = `
-                    <div class="flex-grow">
-                        <input type="text" id="timeInput" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
-                    </div>
-                    <div class="flex space-x-2">
-                        <button id="saveTimeButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1 px-3 rounded text-sm">Save</button>
-                        <button id="cancelTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Cancel</button>
-                    </div>
-                `;
-
-                $('saveTimeButton').addEventListener('click', () => {
-                    const newTime = $('timeInput').value.trim();
-                    const favIndex = state.favorites.findIndex(f => f.id === details.id);
-                    if (favIndex > -1) {
-                        state.favorites[favIndex].manualTime = newTime;
-                    }
-                    saveDataToFirestore();
-                    renderModal(details); 
-                });
-                $('cancelTimeButton').addEventListener('click', () => renderModal(details));
-            }
-
-            function parseTimeToMinutes(timeString) {
-                if (!timeString || typeof timeString !== 'string') return 9999; 
-                const time = timeString.toLowerCase().trim();
-                let hours = 0;
-                let minutes = 0;
-                const match = time.match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/);
-                if (match) {
-                    hours = parseInt(match[1], 10);
-                    minutes = match[2] ? parseInt(match[2], 10) : 0;
-                    const period = match[3];
-                    if (period === 'pm' && hours < 12) hours += 12;
-                    if (period === 'am' && hours === 12) hours = 0;
-                }
-                return hours * 60 + minutes;
-            }
-
-            async function searchMedia(query, isLiveSearch = false) {
-                if (!query) { liveSearchResults.classList.add('hidden'); return; }
-                if(!isLiveSearch) showLoading();
-                try {
-                    const data = await apiFetch(`search/multi?query=${query}`);
-                    if (isLiveSearch) {
-                        renderLiveSearchResults(data.results);
-                    } else {
-                        renderSearchResults(data.results);
-                    }
-                } catch (error) {
-                    console.error('Search failed:', error);
-                    if (!isLiveSearch) {
-                        searchResultsMessage.textContent = "Search failed. Please try again.";
-                        searchResultsMessage.classList.remove('hidden');
-                    }
-                } finally {
-                    if(!isLiveSearch) hideLoading();
-                }
-            }
-
-            async function getMediaDetails(id, type) {
-                showLoading();
-                try {
-                    const data = await apiFetch(`${type}/${id}?append_to_response=watch/providers,credits`);
-                    renderModal(data);
-                } catch (error) {
-                    console.error('Failed to get details:', error);
-                } finally {
-                    hideLoading();
-                }
-            }
-
-            async function renderFavorites() {
-                const movieFavorites = state.favorites.filter(f => f.media_type === 'movie');
-                const tvFavorites = state.favorites.filter(f => f.media_type === 'tv');
-
-                await renderFavoriteSection('movie', movieFavorites);
-                await renderFavoriteSection('tv', tvFavorites);
-            }
-
-            async function renderFavoriteSection(type, items) {
-                const isManaging = type === 'movie' ? state.isManagingMovies : state.isManagingTvs;
-                const view = type === 'movie' ? state.movieFavoritesView : state.tvFavoritesView;
-                
-                const viewControls = $(`${type}-favorites-view-controls`);
-                const manageControls = $(`${type}-favorites-manage-controls`);
-                const messageEl = $(`${type}FavoritesMessage`);
-                const gridContainer = $(`${type}FavoritesContainer`);
-                const listContainer = $(`${type}FavoritesListContainer`);
-
-                viewControls.parentElement.classList.toggle('hidden', isManaging);
-                manageControls.classList.toggle('hidden', !isManaging);
-                
-                messageEl.classList.toggle('hidden', items.length > 0);
-                if (items.length === 0) {
-                    gridContainer.innerHTML = '';
-                    listContainer.innerHTML = '';
-                    messageEl.textContent = `You have no favorite ${type === 'movie' ? 'movies' : 'TV shows'}.`;
-                    return;
-                }
-                
-                const sortedItems = [...items].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
-
-                if (view === 'grid') {
-                    gridContainer.classList.remove('hidden');
-                    listContainer.classList.add('hidden');
-                    gridContainer.innerHTML = '';
-                    sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
-                } else {
-                    gridContainer.classList.add('hidden');
-                    listContainer.classList.remove('hidden');
-                    // Manage mode is not supported for list view; it will always show the regular list.
-                    await renderFavoritesList(sortedItems, listContainer);
-                }
-                updateSelectedCount(type);
-            }
-            
-            async function renderFavoritesList(sortedFavorites, container) {
-                container.innerHTML = '';
-                if(sortedFavorites.length === 0) return;
-
-                showLoading();
-                try {
-                    const providerPromises = sortedFavorites.map(fav => apiFetch(`${fav.media_type}/${fav.id}?append_to_response=watch/providers`));
-                    const favoritesWithDetails = await Promise.all(providerPromises);
-
-                    favoritesWithDetails.forEach(details => {
-                        const title = details.title || details.name;
-                        const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A';
-                        const providers = details['watch/providers']?.results?.US?.flatrate || [];
-                        let providersHtml = '<span class="text-zinc-400 text-sm">Not on streaming</span>';
-                        if (providers.length > 0) {
-                            providersHtml = providers.map(p => `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" class="h-8 w-8 rounded-md object-cover" title="${p.provider_name}">`).join('');
-                        }
-                        const listItem = document.createElement('div');
-                        listItem.className = 'flex items-center space-x-4 p-3 bg-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-700';
-                        listItem.innerHTML = `
-                            <img src="${posterUrl}" class="w-12 h-auto rounded-md flex-shrink-0">
-                            <div class="flex-grow min-w-0"><p class="font-bold truncate">${title}</p></div>
-                            <div class="flex flex-wrap gap-2 justify-end items-center flex-shrink" style="max-width: 50%;">${providersHtml}</div>
-                        `;
-                        listItem.addEventListener('click', () => getMediaDetails(details.id, details.title ? 'movie' : 'tv'));
-                        container.appendChild(listItem);
-                    });
-                } catch (error) {
-                    console.error("Error fetching favorites details:", error);
-                    container.innerHTML = `<p class="text-center text-red-400">Could not load details.</p>`;
-                } finally {
-                    hideLoading();
-                }
-            }
-
-            function updateSelectedCount(type) {
-                const container = $(`${type}FavoritesContainer`);
-                const countEl = $(`${type}FavoritesSelectedCount`);
-                if (!container || !countEl) return;
-                const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
-                countEl.textContent = `${selected.length} selected`;
-            }
-
-            async function renderSpotlight(upcomingMovies) {
-                const spotlightSection = $('spotlightSection');
-                const spotlightContainer = $('spotlightContainer');
-                spotlightContainer.innerHTML = '';
-                spotlightSection.classList.add('hidden');
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 7);
-                const sevenDaysHence = new Date(today);
-                sevenDaysHence.setDate(today.getDate() + 7);
-
-                const favoriteMovieIds = new Set(state.favorites.filter(f => f.media_type === 'movie').map(f => f.id));
-                const upcomingFavoriteMovies = upcomingMovies.filter(movie => {
-                    const releaseDate = parseLocalDate(movie.release_date);
-                    return favoriteMovieIds.has(movie.id) && releaseDate >= sevenDaysAgo && releaseDate <= sevenDaysHence;
-                }).map(m => ({...m, media_type: 'movie'}));
-
-                const favoriteShowIds = new Set(state.favorites.filter(f => f.media_type === 'tv').map(f => f.id));
-                const groupedEpisodes = state.scheduledEpisodes.reduce((acc, ep) => {
-                    if (!favoriteShowIds.has(ep.showId)) return acc;
-                    const key = `${ep.showId}-${ep.air_date}`;
-                    if (!acc[key]) {
-                        acc[key] = { ...ep };
-                    }
-                    return acc;
-                }, {});
-
-                const upcomingFavoriteShows = Object.values(groupedEpisodes).filter(show => {
-                    const airDate = parseLocalDate(show.air_date);
-                    return airDate >= sevenDaysAgo && airDate <= sevenDaysHence;
-                }).map(s => ({
-                    id: s.showId,
-                    title: s.showName,
-                    release_date: s.air_date,
-                    poster_path: s.poster_path,
-                    media_type: 'tv'
-                }));
-
-                const potentialHighlights = [...upcomingFavoriteMovies, ...upcomingFavoriteShows];
-
-                if (potentialHighlights.length === 0) {
-                    return;
-                }
-
-                potentialHighlights.sort((a, b) => {
-                    const dateA = parseLocalDate(a.release_date);
-                    const dateB = parseLocalDate(b.release_date);
-                    return dateA - dateB;
-                });
-
-                let focusIndex = potentialHighlights.findIndex(item => parseLocalDate(item.release_date) >= today);
-                if (focusIndex === -1 && potentialHighlights.length > 0) {
-                    focusIndex = potentialHighlights.length - 1; // Default to last item if all are in the past
-                }
-
-                potentialHighlights.forEach((item, index) => {
-                    if (!item.poster_path) return;
-                    const card = document.createElement('div');
-                    card.id = `spotlight-item-${index}`;
-                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
-                    
-                    const releaseDate = parseLocalDate(item.release_date);
-                    const diffDays = Math.round((releaseDate - today) / (1000 * 60 * 60 * 24));
-                    
-                    let releaseText = '';
-                    if (diffDays === 0) releaseText = 'Today';
-                    else if (diffDays === 1) releaseText = 'Tomorrow';
-                    else if (diffDays > 1) releaseText = `In ${diffDays} days`;
-                    else if (diffDays === -1) releaseText = 'Yesterday';
-                    else releaseText = `${Math.abs(diffDays)} days ago`;
-
-                    card.innerHTML = `
-                        <img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg">
-                        <p class="text-sm mt-2 truncate font-bold">${item.title || item.name}</p>
-                        <p class="text-xs text-red-400 font-semibold">${releaseText}</p>
-                    `;
-                    card.addEventListener('click', () => getMediaDetails(item.id, item.media_type));
-                    spotlightContainer.appendChild(card);
-                });
-
-                spotlightSection.classList.remove('hidden');
-
-                if (focusIndex !== -1) {
-                    setTimeout(() => {
-                        const elementToFocus = document.getElementById(`spotlight-item-${focusIndex}`);
-                        if (elementToFocus) {
-                            const containerPadding = 16; 
-                            const scrollPosition = elementToFocus.offsetLeft - containerPadding;
-                            spotlightContainer.scrollTo({
-                                left: scrollPosition,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }, 100);
-                }
-            }
-            
-            async function renderRecommendations() {
-                const recommendationsSection = $('recommendationsSection');
-                const recommendationsTitle = $('recommendationsTitle');
-                const recommendationsContainer = $('recommendationsContainer');
-
-                recommendationsSection.classList.add('hidden');
-                recommendationsContainer.innerHTML = '';
-
-                if (state.favorites.length < 3) { // Require a few favorites for a good profile
-                    return; 
-                }
-
-                try {
-                    // Step 1: Fetch details for all favorites to get genres and keywords
-                    const detailPromises = state.favorites.map(fav => 
-                        apiFetch(`${fav.media_type}/${fav.id}?append_to_response=keywords`)
-                    );
-                    const detailResults = await Promise.allSettled(detailPromises);
-                    const favoriteDetails = detailResults
-                        .filter(result => result.status === 'fulfilled')
-                        .map(result => result.value);
-
-                    if (favoriteDetails.length === 0) return;
-
-                    // Step 2: Create a taste profile
-                    const genreCounts = new Map();
-                    const keywordCounts = new Map();
-
-                    favoriteDetails.forEach(detail => {
-                        (detail.genres || []).forEach(genre => {
-                            genreCounts.set(genre.id, (genreCounts.get(genre.id) || 0) + 1);
-                        });
-                        const keywords = detail.keywords?.keywords || detail.keywords?.results || [];
-                        keywords.forEach(keyword => {
-                            keywordCounts.set(keyword.id, (keywordCounts.get(keyword.id) || 0) + 1);
-                        });
-                    });
-
-                    // Step 3: Identify top genres and keywords
-                    const sortedGenres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]);
-                    const sortedKeywords = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]);
-
-                    const topGenreIds = sortedGenres.slice(0, 2).map(g => g[0]).join('|');
-                    const topKeywordIds = sortedKeywords.slice(0, 5).map(k => k[0]).join('|');
-
-                    if (!topGenreIds && !topKeywordIds) return;
-
-                    // Step 4: Fetch recommendations based on the profile
-                    let movieRecommendations = [];
-                    let tvRecommendations = [];
-
-                    if (topGenreIds || topKeywordIds) {
-                        const discoverMoviePromise = apiFetch(`discover/movie?with_genres=${topGenreIds}&with_keywords=${topKeywordIds}&sort_by=popularity.desc`);
-                        const discoverTvPromise = apiFetch(`discover/tv?with_genres=${topGenreIds}&with_keywords=${topKeywordIds}&sort_by=popularity.desc`);
-                        
-                        const [movieResults, tvResults] = await Promise.allSettled([discoverMoviePromise, discoverTvPromise]);
-
-                        if (movieResults.status === 'fulfilled') movieRecommendations = movieResults.value.results;
-                        if (tvResults.status === 'fulfilled') tvRecommendations = tvResults.value.results;
-                    }
-                   
-                    // Step 5: Filter and combine results
-                    const favoriteIds = new Set(state.favorites.map(f => f.id));
-                    const combined = [...movieRecommendations, ...tvRecommendations]
-                        .filter(item => item.poster_path && !favoriteIds.has(item.id)) // Filter out existing favorites and items without posters
-                        .sort((a, b) => b.popularity - a.popularity) // Sort by popularity
-                        .slice(0, 20); // Limit to 20 results
-
-                    if (combined.length > 0) {
-                        recommendationsTitle.textContent = `Recommended for You`;
-
-                        combined.forEach(item => {
-                            const card = document.createElement('div');
-                            card.className = 'flex-shrink-0 w-32 cursor-pointer';
-                            card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
-                            card.addEventListener('click', () => getMediaDetails(item.id, item.media_type || (item.title ? 'movie' : 'tv')));
-                            recommendationsContainer.appendChild(card);
-                        });
-
-                        recommendationsSection.classList.remove('hidden');
-                    }
-                } catch (error) {
-                    console.error("Failed to load recommendations:", error);
-                }
-            }
-
-            async function fetchDashboardData() {
-                showLoading();
-                try {
-                    dashboardUserName.textContent = state.userName || 'You';
-                    const trendingPromise = apiFetch(`trending/all/day`);
-                    const upcomingPromise = apiFetch(`movie/upcoming`);
-                    const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, fetchScheduleData(true)]);
-                    
-                    renderDashboardTrending(trendingData.results);
-                    renderDashboardUpcomingMovies(upcomingData.results);
-                    renderDashboardUpcoming();
-                    await renderSpotlight(upcomingData.results);
-                    await renderRecommendations();
-                } catch (error) {
-                    console.error("Failed to load dashboard:", error);
-                    upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">Could not load dashboard data.</p>`;
-                    trendingContainer.innerHTML = '';
-                    upcomingMoviesContainer.innerHTML = '';
-                } finally {
-                    hideLoading();
-                }
-            }
-            
-            function renderDashboardTrending(items = []) {
-                trendingContainer.innerHTML = '';
-                if(items.length === 0) { return; }
-                items.filter(item => item.poster_path).forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
-                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title || item.name}</p>`;
-                    card.addEventListener('click', () => getMediaDetails(item.id, item.media_type));
-                    trendingContainer.appendChild(card);
-                });
-            }
-
-            function renderDashboardUpcomingMovies(items = []) {
-                upcomingMoviesContainer.innerHTML = '';
-                if (items.length === 0) { return; }
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 7);
-                const fourteenDaysHence = new Date(today);
-                fourteenDaysHence.setDate(today.getDate() + 14);
-
-                const filteredAndSortedMovies = items
-                    .filter(item => {
-                        const releaseDate = parseLocalDate(item.release_date);
-                        return item.poster_path && releaseDate && releaseDate >= sevenDaysAgo && releaseDate <= fourteenDaysHence;
-                    })
-                    .sort((a, b) => parseLocalDate(a.release_date) - parseLocalDate(b.release_date));
-
-                if (filteredAndSortedMovies.length === 0) return;
-
-                filteredAndSortedMovies.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'flex-shrink-0 w-32 cursor-pointer';
-                    const releaseDate = new Date(item.release_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                    card.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${item.poster_path}" class="rounded-lg"><p class="text-sm mt-2 truncate">${item.title}</p><p class="text-xs text-zinc-300">${releaseDate}</p>`;
-                    card.addEventListener('click', () => getMediaDetails(item.id, 'movie'));
-                    upcomingMoviesContainer.appendChild(card);
-                });
-            }
-
-
-            function parseLocalDate(dateString) {
-                if (!dateString) return null;
-                const [year, month, day] = dateString.split('-').map(Number);
-                return new Date(year, month - 1, day);
-            }
-            
-            async function fetchScheduleData(isDashboard = false) {
-                const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
-                if (!isDashboard) scheduleMessage.classList.add('hidden');
-                
-                if (favoriteTvShows.length === 0) {
-                    state.scheduledEpisodes = [];
-                    return;
-                }
-
-                if (!isDashboard) showLoading();
-                try {
-                    const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
-                    
-                    const showDetailResults = await Promise.allSettled(showDetailPromises);
-                    const showDetailsList = showDetailResults
-                        .filter(result => result.status === 'fulfilled')
-                        .map(result => result.value);
-
-                    const seasonPromises = [];
-                    for (const showDetail of showDetailsList) {
-                        if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
-                            // Find the most recent season with a future air date, or the latest overall season
-                            const futureSeasons = showDetail.seasons.filter(s => s.air_date && new Date(s.air_date) > new Date());
-                            let seasonToFetch = futureSeasons.sort((a,b) => new Date(a.air_date) - new Date(b.air_date))[0];
-                            if(!seasonToFetch) {
-                                seasonToFetch = showDetail.seasons.filter(s => s.season_number > 0).sort((a, b) => b.season_number - a.season_number)[0];
-                            }
-
-                            if (seasonToFetch) {
-                                seasonPromises.push(apiFetch(`tv/${showDetail.id}/season/${seasonToFetch.season_number}`).then(seasonData => ({...seasonData, showId: showDetail.id, showName: showDetail.name, showPoster: showDetail.poster_path, networks: showDetail.networks, providers: showDetail['watch/providers'] })));
-                            }
-                        }
-                    }
-                    
-                    const seasonDetailResults = await Promise.allSettled(seasonPromises);
-                    const seasonDetailsList = seasonDetailResults
-                        .filter(result => result.status === 'fulfilled')
-                        .map(result => result.value);
-
-                    const allEpisodes = [];
-                    for (const season of seasonDetailsList) {
-                        if (season.episodes) {
-                            const us_providers = season.providers?.results?.US?.flatrate || [];
-                            const subscribedProvider = us_providers.find(p => state.subscriptions.includes(p.provider_id));
-                            let displayNetwork = subscribedProvider ? { name: subscribedProvider.provider_name, logo_path: subscribedProvider.logo_path } : (season.networks && season.networks.length > 0 ? season.networks[0] : null);
-                            const episodesWithContext = season.episodes.filter(ep => ep.air_date).map(ep => ({ ...ep, showId: season.showId, showName: season.showName, poster_path: season.showPoster, displayNetwork }));
-                            allEpisodes.push(...episodesWithContext);
-                        }
-                    }
-                    state.scheduledEpisodes = allEpisodes;
-
-                } catch (error) {
-                    console.error("Error fetching schedule data:", error);
-                    if (!isDashboard) {
-                        scheduleMessage.textContent = "Could not load schedule data.";
-                        scheduleMessage.classList.remove('hidden');
-                    }
-                    state.scheduledEpisodes = [];
-                } finally {
-                    if (!isDashboard) hideLoading();
-                }
-            }
-            
-            function renderDashboardUpcoming() {
-                upcomingContainer.innerHTML = '';
-                 const today = new Date(); today.setHours(0,0,0,0);
-                 let endDate = new Date(today);
-                 if (state.dashboardScheduleFilter === 'today') {} 
-                 else if (state.dashboardScheduleFilter === 'week') { endDate.setDate(today.getDate() + 6); } 
-                 else if (state.dashboardScheduleFilter === 'month') { endDate.setMonth(today.getMonth() + 1); }
-
-                 const upcoming = state.scheduledEpisodes
-                     .map(ep => {
-                         const favorite = state.favorites.find(f => f.id === ep.showId);
-                         return { ...ep, manualTime: favorite ? favorite.manualTime : null };
-                     })
-                       .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
-                       .sort((a,b) => {
-                             const dateA = parseLocalDate(a.air_date);
-                             const dateB = parseLocalDate(b.air_date);
-                             if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-                             return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
-                        });
-
-                const groupedUpcoming = upcoming.reduce((acc, ep) => {
-                    const key = `${ep.showId}-${ep.air_date}`;
-                    if (!acc[key]) {
-                        acc[key] = {
-                            ...ep, // Copy details from the first episode
-                            episodes: []
-                        };
-                    }
-                    acc[key].episodes.push({
-                        season_number: ep.season_number,
-                        episode_number: ep.episode_number,
-                        name: ep.name
-                    });
-                    return acc;
-                }, {});
-
-                const upcomingItems = Object.values(groupedUpcoming);
-
-                 if (upcomingItems.length === 0) {
-                         upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
-                         return;
-                 }
-                
-                 upcomingItems.forEach(item => {
-                         const el = document.createElement('div');
-                         el.className = 'flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg';
-                         const airDate = parseLocalDate(item.air_date);
-                         const day = airDate.toLocaleDateString(undefined, { weekday: 'short' });
-                         const date = airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                         let networkHtml = '';
-                         if (item.displayNetwork && item.displayNetwork.logo_path) {
-                                networkHtml = `<img src="https://image.tmdb.org/t/p/w92${item.displayNetwork.logo_path}" class="h-6 object-contain" title="${item.displayNetwork.name}">`;
-                         } else if (item.displayNetwork) {
-                                networkHtml = `<span class="text-xs text-zinc-400">${item.displayNetwork.name}</span>`;
-                         }
-
-                        let episodeDetailsText;
-                        if (item.episodes.length > 1) {
-                            episodeDetailsText = `${item.episodes.length} episodes today`;
-                        } else {
-                            const singleEp = item.episodes[0];
-                            episodeDetailsText = `S${singleEp.season_number} E${singleEp.episode_number}: ${singleEp.name}`;
-                        }
-
-                         el.innerHTML = `
-                             <div class="text-center w-20 flex-shrink-0">
-                                 <p class="font-bold text-xl text-zinc-300">${day}</p>
-                                 <p class="text-sm text-zinc-400">${date}</p>
-                             </div>
-                             <div class="flex-grow min-w-0">
-                                 <p class="font-bold">${item.showName}</p>
-                                 <p class="text-sm text-zinc-400 truncate">${episodeDetailsText}</p>
-                                 <p class="text-sm font-semibold text-zinc-300 mt-1">${item.manualTime || ''}</p>
-                             </div>
-                             <div class="flex flex-col items-center justify-center w-16 flex-shrink-0 space-y-2">
-                                 <img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-12 h-auto rounded-md">
-                                 <div class="h-6 flex items-center justify-center">${networkHtml}</div>
-                             </div>`;
-                         upcomingContainer.appendChild(el);
-                  });
-            }
-            
-            function renderSchedule() {
-                scheduleMessage.classList.add('hidden');
-                if (state.scheduledEpisodes.length === 0) {
-                    scheduleMessage.textContent = "No upcoming episodes for your favorite shows.";
-                    scheduleMessage.classList.remove('hidden');
-                    scheduleContent.innerHTML = '';
-                    return;
-                }
-                if (state.scheduleView === 'calendar') renderCalendar();
-                else renderAgenda();
-            }
-
-            function renderCalendar() {
-                const date = state.currentDate;
-                const year = date.getFullYear(), month = date.getMonth();
-                const firstDayOfMonth = new Date(year, month, 1);
-                const firstDayOfWeek = firstDayOfMonth.getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                
-                const monthName = date.toLocaleString('default', { month: 'long' });
-                let html = `<div class="p-4"><div class="flex justify-between items-center mb-4"><button id="prevMonth" class="px-2 py-1">&lt;</button><h3 class="text-xl font-semibold">${monthName} ${year}</h3><button id="nextMonth" class="px-2 py-1">&gt;</button></div><div class="grid grid-cols-7 gap-2 text-center text-xs text-zinc-400"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendarGrid" class="grid grid-cols-7 gap-2 mt-2">`;
-
-                for (let i = 0; i < firstDayOfWeek; i++) { html += `<div></div>`; }
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayDate = new Date(year, month, day);
-                    const dayEvents = state.scheduledEpisodes.filter(ep => {
-                        const epDate = parseLocalDate(ep.air_date);
-                        return epDate && epDate.getTime() === dayDate.getTime();
-                    });
-                    const uniqueShowNames = [...new Set(dayEvents.map(e => e.showName))];
-                    html += `<div class="p-2 h-20 border border-zinc-700 rounded-md text-xs overflow-hidden ${dayEvents.length > 0 ? 'bg-zinc-900' : ''}"><div class="font-bold">${day}</div><div class="truncate">${uniqueShowNames.join(', ')}</div></div>`;
-                }
-                html += `</div></div>`;
-                scheduleContent.innerHTML = html;
-                $('prevMonth').addEventListener('click', () => { state.currentDate.setMonth(month - 1); renderCalendar(); });
-                $('nextMonth').addEventListener('click', () => { state.currentDate.setMonth(month + 1); renderCalendar(); });
-            }
-
-            function renderAgenda() {
-                const sortedEpisodes = [...state.scheduledEpisodes]
-                    .map(ep => {
-                        const favorite = state.favorites.find(f => f.id === ep.showId);
-                        return { ...ep, manualTime: favorite ? favorite.manualTime : null };
-                    })
-                    .sort((a,b) => {
-                        const dateA = parseLocalDate(a.air_date);
-                        const dateB = parseLocalDate(b.air_date);
-                        if (dateA && dateB && dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-                        if (!dateA) return 1;
-                        if (!dateB) return -1;
-                        return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
-                    });
-                
-                const groupedEpisodes = sortedEpisodes.reduce((acc, ep) => {
-                    const key = `${ep.showId}-${ep.air_date}`;
-                    if (!acc[key]) {
-                        acc[key] = {
-                            ...ep, // Copy details from the first episode
-                            episodes: []
-                        };
-                    }
-                    acc[key].episodes.push({
-                        id: ep.id,
-                        season_number: ep.season_number,
-                        episode_number: ep.episode_number,
-                        name: ep.name
-                    });
-                    return acc;
-                }, {});
-
-                const agendaItems = Object.values(groupedEpisodes).sort((a, b) => {
-                    const dateA = parseLocalDate(a.air_date);
-                    const dateB = parseLocalDate(b.air_date);
-                    if (dateA && dateB && dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-                    if (!dateA) return 1;
-                    if (!dateB) return -1;
-                    return parseTimeToMinutes(a.manualTime) - parseTimeToMinutes(b.manualTime);
-                });;
-
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                scheduleContent.innerHTML = `<div class="space-y-4">${agendaItems.map(item => {
-                    const airDate = parseLocalDate(item.air_date);
-                    if (!airDate) return '';
-                    const isPast = airDate < today;
-                    let networkHtml = '';
-                     if (item.displayNetwork && item.displayNetwork.logo_path) { networkHtml = `<img src="https://image.tmdb.org/t/p/w92${item.displayNetwork.logo_path}" class="h-6 object-contain" alt="${item.displayNetwork.name}">`; } else if (item.displayNetwork) { networkHtml = `<span class="text-sm text-zinc-400">${item.displayNetwork.name}</span>`; }
-                    
-                    let episodeDetailsHtml;
-                    if (item.episodes.length > 1) {
-                        const firstEp = item.episodes[0];
-                        const episodeNumbers = item.episodes.map(e => `E${e.episode_number}`).join(', ');
-                        episodeDetailsHtml = `<p class="text-sm text-zinc-400 truncate">S${firstEp.season_number}: ${episodeNumbers}</p>`;
-                    } else {
-                        const singleEp = item.episodes[0];
-                        episodeDetailsHtml = `<p class="text-sm text-zinc-400 truncate">S${singleEp.season_number} E${singleEp.episode_number}: ${singleEp.name}</p>`;
-                    }
-                    
-                    const agendaItemId = `agenda-item-${item.showId}-${item.air_date.replace(/-/g, '')}`;
-
-                    return `<div id="${agendaItemId}" class="flex items-center space-x-4 p-3 bg-zinc-700 rounded-lg ${isPast ? 'opacity-50' : ''}"><img src="https://image.tmdb.org/t/p/w92${item.poster_path}" class="w-12 h-auto rounded-md flex-shrink-0"><div class="flex-grow min-w-0"><p class="font-bold">${item.showName}</p>${episodeDetailsHtml}</div><div class="text-right flex-shrink-0 w-32"><p class="font-bold text-zinc-300 text-md">${airDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p><p class="text-sm text-zinc-300">${item.manualTime || ''}</p><div class="mt-1 h-6 flex justify-end items-center">${networkHtml}</div></div></div>`;
-                }).join('')}</div>`;
-
-                const firstUpcomingIndex = agendaItems.findIndex(item => {
-                    const airDate = parseLocalDate(item.air_date);
-                    return airDate && airDate >= today;
-                });
-
-                if (firstUpcomingIndex !== -1) {
-                    const firstUpcomingItem = agendaItems[firstUpcomingIndex];
-                    const firstUpcomingId = `agenda-item-${firstUpcomingItem.showId}-${firstUpcomingItem.air_date.replace(/-/g, '')}`;
-                    setTimeout(() => {
-                        const element = $(firstUpcomingId);
-                        if (element) {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    }, 100);
-                }
-            }
-
-            async function refreshCurrentView() {
-                // This function is called whenever data changes in Firestore
-                updateAccountSection();
-                renderSubscriptions();
-                updateUpcomingFilterButtonsUI(); // Refresh button state
-                dashboardUserName.textContent = state.userName || 'You';
-                
-                if (state.activeTab === 'dashboard') {
-                    await fetchDashboardData(true);
-                    renderDashboardUpcoming();
-                }
-                if (state.activeTab === 'favorites') {
-                    await renderFavorites();
-                }
-                if (state.activeTab === 'schedule') { 
-                    await fetchScheduleData(); 
-                    renderSchedule(); 
-                }
-            }
-
-
-            function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
-            function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
-            function closeModal() { modal.classList.add('hidden'); }
-            function closeSuggestionModal() { suggestionModal.classList.add('hidden'); }
-
-            function openSuggestionModal() {
-                const title = $('suggestionModalTitle');
-                const subtitle = $('suggestionModalSubtitle');
-                const textarea = $('suggestionText');
-
-                if (state.theme === 'horror') {
-                    title.textContent = "We Have Such Sights to Show You";
-                    subtitle.textContent = "What is your pleasure, sir? Let us know what features you desire.";
-                } else if (state.theme === 'scifi') {
-                    title.textContent = "Feature Request Transmission";
-                    subtitle.textContent = "They mostly come at night. Mostly. But your suggestions can come anytime.";
-                } else if (state.theme === 'clean') {
-                    title.textContent = "This is a Tasty Burger!";
-                    subtitle.textContent = "Enjoying your app? Let us know how we can make it even better.";
-                } else {
-                    title.textContent = "Got a Suggestion?";
-                    subtitle.textContent = "We'd love to hear it. Let us know what we can do to improve your experience.";
-                }
-                suggestionModal.classList.remove('hidden');
-            }
-
-            // A new helper function to manage the UI of the filter buttons
-            function updateUpcomingFilterButtonsUI() {
-                upcomingFilterBtns.forEach(b => {
-                    const isSelected = b.dataset.filter === state.dashboardScheduleFilter;
-                    b.classList.toggle('bg-zinc-900', isSelected);
-                    b.classList.toggle('text-white', isSelected);
-                    b.classList.toggle('text-zinc-300', !isSelected);
-                });
-            }
-
-            async function initAppUI() {
-                if (!isDataLoaded) return;
-                updateAccountSection();
-                renderSubscriptions();
-                updateUpcomingFilterButtonsUI(); // Set the initial state of the buttons
-                await switchTab('dashboard');
-            }
-
-            function handleFullSearch() {
-                const query = searchInput.value.trim();
-                liveSearchResults.classList.add('hidden');
-                switchTab('search-results');
-                searchMedia(query, false);
-            }
-
-            let debounceTimer;
-            function handleLiveSearch() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    searchMedia(searchInput.value.trim(), true);
-                }, 300);
-            }
-
-            function setupFavoriteSectionControls(type) {
-                const viewBtns = document.querySelectorAll(`.${type}-fav-view-btn`);
-                const manageBtn = $(`manage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const cancelManageBtn = $(`cancelManage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const deleteAllBtn = $(`deleteAll${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const deleteSelectedBtn = $(`deleteSelected${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const container = $(`${type}FavoritesContainer`);
-
-                viewBtns.forEach(btn => btn.addEventListener('click', () => {
-                    if (type === 'movie') state.movieFavoritesView = btn.dataset.view;
-                    else state.tvFavoritesView = btn.dataset.view;
-
-                    viewBtns.forEach(b => {
-                        b.classList.toggle('bg-zinc-900', b === btn);
-                        b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-zinc-300', b !== btn);
-                    });
-                    renderFavorites();
-                }));
-
-                manageBtn.addEventListener('click', () => {
-                    if (type === 'movie') state.isManagingMovies = true;
-                    else state.isManagingTvs = true;
-                    renderFavorites();
-                });
-
-                cancelManageBtn.addEventListener('click', () => {
-                    if (type === 'movie') state.isManagingMovies = false;
-                    else state.isManagingTvs = false;
-                    renderFavorites();
-                });
-                
-                deleteAllBtn.addEventListener('click', () => {
-                    showConfirmationModal(`Are you sure you want to remove all favorite ${type === 'movie' ? 'movies' : 'TV shows'}?`, () => {
-                        state.favorites = state.favorites.filter(fav => fav.media_type !== type);
-                        saveDataToFirestore();
-                    });
-                });
-
-                deleteSelectedBtn.addEventListener('click', () => {
-                    const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
-                    if (selected.length === 0) return;
-                    const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
-                    state.favorites = state.favorites.filter(fav => !idsToDelete.includes(fav.id));
-                    saveDataToFirestore();
-                });
-            }
-
-            function initEventListeners() {
-                $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
-                
-                searchButton.addEventListener('click', handleFullSearch);
-                searchInput.addEventListener('input', handleLiveSearch);
-                searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleFullSearch(); });
-
-                tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-                
-                scheduleViewBtns.forEach(btn => btn.addEventListener('click', () => {
-                    state.scheduleView = btn.dataset.view;
-                    scheduleViewBtns.forEach(b => {
-                        b.classList.toggle('bg-zinc-900', b === btn);
-                        b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-zinc-300', b !== btn);
-                    });
-                    renderSchedule();
-                }));
-
-                upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
-                    state.dashboardScheduleFilter = btn.dataset.filter;
-                    updateUpcomingFilterButtonsUI(); // Update button visuals
-                    saveDataToFirestore(); // Save the new preference
-                    renderDashboardUpcoming();
-                }));
-
-                saveUserNameButton.addEventListener('click', () => {
-                    if(!userId) { promptForLogin('saving your name'); return; }
-                    const name = userNameInput.value.trim();
-                    state.userName = name;
-                    saveDataToFirestore();
-                    userNameMessage.textContent = 'Name saved!';
-                    userNameMessage.classList.remove('hidden');
-                    setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
-                });
-                
-                themeBtns.forEach(btn => btn.addEventListener('click', () => {
-                    state.theme = btn.dataset.theme;
-                    applyTheme(state.theme);
-                    saveDataToFirestore();
-                }));
-
-                suggestionAvatarBtn.addEventListener('click', openSuggestionModal);
-                closeSuggestionModalBtn.addEventListener('click', closeSuggestionModal);
-                suggestionModal.addEventListener('click', (e) => {
-                    if (e.target === suggestionModal) closeSuggestionModal();
-                });
-                suggestionForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const suggestion = $('suggestionText').value;
-                    if(suggestion.trim()) {
-                        window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
-                        $('suggestionText').value = '';
-                        closeSuggestionModal();
-                    }
-                });
-
-                // Setup Favorites Management for both sections
-                setupFavoriteSectionControls('movie');
-                setupFavoriteSectionControls('tv');
-
-                scrollLeftBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
-                scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
-                scrollUpcomingLeftBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
-                scrollUpcomingRightBtn.addEventListener('click', () => { upcomingMoviesContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
-                $('spotlightScrollLeftBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
-                $('spotlightScrollRightBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-                $('recommendationsScrollLeftBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
-                $('recommendationsScrollRightBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-
-
-                modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-            }
-
-            initEventListeners();
+            // ... all other existing functions in runApp ...
+
+            // Must re-grab tabs NodeList after adding new one to HTML
+            const tabs = document.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+        
+            // ... existing initEventListeners, but tabs are handled above now
         }
 
         document.addEventListener('DOMContentLoaded', initializeAppWithConfig);
