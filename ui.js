@@ -1,6 +1,9 @@
 import { state } from './state.js';
 import { apiFetch } from './api.js';
-import { auth, saveDataToFirestore } from './firebase.js';
+// By dynamically importing firebase when needed, we break the circular dependency.
+// This is a common and effective pattern.
+let firebaseModule;
+import('./firebase.js').then(module => firebaseModule = module);
 import { toggleFavorite, toggleSubscription } from './events.js';
 
 
@@ -141,7 +144,7 @@ function showConfirmationModal(message, onConfirm) {
 
 function renderModal(details) {
     const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
-    const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+    const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : '[https://placehold.co/500x750/374151/FFFFFF?text=No+Image](https://placehold.co/500x750/374151/FFFFFF?text=No+Image)';
     const isFavorite = state.favorites.some(fav => fav.id === details.id);
     const providers = details['watch/providers']?.results?.US?.flatrate || [];
     const mediaType = details.title ? 'movie' : 'tv';
@@ -199,7 +202,9 @@ function editManualTime(details) {
         if (favIndex > -1) {
             state.favorites[favIndex].manualTime = newTime;
         }
-        saveDataToFirestore();
+        if (firebaseModule) {
+            firebaseModule.saveDataToFirestore();
+        }
         renderModal(details); 
     });
     $('cancelTimeButton').addEventListener('click', () => renderModal(details));
@@ -230,7 +235,7 @@ function createMediaCard(item, isManageMode = false) {
     const title = item.title || item.name;
     const releaseDate = item.release_date || item.first_air_date;
     const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
-    const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
+    const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '[https://placehold.co/500x750/374151/FFFFFF?text=No+Image](https://placehold.co/500x750/374151/FFFFFF?text=No+Image)';
     card.innerHTML = `<img src="${posterUrl}" alt="${title}" class="w-full h-auto object-cover transition-all duration-300"><div class="p-4"><h3 class="font-bold text-md truncate">${title}</h3><p class="text-sm text-zinc-400">${year}</p></div>`;
     
     if (isManageMode) {
@@ -316,11 +321,12 @@ async function switchTab(tabName) {
 }
 
 function updateAccountSection() {
-    const user = auth.currentUser;
+    if (!firebaseModule || !firebaseModule.auth) return;
+    const user = firebaseModule.auth.currentUser;
     if (user) {
         $('accountSection').innerHTML = `<h2 class="text-2xl font-bold mb-4">Account</h2><p class="text-zinc-400 mb-4">Signed in as ${user.displayName || user.email}</p><button id="signOutButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Sign Out</button>`;
-        $('signOutButton').addEventListener('click', () => import('./firebase.js').then(m => m.handleSignOut()));
-        $('deleteAccountBtn').addEventListener('click', () => showConfirmationModal("Are you sure you want to delete your account?", () => import('./firebase.js').then(m => m.handleDeleteAccount())));
+        $('signOutButton').addEventListener('click', () => firebaseModule.handleSignOut());
+        $('deleteAccountBtn').addEventListener('click', () => showConfirmationModal("Are you sure you want to delete your account?", () => firebaseModule.handleDeleteAccount()));
     }
 }
 
@@ -628,7 +634,7 @@ async function renderFavoritesList(sortedFavorites, container) {
 
         favoritesWithDetails.forEach(details => {
             const title = details.title || details.name;
-            const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A';
+            const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : '[https://placehold.co/92x138/374151/FFFFFF?text=N/A](https://placehold.co/92x138/374151/FFFFFF?text=N/A)';
             const providers = details['watch/providers']?.results?.US?.flatrate || [];
             let providersHtml = '<span class="text-zinc-400 text-sm">Not on streaming</span>';
             if (providers.length > 0) {
