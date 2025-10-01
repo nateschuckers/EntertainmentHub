@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state, loadDataFromFirestore } from './state.js';
-import { applyTheme, initAppUI, refreshCurrentView, renderConfigError, showLoginScreen, showAppScreen } from './ui.js';
+// We now import screen controls from ui.js instead of touching the DOM directly.
+import { applyTheme, initAppUI, refreshCurrentView, renderConfigError, showAppScreen, showLoginScreen } from './ui.js';
 import { initAppListeners } from './events.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
@@ -16,21 +17,17 @@ async function initializeAppWithConfig() {
         const response = await fetch('/.netlify/functions/get-firebase-config');
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Server returned status ${response.status}. Response: ${errorText.substring(0, 200)}...`);
+            throw new Error(`Server error: ${response.status}. Response: ${errorText.substring(0, 200)}...`);
         }
         const firebaseConfig = await response.json();
         
         if (!firebaseConfig.apiKey) {
-                throw new Error("Received config is missing critical keys. Check Netlify environment variables.");
+                throw new Error("Firebase config is missing critical keys.");
         }
         runApp(firebaseConfig);
 
     } catch (error) {
-        let errorMessage = error.message;
-        if (error instanceof SyntaxError) {
-            errorMessage = "The server returned an invalid response (likely HTML instead of JSON). This is a routing issue. Please ensure your netlify.toml redirect rule is correct.";
-        }
-        renderConfigError(errorMessage);
+        renderConfigError(error.message);
     }
 }
 
@@ -46,7 +43,7 @@ function runApp(firebaseConfig) {
         if (user) {
             userId = user.uid;
             userDocRef = doc(db, "users", userId);
-            showAppScreen();
+            showAppScreen(); // Use the safe UI function
             
             unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                 const wasAlreadyLoaded = isDataLoaded;
@@ -72,7 +69,7 @@ function runApp(firebaseConfig) {
             userId = null;
             userDocRef = null;
             applyTheme('default');
-            showLoginScreen();
+            showLoginScreen(); // Use the safe UI function
             state.favorites = [];
             state.subscriptions = [];
             state.userName = null;
