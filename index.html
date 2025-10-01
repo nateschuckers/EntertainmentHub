@@ -716,7 +716,7 @@
         const SearchIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>;
 
         // --- Reusable Movie Card Component ---
-        const MovieCard = ({ movie, onAction, actionText, actionIcon }) => (
+        const MovieCard = ({ movie, onAction, actionText, actionIcon, colors }) => (
             <div className="bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col">
                 <img 
                     src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://placehold.co/500x750/1f2937/9ca3af?text=No+Image'} 
@@ -731,7 +731,7 @@
                     {onAction && (
                         <button
                             onClick={() => onAction(movie)}
-                            className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center transition-colors"
+                            className={`mt-4 w-full text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center transition-colors ${colors.primary} ${colors.hover}`}
                         >
                             {actionIcon}
                             {actionText}
@@ -742,12 +742,20 @@
         );
 
         // --- Main Horror Tracker Component ---
-        function HorrorTracker({ db, userId, firestore }) {
+        function HorrorTracker({ db, userId, firestore, theme }) {
             const [activeTab, setActiveTab] = React.useState('watched');
             const [watchedMovies, setWatchedMovies] = React.useState([]);
             const [watchlist, setWatchlist] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
             const [error, setError] = React.useState(null);
+
+            const themeConfig = {
+                default: { header: 'text-blue-500', primary: 'bg-blue-600', hover: 'hover:bg-blue-700', ring: 'focus:ring-blue-500' },
+                horror: { header: 'text-red-500', primary: 'bg-red-700', hover: 'hover:bg-red-800', ring: 'focus:ring-red-500' },
+                scifi: { header: 'text-green-400', primary: 'bg-green-700', hover: 'hover:bg-green-800', ring: 'focus:ring-green-500' },
+                clean: { header: 'text-zinc-600', primary: 'bg-zinc-700', hover: 'hover:bg-zinc-600', ring: 'focus:ring-zinc-500' },
+            };
+            const colors = themeConfig[theme] || themeConfig.default;
 
             React.useEffect(() => {
                 if (!userId || !db) { setLoading(false); return; }
@@ -818,15 +826,15 @@
                         <div className="bg-zinc-800 p-4 rounded-lg mb-6 shadow-md">
                             <h2 className="text-xl font-bold text-white mb-2">October Progress</h2>
                             <p className="text-zinc-300 mb-4">{octoberMovies.length} of 31 movies watched</p>
-                            <div className="w-full bg-zinc-700 rounded-full h-4"><div className="bg-red-600 h-4 rounded-full" style={{ width: `${progress}%` }}></div></div>
+                            <div className="w-full bg-zinc-700 rounded-full h-4"><div className={`${colors.primary} h-4 rounded-full`} style={{ width: `${progress}%` }}></div></div>
                         </div>
                         {sortedDays.map(date => (
                             <div key={date} className="mb-8">
-                                <h3 className="text-2xl font-semibold text-red-500 mb-4 border-b-2 border-zinc-700 pb-2">
+                                <h3 className={`text-2xl font-semibold ${colors.header} mb-4 border-b-2 border-zinc-700 pb-2`}>
                                 Watched on: {new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
                                 </h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                    {groupedByDay[date].map(movie => <MovieCard key={movie.id} movie={movie} />)}
+                                    {groupedByDay[date].map(movie => <MovieCard key={movie.id} movie={movie} colors={colors} />)}
                                 </div>
                             </div>
                         ))}
@@ -854,12 +862,12 @@
                 return (
                     <div>
                         <form onSubmit={handleSearch} className="mb-8 flex">
-                            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search for a horror movie..." className="flex-grow bg-zinc-700 text-white p-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-red-500"/>
-                            <button type="submit" className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-r-lg" disabled={isSearching}>{isSearching ? '...' : <SearchIcon />}</button>
+                            <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search for a horror movie..." className={`flex-grow bg-zinc-700 text-white p-3 rounded-l-lg focus:outline-none focus:ring-2 ${colors.ring}`}/>
+                            <button type="submit" className={`text-white p-3 rounded-r-lg ${colors.primary} ${colors.hover}`} disabled={isSearching}>{isSearching ? '...' : <SearchIcon />}</button>
                         </form>
-                        {searchResults.length > 0 && (<div className="mb-8"><h3 className="text-2xl font-semibold text-red-500 mb-4">Search Results</h3><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{searchResults.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleAddToWatchlist} actionText="Add to Watchlist" actionIcon={<ListIcon/>}/>))}</div></div>)}
-                        <h3 className="text-2xl font-semibold text-red-500 mb-4 mt-8 border-t-2 border-zinc-700 pt-4">My Watchlist</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{watchlist.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleMoveToWatched} actionText="I Watched This!" actionIcon={<FilmIcon />}/>))}</div>
+                        {searchResults.length > 0 && (<div className="mb-8"><h3 className={`text-2xl font-semibold ${colors.header} mb-4`}>Search Results</h3><div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{searchResults.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleAddToWatchlist} actionText="Add to Watchlist" actionIcon={<ListIcon/>} colors={colors} />))}</div></div>)}
+                        <h3 className={`text-2xl font-semibold ${colors.header} mb-4 mt-8 border-t-2 border-zinc-700 pt-4`}>My Watchlist</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">{watchlist.map(movie => (<MovieCard key={movie.id} movie={movie} onAction={handleMoveToWatched} actionText="I Watched This!" actionIcon={<FilmIcon />} colors={colors} />))}</div>
                     </div>
                 );
             };
@@ -869,8 +877,8 @@
                 const moviesWithCounts = Object.entries(watchCounts).map(([tmdb_id, count]) => ({ ...watchedMovies.find(m => m.tmdb_id == tmdb_id), count })).sort((a, b) => b.count - a.count);
                 return (
                     <div>
-                        <h2 className="text-2xl font-semibold text-red-500 mb-4">All-Time Watch Metrics</h2>
-                        <div className="bg-zinc-800 rounded-lg shadow-md overflow-hidden"><table className="min-w-full"><thead className="bg-zinc-700"><tr><th className="text-left py-3 px-4 font-semibold text-white">Movie Title</th><th className="text-left py-3 px-4 font-semibold text-white">Release Year</th><th className="text-left py-3 px-4 font-semibold text-white">Total Watches</th></tr></thead><tbody className="text-zinc-300">{moviesWithCounts.map((movie, index) => (<tr key={movie.tmdb_id} className={`border-t border-zinc-700 ${index % 2 === 0 ? 'bg-zinc-800' : 'bg-zinc-900/50'}`}><td className="py-3 px-4">{movie.title}</td><td className="py-3 px-4">{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</td><td className="py-3 px-4 text-center font-bold text-red-500">{movie.count}</td></tr>))}</tbody></table></div>
+                        <h2 className={`text-2xl font-semibold ${colors.header} mb-4`}>All-Time Watch Metrics</h2>
+                        <div className="bg-zinc-800 rounded-lg shadow-md overflow-hidden"><table className="min-w-full"><thead className="bg-zinc-700"><tr><th className="text-left py-3 px-4 font-semibold text-white">Movie Title</th><th className="text-left py-3 px-4 font-semibold text-white">Release Year</th><th className="text-left py-3 px-4 font-semibold text-white">Total Watches</th></tr></thead><tbody className="text-zinc-300">{moviesWithCounts.map((movie, index) => (<tr key={movie.tmdb_id} className={`border-t border-zinc-700 ${index % 2 === 0 ? 'bg-zinc-800' : 'bg-zinc-900/50'}`}><td className="py-3 px-4">{movie.title}</td><td className="py-3 px-4">{movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</td><td className={`py-3 px-4 text-center font-bold ${colors.header}`}>{movie.count}</td></tr>))}</tbody></table></div>
                     </div>
                 );
             };
@@ -886,7 +894,7 @@
                                 <UploadIcon /><span className="ml-2 text-base leading-normal">{file ? file.name : "Select a CSV file"}</span>
                                 <input type='file' accept=".csv" className="hidden" onChange={(e) => setFile(e.target.files[0])}/>
                             </label>
-                            <button onClick={() => file && handleImportCsv(file)} disabled={!file} className="bg-red-600 text-white font-bold py-2 px-6 rounded-lg disabled:bg-zinc-500 disabled:cursor-not-allowed hover:bg-red-700 transition-colors">Import</button>
+                            <button onClick={() => file && handleImportCsv(file)} disabled={!file} className={`text-white font-bold py-2 px-6 rounded-lg disabled:bg-zinc-500 disabled:cursor-not-allowed transition-colors ${colors.primary} ${colors.hover}`}>Import</button>
                         </div>
                     </div>
                 )
@@ -898,12 +906,12 @@
 
             return (
                 <div className="bg-black text-white font-sans w-full -m-4 md:-m-8">
-                    <header className="bg-zinc-900 shadow-lg p-4"><div className="container mx-auto"><h1 className="text-3xl font-bold text-red-600 tracking-wider">31 Nights of Horror</h1></div></header>
+                    <header className="bg-zinc-900 shadow-lg p-4"><div className="container mx-auto"><h1 className={`text-3xl font-bold ${colors.header} tracking-wider`}>31 Nights of Horror</h1></div></header>
                     <nav className="bg-zinc-800"><div className="container mx-auto flex justify-center items-center space-x-2 md:space-x-4 p-2 text-sm md:text-base">
-                        <button onClick={() => setActiveTab('watched')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watched' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><FilmIcon /> Watched</button>
-                        <button onClick={() => setActiveTab('watchlist')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watchlist' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><ListIcon /> Watchlist</button>
-                        <button onClick={() => setActiveTab('metrics')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'metrics' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><ChartIcon /> Metrics</button>
-                        <button onClick={() => setActiveTab('import')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'import' ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-zinc-700'}`}><UploadIcon/> Import</button>
+                        <button onClick={() => setActiveTab('watched')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watched' ? `${colors.primary} text-white` : 'text-zinc-300 hover:bg-zinc-700'}`}><FilmIcon /> Watched</button>
+                        <button onClick={() => setActiveTab('watchlist')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'watchlist' ? `${colors.primary} text-white` : 'text-zinc-300 hover:bg-zinc-700'}`}><ListIcon /> Watchlist</button>
+                        <button onClick={() => setActiveTab('metrics')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'metrics' ? `${colors.primary} text-white` : 'text-zinc-300 hover:bg-zinc-700'}`}><ChartIcon /> Metrics</button>
+                        <button onClick={() => setActiveTab('import')} className={`flex items-center px-4 py-2 rounded-lg transition-colors ${activeTab === 'import' ? `${colors.primary} text-white` : 'text-zinc-300 hover:bg-zinc-700'}`}><UploadIcon/> Import</button>
                     </div></nav>
                     <main className="container mx-auto p-4 md:p-6">
                         {activeTab === 'watched' && <WatchedTab />}
@@ -916,10 +924,10 @@
         }
 
         // This function will be called from your main script to render the app
-        function renderHorrorTracker(db, userId, firestore) {
+        function renderHorrorTracker(db, userId, firestore, theme) {
             const container = document.getElementById('horror-tracker-root');
             const root = ReactDOM.createRoot(container);
-            root.render(<HorrorTracker db={db} userId={userId} firestore={firestore} />);
+            root.render(<HorrorTracker db={db} userId={userId} firestore={firestore} theme={theme} />);
         }
     </script>
 
@@ -1051,7 +1059,6 @@
             const closeSuggestionModalBtn = $('closeSuggestionModal');
             const suggestionForm = $('suggestionForm');
 
-            // MODIFIED: Pass all firestore functions to the React component
             const firestoreFunctions = {
                 collection, addDoc, writeBatch, Timestamp, doc, onSnapshot, setDoc, deleteDoc
             };
@@ -1066,9 +1073,6 @@
                     loginScreen.classList.add('hidden');
                     mainApp.classList.remove('hidden');
                     suggestionAvatarBtn.classList.remove('hidden');
-                    
-                    // Renders the React component once the user is logged in
-                    renderHorrorTracker(db, userId, firestoreFunctions);
                     
                     unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                         const wasAlreadyLoaded = isDataLoaded;
@@ -1092,7 +1096,7 @@
                 } else {
                     userId = null;
                     userDocRef = null;
-                    applyTheme('default'); // Reset to default on logout
+                    applyTheme('default');
                     loginScreen.classList.remove('hidden');
                     mainApp.classList.add('hidden');
                     suggestionAvatarBtn.classList.add('hidden');
@@ -1176,7 +1180,7 @@
             }
 
             function applyTheme(theme) {
-                document.body.className = 'bg-zinc-900 text-zinc-200'; // Reset body classes
+                document.body.className = 'bg-zinc-900 text-zinc-200';
                 if(theme === 'horror' || theme === 'scifi' || theme === 'clean') {
                     document.body.classList.add(`theme-${theme}`);
                 }
@@ -1185,11 +1189,15 @@
 
                 themeBtns.forEach(btn => {
                     const isSelected = btn.dataset.theme === theme;
-                    btn.classList.toggle('bg-zinc-900', isSelected); // Used as a "selected" marker by CSS
+                    btn.classList.toggle('bg-zinc-900', isSelected);
                     btn.classList.toggle('text-white', isSelected);
                     btn.classList.toggle('bg-zinc-700', !isSelected);
                     btn.classList.toggle('text-zinc-300', !isSelected);
                 });
+
+                if (userId && db) {
+                    renderHorrorTracker(db, userId, firestoreFunctions, theme);
+                }
             }
 
             async function apiFetch(endpoint) {
