@@ -1,39 +1,38 @@
-/**
- * Netlify Function to securely provide Firebase configuration to the front-end.
- * It reads the environment variables set in the Netlify UI and returns them as a JSON object.
- */
 exports.handler = async function(event, context) {
-  try {
-    const firebaseConfig = {
-  apiKey: "AIzaSyDd6yc1Y_0TdJjR1z3pvaYbkSJ-ToJVdWY",
-  authDomain: "entertainment-hub-12e9c.firebaseapp.com",
-  projectId: "entertainment-hub-12e9c",
-  storageBucket: "entertainment-hub-12e9c.firebasestorage.app",
-  messagingSenderId: "851340832325",
-  appId: "1:851340832325:web:ca9a9b98864be89c8d3d2c"
-    };
+  // Check for required environment variables
+  const requiredVars = [
+    'FIREBASE_API_KEY',
+    'FIREBASE_AUTH_DOMAIN',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_STORAGE_BUCKET',
+    'FIREBASE_MESSAGING_SENDER_ID',
+    'FIREBASE_APP_ID'
+  ];
 
-    // Validate that all required environment variables are present
-    for (const key in firebaseConfig) {
-      if (!firebaseConfig[key]) {
-        // This will show a clear error in the function logs if a variable is missing
-        console.error(`Missing environment variable for Firebase config: ${key}`);
-        throw new Error(`Configuration error: Missing required environment variable ${key}.`);
-      }
+  for (const variable of requiredVars) {
+    if (!process.env[variable]) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: `Missing required environment variable: ${variable}` }),
+      };
     }
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(firebaseConfig),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
-    };
   }
+  
+  const firebaseConfig = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID
+  };
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(firebaseConfig),
+  };
 };
 
