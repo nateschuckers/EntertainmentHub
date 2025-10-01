@@ -3,19 +3,38 @@ import { apiFetch } from './api.js';
 import { auth, saveDataToFirestore } from './firebase.js';
 import { toggleFavorite, toggleSubscription } from './events.js';
 
+
+// --- Module-level variables to cache core DOM elements ---
+let loginScreenEl, appScreenEl, suggestionAvatarEl, loadingSpinnerEl;
+
+/**
+ * Finds and caches the primary DOM elements. This must be called 
+ * once the DOM is fully loaded to ensure elements are available.
+ */
+function initUI() {
+    loginScreenEl = document.getElementById('loginScreen');
+    appScreenEl = document.getElementById('app');
+    suggestionAvatarEl = document.getElementById('suggestion-avatar-btn');
+    loadingSpinnerEl = document.getElementById('loadingSpinner');
+}
+
 const $ = (selector) => document.getElementById(selector);
 
 // --- Screen Management ---
 function showLoginScreen() {
-    $('loginScreen').classList.remove('hidden');
-    $('app').classList.add('hidden');
-    $('suggestion-avatar-btn').classList.add('hidden');
+    if (loginScreenEl && appScreenEl && suggestionAvatarEl) {
+        loginScreenEl.classList.remove('hidden');
+        appScreenEl.classList.add('hidden');
+        suggestionAvatarEl.classList.add('hidden');
+    }
 }
 
 function showAppScreen() {
-    $('loginScreen').classList.add('hidden');
-    $('app').classList.remove('hidden');
-    $('suggestion-avatar-btn').classList.remove('hidden');
+    if (loginScreenEl && appScreenEl && suggestionAvatarEl) {
+        loginScreenEl.classList.add('hidden');
+        appScreenEl.classList.remove('hidden');
+        suggestionAvatarEl.classList.remove('hidden');
+    }
 }
 
 
@@ -53,8 +72,8 @@ function applyTheme(theme) {
 
 // --- Generic UI Components & Helpers ---
 
-function showLoading() { $('loadingSpinner').classList.remove('hidden'); }
-function hideLoading() { $('loadingSpinner').classList.add('hidden'); }
+function showLoading() { if (loadingSpinnerEl) loadingSpinnerEl.classList.remove('hidden'); }
+function hideLoading() { if (loadingSpinnerEl) loadingSpinnerEl.classList.add('hidden'); }
 function parseLocalDate(dateString) {
     if (!dateString) return null;
     const [year, month, day] = dateString.split('-').map(Number);
@@ -779,12 +798,11 @@ function renderConfigError(message) {
 
 
 export {
+    initUI, showLoginScreen, showAppScreen,
     applyTheme, initAppUI, refreshCurrentView, renderConfigError,
     showLoading, hideLoading, closeModal, closeSuggestionModal, openSuggestionModal,
     showConfirmationModal, createMediaCard, renderSearchResults, renderLiveSearchResults,
     renderSubscriptions, renderModal, switchTab, renderFavorites,
     renderSchedule, updateUpcomingFilterButtonsUI, renderDashboardUpcoming
 };
-
-" and I would like to make the following changes to the selection: "now i'm not seeign the login screen again, error from console attached"
 
