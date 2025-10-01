@@ -2,8 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state, loadDataFromFirestore, saveDataToFirestore } from './state.js';
-import { applyTheme, initAppUI, refreshCurrentView, renderConfigError, updateHeaderText } from './ui.js';
-import { initEventListeners } from './events.js';
+import { applyTheme, initAppUI, refreshCurrentView, renderConfigError } from './ui.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
 let isDataLoaded = false;
@@ -36,7 +35,6 @@ function runApp(firebaseConfig) {
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
-    const googleProvider = new GoogleAuthProvider();
 
     onAuthStateChanged(auth, (user) => {
         if (unsubscribeUserDoc) unsubscribeUserDoc();
@@ -81,7 +79,10 @@ function runApp(firebaseConfig) {
         }
     });
 
-    initEventListeners();
+    // Dynamically import and initialize event listeners to prevent circular dependencies
+    import('./events.js').then(eventsModule => {
+        eventsModule.initEventListeners();
+    }).catch(err => console.error("Failed to load event listeners module:", err));
 }
 
 function handleGoogleSignIn() {
