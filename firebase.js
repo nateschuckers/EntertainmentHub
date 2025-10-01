@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state, loadDataFromFirestore } from './state.js';
-import { applyTheme, initAppUI, refreshCurrentView, renderConfigError } from './ui.js';
+import { applyTheme, initAppUI, refreshCurrentView, renderConfigError, showLoginScreen, showAppScreen } from './ui.js';
 import { initAppListeners } from './events.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
@@ -46,9 +46,7 @@ function runApp(firebaseConfig) {
         if (user) {
             userId = user.uid;
             userDocRef = doc(db, "users", userId);
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            document.getElementById('suggestion-avatar-btn').classList.remove('hidden');
+            showAppScreen();
             
             unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                 const wasAlreadyLoaded = isDataLoaded;
@@ -65,8 +63,6 @@ function runApp(firebaseConfig) {
                 if (!wasAlreadyLoaded) {
                    isDataLoaded = true;
                    initAppUI(); 
-                   // Now that the user is logged in and the main app is visible,
-                   // we can safely initialize all of its event listeners.
                    initAppListeners();
                 } else {
                     refreshCurrentView();
@@ -76,9 +72,7 @@ function runApp(firebaseConfig) {
             userId = null;
             userDocRef = null;
             applyTheme('default');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('app').classList.add('hidden');
-            document.getElementById('suggestion-avatar-btn').classList.add('hidden');
+            showLoginScreen();
             state.favorites = [];
             state.subscriptions = [];
             state.userName = null;
@@ -104,8 +98,6 @@ async function saveDataToFirestore() {
 
 
 function handleGoogleSignIn() {
-    // 'auth' is guaranteed to be initialized here because this function is only
-    // called after initializeAppWithConfig -> runApp has been executed.
     if (auth) {
         signInWithPopup(auth, googleProvider).catch(console.error);
     } else {
