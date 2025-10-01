@@ -80,10 +80,6 @@ function runApp(firebaseConfig) {
             state.userName = null;
         }
     });
-
-    import('./events.js').then(eventsModule => {
-        eventsModule.initEventListeners();
-    }).catch(err => console.error("Failed to load event listeners module:", err));
 }
 
 async function saveDataToFirestore() {
