@@ -1,17 +1,17 @@
 import { initializeAppWithConfig } from './firebase.js';
-import { initEventListeners } from './events.js';
+import { initLoginListeners } from './events.js';
 
 /**
  * This is the main entry point for the application.
  * It ensures that the DOM is fully loaded before initializing scripts.
  */
 function startApp() {
-    // 1. Initialize all event listeners for elements that exist on page load.
-    // This is crucial for making the "Sign in with Google" button work immediately.
-    initEventListeners();
+    // 1. Initialize only the listeners needed for the login screen.
+    // This makes the "Sign in with Google" button work immediately.
+    initLoginListeners();
 
-    // 2. Initialize Firebase, which handles authentication and data loading.
-    // This will trigger the onAuthStateChanged listener in firebase.js.
+    // 2. Initialize Firebase, which handles authentication. The authentication
+    // process will then trigger the setup for the rest of the app.
     initializeAppWithConfig();
 }
 
