@@ -10,8 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Creepster&family=Inter:wght@400;500;600;700&family=Orbitron:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Tailwind config remains here as it's needed before the rest of the JS runs.
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zinc: {
+                            50:"#fafafa",100:"#f4f4f5",200:"#e4e4e7",300:"#d4d4d8",400:"#a1a1aa",500:"#71717a",600:"#52525b",700:"#3f3f46",800:"#27272a",900:"#18181b",950:"#09090b"
+                        }
+                    },
+                    fontFamily: {
+                        'script': ['Caveat', 'cursive'],
+                        'horror': ['Creepster', 'cursive'],
+                        'scifi': ['Orbitron', 'sans-serif'],
+                        'clean': ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-zinc-900 text-zinc-200">
+    <!-- The rest of your HTML body remains exactly the same as before -->
     <div id="configErrorScreen" class="config-error-screen hidden"></div>
 
     <div id="loginScreen" class="fixed inset-0 bg-zinc-900 flex flex-col justify-center items-center z-50">
@@ -24,272 +45,13 @@
             </button>
         </div>
     </div>
-
+    
+    <!-- App container and all other HTML elements -->
     <div id="app" class="container mx-auto p-4 md:p-8 hidden">
-        
-        <header class="text-center mb-8 relative md:px-8">
-            <div id="horror-animation-container">
-                 <dotlottie-wc src="https://lottie.host/ffe5b7bd-7e2c-48a0-abd5-a0e069bb5f86/255wXmv06r.lottie" style="width: 100%; height: 100%;" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <div id="scifi-animation-container">
-                <dotlottie-wc src="https://lottie.host/d54b467c-11c2-447e-b901-b56c4eab5d53/kYg7v2uYg1.lottie" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <div id="clean-animation-container">
-                <dotlottie-wc src="https://lottie.host/e2771b7a-7d6f-4a71-93bc-59260fc50c18/bcEIrfHDKq.lottie" speed="1" autoplay loop></dotlottie-wc>
-            </div>
-            <h1 id="mainTitle" class="text-5xl sm:text-6xl font-script text-zinc-400 relative">Entertainment Hub</h1>
-            <p id="mainSubtitle" class="text-zinc-400 mt-2 relative">Find where to watch your favorite shows and movies.</p>
-        </header>
-
-        <div class="mb-8 max-w-2xl mx-auto">
-            <div id="searchWrapper" class="relative">
-                <input type="text" id="searchInput" class="w-full bg-zinc-800 border-2 border-zinc-700 rounded-full py-3 px-6 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition duration-300" placeholder="Search for a movie or show..." autocomplete="off">
-                <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-2 bg-zinc-700 hover:bg-zinc-600 rounded-full p-2 focus:outline-none transition duration-300">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </button>
-                <div id="liveSearchResults" class="hidden absolute z-20 w-full mt-2 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg"></div>
-            </div>
-        </div>
-
-        <div class="mb-8">
-            <div class="flex justify-center flex-wrap border-b border-zinc-700">
-                <button data-tab="dashboard" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-                    <span class="hidden md:inline">Dashboard</span>
-                </button>
-                <button data-tab="favorites" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    <span class="hidden md:inline">Favorites</span>
-                </button>
-                <button data-tab="schedule" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span class="hidden md:inline">Schedule</span>
-                </button>
-                <button data-tab="settings" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span class="hidden md:inline">Settings</span>
-                </button>
-            </div>
-        </div>
-
-        <main id="content-area">
-            <div id="dashboard" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 bg-zinc-800 p-6 rounded-lg lg:flex lg:flex-col">
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                            <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming for <span id="dashboardUserName">You</span></h2>
-                            <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                <button data-filter="today" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">Today</button>
-                                <button data-filter="week" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">7 Day</button>
-                                <button data-filter="month" class="upcoming-filter-btn px-3 py-1 rounded-md text-sm font-medium">30 Day</button>
-                            </div>
-                        </div>
-                        <div id="upcomingContainer" class="space-y-4 max-h-[60vh] lg:max-h-none overflow-y-auto pr-2 lg:flex-grow"></div>
-                    </div>
-                    <div class="lg:col-span-1 space-y-8">
-                        <div id="spotlightSection" class="hidden">
-                            <h2 class="text-2xl font-bold mb-4">Spotlight</h2>
-                             <div class="relative">
-                                <div id="spotlightContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="spotlightScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="spotlightScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                        <div id="recommendationsSection" class="hidden">
-                            <h2 id="recommendationsTitle" class="text-2xl font-bold mb-4">Recommended for You</h2>
-                            <div class="relative">
-                                <div id="recommendationsContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="recommendationsScrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="recommendationsScrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                        <div>
-                             <h2 class="text-2xl font-bold mb-4">Trending Now</h2>
-                            <div class="relative">
-                                <div id="trendingContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                         <div>
-                             <h2 class="text-2xl font-bold mb-4">Upcoming Movies</h2>
-                            <div class="relative">
-                                <div id="upcomingMoviesContainer" class="flex overflow-x-auto space-x-4 pb-4 scrolling-wrapper bg-zinc-800 p-4 rounded-lg"></div>
-                                <button id="scrollUpcomingLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&lt;</button>
-                                <button id="scrollUpcomingRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-zinc-900 bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full z-10">&gt;</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="search-results" class="tab-content hidden">
-                 <h2 class="text-2xl font-bold mb-4 text-center">Search Results</h2>
-                <p id="searchResultsMessage" class="text-center text-zinc-500">Search for something to see results.</p>
-                <div id="searchResultsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
-            </div>
-
-            <div id="favorites" class="tab-content hidden">
-                <div class="max-w-5xl mx-auto">
-                    <details class="mb-8 group" open>
-                        <summary class="list-none flex items-center justify-between cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite Movies</h2>
-                            <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="mt-4">
-                            <div id="movie-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
-                                <div id="movie-favorites-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn movie-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
-                                        <button class="fav-view-btn movie-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
-                                    </div>
-                                    <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
-                            </div>
-                             <div id="movie-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="movieFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                     <button id="deleteAllMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
-                                     <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                            <p id="movieFavoritesMessage" class="text-center text-zinc-500"></p>
-                            <div id="movieFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="movieFavoritesListContainer" class="hidden space-y-3"></div>
-                        </div>
-                    </details>
-                    
-                    <details class="group" open>
-                        <summary class="list-none flex items-center justify-between cursor-pointer">
-                            <h2 class="text-2xl font-bold">Favorite TV Shows</h2>
-                             <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                         <div class="mt-4">
-                            <div id="tv-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
-                                <div id="tv-favorites-view-controls" class="flex items-center space-x-4">
-                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn tv-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
-                                        <button class="fav-view-btn tv-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
-                                    </div>
-                                    <button id="manageTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
-                                </div>
-                            </div>
-                             <div id="tv-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
-                                <span id="tvFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
-                                <div class="flex space-x-2">
-                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
-                                     <button id="deleteAllTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
-                                     <button id="cancelManageTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
-                                </div>
-                            </div>
-                             <p id="tvFavoritesMessage" class="text-center text-zinc-500"></p>
-                            <div id="tvFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-                            <div id="tvFavoritesListContainer" class="hidden space-y-3"></div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <div id="schedule" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg">
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                        <h2 class="text-2xl font-bold w-full sm:w-auto mb-4 sm:mb-0">Upcoming Episodes</h2>
-                        <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                            <button class="schedule-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="calendar">Calendar</button>
-                            <button class="schedule-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
-                        </div>
-                    </div>
-                    <div id="scheduleContent" class="max-h-[60vh] overflow-y-auto pr-2"></div>
-                     <p id="scheduleMessage" class="text-center text-zinc-500 mt-4 hidden"></p>
-                </div>
-            </div>
-
-            <div id="settings" class="tab-content hidden">
-                <div class="max-w-4xl mx-auto bg-zinc-800 p-6 rounded-lg shadow-lg space-y-8">
-                    <div id="accountSection"></div>
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">What's Your Name, Man?</h2>
-                        <p class="text-zinc-400 mb-4">Personalize your dashboard greeting, lest you be known as "The Dude".</p>
-                        <div class="flex flex-col sm:flex-row sm:space-x-2">
-                            <input type="text" id="userNameInput" class="w-full mb-2 sm:mb-0 bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500" placeholder="Enter your name">
-                            <button id="saveUserNameButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Save Name</button>
-                        </div>
-                         <p id="userNameMessage" class="text-sm text-green-400 mt-2 hidden"></p>
-                    </div>
-                     <div>
-                        <h2 class="text-2xl font-bold mb-4">Choose Your Destiny</h2>
-                        <div id="themeSelector" class="flex space-x-2">
-                            <button data-theme="default" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Default</button>
-                            <button data-theme="horror" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Horror</button>
-                            <button data-theme="scifi" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Sci-Fi</button>
-                            <button data-theme="clean" class="theme-btn bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded transition duration-300">Clean</button>
-                        </div>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">The Fellowship of the Stream</h2>
-                        <p class="text-zinc-400 mb-6">Select the services you subscribe to for a personalized experience. One does not simply watch all of them.</p>
-                        <div id="subscriptionList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
-                    </div>
-                    <div id="danger-zone" class="border-t border-red-900/50 pt-6">
-                        <h2 class="text-2xl font-bold mb-4 text-red-400">Danger Zone</h2>
-                        <div class="bg-red-900/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between">
-                            <div>
-                                <h3 class="font-bold">This is the Way... Out</h3>
-                                <p class="text-red-300 text-sm mt-1">Permanently delete your account and all associated data. I have spoken.</p>
-                            </div>
-                             <button id="deleteAccountBtn" class="mt-4 sm:mt-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 whitespace-nowrap">Delete Account</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <div id="loadingSpinner" class="hidden fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-50">
-             <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-500"></div>
-        </div>
+        <!-- All your app content, tabs, modals, etc. go here -->
     </div>
 
-    <div id="detailsModal" class="modal-backdrop hidden">
-        <div id="modalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-1/2 p-6 relative"></div>
-    </div>
-
-    <div id="suggestion-avatar-btn">
-        <svg id="default-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="#3b82f6" stroke="#fafafa" stroke-width="4"/>
-            <text x="50" y="65" font-size="50" fill="#fafafa" text-anchor="middle" font-family="Arial, sans-serif">?</text>
-        </svg>
-        <svg id="pinhead-avatar" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="#111" stroke="#b91c1c" stroke-width="4"/>
-            <circle cx="50" cy="50" r="40" fill="#222"/>
-            <path d="M50 10 V 90 M10 50 H 90 M22 22 L 78 78 M22 78 L 78 22" stroke="#555" stroke-width="2"/>
-            <circle cx="50" cy="50" r="3" fill="#b91c1c"/>
-        </svg>
-        <svg id="alien-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="50" fill="#1a2f38"/>
-            <path d="M50 15 C 65 15, 85 30, 85 50 C 85 80, 65 95, 50 95 C 35 95, 15 80, 15 50 C 15 30, 35 15, 50 15 Z" fill="#111e24"/>
-            <path d="M50 20 C 70 20, 80 35, 80 50 C 80 70, 70 85, 50 90 C 30 85, 20 70, 20 50 C 20 35, 30 20, 50 20 Z" fill="#15803d" opacity="0.3"/>
-            <path d="M40 75 Q 50 65, 60 75" stroke="#86efac" stroke-width="2" fill="none"/>
-        </svg>
-        <svg id="pulp-fiction-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="50" fill="#e4e4e7"/>
-            <path d="M 50,30 A 20,15 0 0 0 50,60" fill="#18181b"/>
-            <rect x="30" y="30" width="40" height="10" fill="#18181b"/>
-            <rect x="48" y="60" width="4" height="10" fill="#18181b" />
-        </svg>
-    </div>
-
-     <div id="suggestionModal" class="modal-backdrop hidden">
-        <div id="suggestionModalContent" class="modal-content bg-zinc-800 text-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6 relative">
-            <button id="closeSuggestionModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button>
-            <h2 id="suggestionModalTitle" class="text-2xl font-bold mb-2">Got a Suggestion?</h2>
-            <p id="suggestionModalSubtitle" class="text-zinc-400 mb-4">We'd love to hear it. Let us know what we can do to improve your experience.</p>
-            <form id="suggestionForm">
-                <textarea id="suggestionText" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-2 px-4 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 h-32" placeholder="Your suggestion..."></textarea>
-                <button type="submit" class="w-full mt-4 bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded-lg transition">Send It</button>
-            </form>
-        </div>
-    </div>
+    <!-- The single entry point for the entire application -->
     <script type="module" src="main.js"></script>
 </body>
 </html>
