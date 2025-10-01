@@ -15,7 +15,8 @@ import {
     renderFavorites,
     showConfirmationModal,
     showLoading,
-    hideLoading
+    hideLoading,
+    renderModal
 } from './ui.js';
 
 let debounceTimer;
@@ -61,7 +62,6 @@ async function searchMedia(query, isLiveSearch = false) {
 }
 
 function toggleSubscription(serviceId) {
-    if (!state.userId) { /* prompt for login */ return; }
     const index = state.subscriptions.indexOf(serviceId);
     if (index > -1) state.subscriptions.splice(index, 1);
     else state.subscriptions.push(serviceId);
@@ -69,7 +69,6 @@ function toggleSubscription(serviceId) {
 }
 
 function toggleFavorite(mediaItem) {
-    if (!state.userId) { /* prompt for login */ return; }
     const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
     if (index > -1) {
         state.favorites.splice(index, 1);
@@ -89,17 +88,30 @@ function toggleFavorite(mediaItem) {
     renderModal(mediaItem);
 }
 
+/**
+ * Initializes event listeners for the login screen ONLY.
+ */
+function initLoginListeners() {
+    const signInButton = document.getElementById('signInWithGoogleButton');
+    if (signInButton) {
+        signInButton.addEventListener('click', handleGoogleSignIn);
+    }
+}
 
-function initEventListeners() {
-    document.getElementById('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
-
+/**
+ * Initializes all event listeners for the main application,
+ * to be called AFTER the user has logged in.
+ */
+function initAppListeners() {
     const searchButton = document.getElementById('searchButton');
     const searchInput = document.getElementById('searchInput');
-    searchButton.addEventListener('click', handleFullSearch);
-    searchInput.addEventListener('input', handleLiveSearch);
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleFullSearch();
-    });
+    if (searchButton && searchInput) {
+        searchButton.addEventListener('click', handleFullSearch);
+        searchInput.addEventListener('input', handleLiveSearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleFullSearch();
+        });
+    }
 
     document.querySelectorAll('.tab-button').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
 
@@ -194,5 +206,5 @@ function setupFavoriteSectionControls(type) {
     });
 }
 
-export { initEventListeners, toggleSubscription, toggleFavorite };
+export { initLoginListeners, initAppListeners, toggleSubscription, toggleFavorite };
 
