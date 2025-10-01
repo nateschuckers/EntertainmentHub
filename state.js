@@ -1,6 +1,3 @@
-import { userDocRef } from './firebase.js';
-import { setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
 const state = {
     userName: null,
     theme: 'default',
@@ -43,21 +40,5 @@ function loadDataFromFirestore(data) {
     }
 }
 
-async function saveDataToFirestore() {
-    if (!userDocRef) return;
-    const dataToSave = {
-        userName: state.userName,
-        subscriptions: state.subscriptions,
-        favorites: state.favorites,
-        theme: state.theme,
-        dashboardScheduleFilter: state.dashboardScheduleFilter
-    };
-    try {
-        await setDoc(userDocRef, dataToSave, { merge: true });
-    } catch (e) {
-        console.error("Error writing document: ", e);
-    }
-}
-
-export { state, loadDataFromFirestore, saveDataToFirestore };
+export { state, loadDataFromFirestore };
 
