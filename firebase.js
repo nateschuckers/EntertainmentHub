@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state, loadDataFromFirestore } from './state.js';
 import { applyTheme, initAppUI, refreshCurrentView, renderConfigError } from './ui.js';
+import { initAppListeners } from './events.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
 let isDataLoaded = false;
@@ -64,6 +65,9 @@ function runApp(firebaseConfig) {
                 if (!wasAlreadyLoaded) {
                    isDataLoaded = true;
                    initAppUI(); 
+                   // Now that the user is logged in and the main app is visible,
+                   // we can safely initialize all of its event listeners.
+                   initAppListeners();
                 } else {
                     refreshCurrentView();
                 }
@@ -100,7 +104,13 @@ async function saveDataToFirestore() {
 
 
 function handleGoogleSignIn() {
-    signInWithPopup(auth, googleProvider).catch(console.error);
+    // 'auth' is guaranteed to be initialized here because this function is only
+    // called after initializeAppWithConfig -> runApp has been executed.
+    if (auth) {
+        signInWithPopup(auth, googleProvider).catch(console.error);
+    } else {
+        console.error("Firebase Auth is not initialized yet.");
+    }
 }
 
 function handleSignOut() {
