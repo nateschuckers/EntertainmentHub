@@ -1,12 +1,14 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { state, loadDataFromFirestore, saveDataToFirestore } from './state.js';
+import { state, loadDataFromFirestore } from './state.js';
 import { applyTheme, initAppUI, refreshCurrentView, renderConfigError } from './ui.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
 let isDataLoaded = false;
 let userId = null;
+
+const googleProvider = new GoogleAuthProvider();
 
 async function initializeAppWithConfig() {
     try {
@@ -79,14 +81,29 @@ function runApp(firebaseConfig) {
         }
     });
 
-    // Dynamically import and initialize event listeners to prevent circular dependencies
     import('./events.js').then(eventsModule => {
         eventsModule.initEventListeners();
     }).catch(err => console.error("Failed to load event listeners module:", err));
 }
 
+async function saveDataToFirestore() {
+    if (!userDocRef) return;
+    const dataToSave = {
+        userName: state.userName,
+        subscriptions: state.subscriptions,
+        favorites: state.favorites,
+        theme: state.theme,
+        dashboardScheduleFilter: state.dashboardScheduleFilter
+    };
+    try {
+        await setDoc(userDocRef, dataToSave, { merge: true });
+    } catch (e) {
+        console.error("Error writing document: ", e);
+    }
+}
+
+
 function handleGoogleSignIn() {
-    const googleProvider = new GoogleAuthProvider();
     signInWithPopup(auth, googleProvider).catch(console.error);
 }
 
@@ -105,6 +122,5 @@ async function handleDeleteAccount() {
     }
 }
 
-
-export { initializeAppWithConfig, auth, db, handleGoogleSignIn, handleSignOut, handleDeleteAccount, userDocRef, userId };
+export { initializeAppWithConfig, auth, db, handleGoogleSignIn, handleSignOut, handleDeleteAccount, userDocRef, userId, saveDataToFirestore };
 
