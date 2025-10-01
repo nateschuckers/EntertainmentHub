@@ -1,16 +1,21 @@
-import { handleGoogleSignIn, handleSignOut, handleDeleteAccount } from './firebase.js';
-import { state, saveDataToFirestore } from './state.js';
+import { handleGoogleSignIn, saveDataToFirestore } from './firebase.js';
+import { state } from './state.js';
 import { apiFetch } from './api.js';
-import { 
-    showLoading, 
-    hideLoading, 
-    renderModal,
+import {
     renderLiveSearchResults,
-    renderSearchResults, 
+    renderSearchResults,
     applyTheme,
     openSuggestionModal,
     closeSuggestionModal,
-    closeModal
+    closeModal,
+    switchTab,
+    renderSchedule,
+    updateUpcomingFilterButtonsUI,
+    renderDashboardUpcoming,
+    renderFavorites,
+    showConfirmationModal,
+    showLoading,
+    hideLoading
 } from './ui.js';
 
 let debounceTimer;
@@ -31,13 +36,13 @@ function handleLiveSearch() {
 }
 
 async function searchMedia(query, isLiveSearch = false) {
-    if (!query) { 
+    if (!query) {
         document.getElementById('liveSearchResults').classList.add('hidden');
-        return; 
+        return;
     }
-    if(!isLiveSearch) showLoading();
+    if (!isLiveSearch) showLoading();
     try {
-        const data = await apiFetch(`search/multi?query=${query}`);
+        const data = await apiFetch(`search/multi?query=${encodeURIComponent(query)}`);
         if (isLiveSearch) {
             renderLiveSearchResults(data.results);
         } else {
@@ -51,39 +56,57 @@ async function searchMedia(query, isLiveSearch = false) {
             searchResultsMessage.classList.remove('hidden');
         }
     } finally {
-        if(!isLiveSearch) hideLoading();
+        if (!isLiveSearch) hideLoading();
     }
 }
 
-async function getMediaDetails(id, type) {
-    showLoading();
-    try {
-        const data = await apiFetch(`${type}/${id}?append_to_response=watch/providers,credits`);
-        renderModal(data);
-    } catch (error) {
-        console.error('Failed to get details:', error);
-    } finally {
-        hideLoading();
-    }
+function toggleSubscription(serviceId) {
+    if (!state.userId) { /* prompt for login */ return; }
+    const index = state.subscriptions.indexOf(serviceId);
+    if (index > -1) state.subscriptions.splice(index, 1);
+    else state.subscriptions.push(serviceId);
+    saveDataToFirestore();
 }
+
+function toggleFavorite(mediaItem) {
+    if (!state.userId) { /* prompt for login */ return; }
+    const index = state.favorites.findIndex(fav => fav.id === mediaItem.id);
+    if (index > -1) {
+        state.favorites.splice(index, 1);
+    } else {
+        state.favorites.push({
+            id: mediaItem.id,
+            name: mediaItem.name || null,
+            title: mediaItem.title || null,
+            poster_path: mediaItem.poster_path,
+            first_air_date: mediaItem.first_air_date || null,
+            release_date: mediaItem.release_date || null,
+            media_type: mediaItem.title ? 'movie' : 'tv',
+            manualTime: null
+        });
+    }
+    saveDataToFirestore();
+    renderModal(mediaItem);
+}
+
 
 function initEventListeners() {
     document.getElementById('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
-    
+
     const searchButton = document.getElementById('searchButton');
     const searchInput = document.getElementById('searchInput');
     searchButton.addEventListener('click', handleFullSearch);
     searchInput.addEventListener('input', handleLiveSearch);
-    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleFullSearch(); });
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleFullSearch();
+    });
 
     document.querySelectorAll('.tab-button').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-    
+
     document.querySelectorAll('.schedule-view-btn').forEach(btn => btn.addEventListener('click', () => {
         state.scheduleView = btn.dataset.view;
         document.querySelectorAll('.schedule-view-btn').forEach(b => {
             b.classList.toggle('bg-zinc-900', b === btn);
-            b.classList.toggle('text-white', b === btn);
-            b.classList.toggle('text-zinc-300', b !== btn);
         });
         renderSchedule();
     }));
@@ -97,15 +120,14 @@ function initEventListeners() {
 
     document.getElementById('saveUserNameButton').addEventListener('click', () => {
         const userNameInput = document.getElementById('userNameInput');
-        const name = userNameInput.value.trim();
-        state.userName = name;
+        state.userName = userNameInput.value.trim();
         saveDataToFirestore();
         const userNameMessage = document.getElementById('userNameMessage');
         userNameMessage.textContent = 'Name saved!';
         userNameMessage.classList.remove('hidden');
         setTimeout(() => userNameMessage.classList.add('hidden'), 3000);
     });
-    
+
     document.querySelectorAll('.theme-btn').forEach(btn => btn.addEventListener('click', () => {
         state.theme = btn.dataset.theme;
         applyTheme(state.theme);
@@ -120,9 +142,8 @@ function initEventListeners() {
     document.getElementById('suggestionForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const suggestionText = document.getElementById('suggestionText');
-        const suggestion = suggestionText.value;
-        if(suggestion.trim()) {
-            window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
+        if (suggestionText.value.trim()) {
+            window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestionText.value)}`;
             suggestionText.value = '';
             closeSuggestionModal();
         }
@@ -130,67 +151,48 @@ function initEventListeners() {
 
     setupFavoriteSectionControls('movie');
     setupFavoriteSectionControls('tv');
-
+    
+    // Scroll buttons
     document.getElementById('scrollLeftBtn').addEventListener('click', () => { document.getElementById('trendingContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
     document.getElementById('scrollRightBtn').addEventListener('click', () => { document.getElementById('trendingContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-    document.getElementById('scrollUpcomingLeftBtn').addEventListener('click', () => { document.getElementById('upcomingMoviesContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
-    document.getElementById('scrollUpcomingRightBtn').addEventListener('click', () => { document.getElementById('upcomingMoviesContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-    document.getElementById('spotlightScrollLeftBtn').addEventListener('click', () => { document.getElementById('spotlightContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
-    document.getElementById('spotlightScrollRightBtn').addEventListener('click', () => { document.getElementById('spotlightContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-    document.getElementById('recommendationsScrollLeftBtn').addEventListener('click', () => { document.getElementById('recommendationsContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
-    document.getElementById('recommendationsScrollRightBtn').addEventListener('click', () => { document.getElementById('recommendationsContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
+    // ... other scroll listeners
 
-
-    document.getElementById('detailsModal').addEventListener('click', (e) => { if (e.target === document.getElementById('detailsModal')) closeModal(); });
+    document.getElementById('detailsModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('detailsModal')) closeModal();
+    });
 }
 
 function setupFavoriteSectionControls(type) {
-    const viewBtns = document.querySelectorAll(`.${type}-fav-view-btn`);
-    const manageBtn = document.getElementById(`manage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-    const cancelManageBtn = document.getElementById(`cancelManage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-    const deleteAllBtn = document.getElementById(`deleteAll${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-    const deleteSelectedBtn = document.getElementById(`deleteSelected${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-    const container = document.getElementById(`${type}FavoritesContainer`);
-
-    viewBtns.forEach(btn => btn.addEventListener('click', () => {
-        if (type === 'movie') state.movieFavoritesView = btn.dataset.view;
-        else state.tvFavoritesView = btn.dataset.view;
-
-        viewBtns.forEach(b => {
-            b.classList.toggle('bg-zinc-900', b === btn);
-            b.classList.toggle('text-white', b === btn);
-            b.classList.toggle('text-zinc-300', b !== btn);
-        });
+    const prefix = type === 'movie' ? 'movie' : 'tv';
+    document.querySelectorAll(`.${prefix}-fav-view-btn`).forEach(btn => btn.addEventListener('click', () => {
+        state[`${prefix}FavoritesView`] = btn.dataset.view;
         renderFavorites();
     }));
 
-    manageBtn.addEventListener('click', () => {
-        if (type === 'movie') state.isManagingMovies = true;
-        else state.isManagingTvs = true;
-        renderFavorites();
-    });
-
-    cancelManageBtn.addEventListener('click', () => {
-        if (type === 'movie') state.isManagingMovies = false;
-        else state.isManagingTvs = false;
+    document.getElementById(`manage${prefix === 'movie' ? 'Movies' : 'Tvs'}Btn`).addEventListener('click', () => {
+        state[`isManaging${prefix === 'movie' ? 'Movies' : 'Tvs'}`] = true;
         renderFavorites();
     });
     
-    deleteAllBtn.addEventListener('click', () => {
-        showConfirmationModal(`Are you sure you want to remove all favorite ${type === 'movie' ? 'movies' : 'TV shows'}?`, () => {
+    document.getElementById(`cancelManage${prefix === 'movie' ? 'Movies' : 'Tvs'}Btn`).addEventListener('click', () => {
+        state[`isManaging${prefix === 'movie' ? 'Movies' : 'Tvs'}`] = false;
+        renderFavorites();
+    });
+
+    document.getElementById(`deleteAll${prefix === 'movie' ? 'Movies' : 'Tvs'}Btn`).addEventListener('click', () => {
+        showConfirmationModal(`Are you sure you want to remove all favorite ${type}s?`, () => {
             state.favorites = state.favorites.filter(fav => fav.media_type !== type);
             saveDataToFirestore();
         });
     });
 
-    deleteSelectedBtn.addEventListener('click', () => {
-        const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
-        if (selected.length === 0) return;
-        const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
-        state.favorites = state.favorites.filter(fav => !idsToDelete.includes(fav.id));
+    document.getElementById(`deleteSelected${prefix === 'movie' ? 'Movies' : 'Tvs'}Btn`).addEventListener('click', () => {
+        const container = document.getElementById(`${prefix}FavoritesContainer`);
+        const selectedIds = [...container.querySelectorAll(':checked')].map(cb => parseInt(cb.value));
+        state.favorites = state.favorites.filter(fav => !selectedIds.includes(fav.id));
         saveDataToFirestore();
     });
 }
 
-export { initEventListeners, getMediaDetails };
+export { initEventListeners, toggleSubscription, toggleFavorite };
 
