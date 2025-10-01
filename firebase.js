@@ -2,8 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { state, loadDataFromFirestore } from './state.js';
-// We now import screen controls from ui.js instead of touching the DOM directly.
-import { applyTheme, initAppUI, refreshCurrentView, renderConfigError, showAppScreen, showLoginScreen } from './ui.js';
+// We no longer import show/hide functions directly, breaking the cycle.
+import { applyTheme, initAppUI, refreshCurrentView, renderConfigError } from './ui.js';
 import { initAppListeners } from './events.js';
 
 let auth, db, userDocRef, unsubscribeUserDoc;
@@ -12,7 +12,8 @@ let userId = null;
 
 const googleProvider = new GoogleAuthProvider();
 
-async function initializeAppWithConfig() {
+// It now accepts an object with the UI functions it needs.
+async function initializeAppWithConfig(uiCallbacks) {
     try {
         const response = await fetch('/.netlify/functions/get-firebase-config');
         if (!response.ok) {
@@ -24,14 +25,16 @@ async function initializeAppWithConfig() {
         if (!firebaseConfig.apiKey) {
                 throw new Error("Firebase config is missing critical keys.");
         }
-        runApp(firebaseConfig);
+        // Pass the UI callbacks down to the main app logic.
+        runApp(firebaseConfig, uiCallbacks);
 
     } catch (error) {
         renderConfigError(error.message);
     }
 }
 
-function runApp(firebaseConfig) {
+// It also accepts the UI callbacks object.
+function runApp(firebaseConfig, uiCallbacks) {
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
@@ -43,7 +46,8 @@ function runApp(firebaseConfig) {
         if (user) {
             userId = user.uid;
             userDocRef = doc(db, "users", userId);
-            showAppScreen(); // Use the safe UI function
+            // Call the function that was passed in.
+            uiCallbacks.showAppScreen();
             
             unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
                 const wasAlreadyLoaded = isDataLoaded;
@@ -68,8 +72,12 @@ function runApp(firebaseConfig) {
         } else {
             userId = null;
             userDocRef = null;
+            // Explicitly reset the theme to default for the login screen.
+            state.theme = 'default';
             applyTheme('default');
-            showLoginScreen(); // Use the safe UI function
+            // Call the function that was passed in.
+            uiCallbacks.showLoginScreen();
+            // Reset all other user-specific data.
             state.favorites = [];
             state.subscriptions = [];
             state.userName = null;
