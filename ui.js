@@ -5,6 +5,20 @@ import { toggleFavorite, toggleSubscription } from './events.js';
 
 const $ = (selector) => document.getElementById(selector);
 
+// --- Screen Management ---
+function showLoginScreen() {
+    $('loginScreen').classList.remove('hidden');
+    $('app').classList.add('hidden');
+    $('suggestion-avatar-btn').classList.add('hidden');
+}
+
+function showAppScreen() {
+    $('loginScreen').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    $('suggestion-avatar-btn').classList.remove('hidden');
+}
+
+
 // --- Core UI & Theme Management ---
 
 const themeContent = {
@@ -771,4 +785,6 @@ export {
     renderSubscriptions, renderModal, switchTab, renderFavorites,
     renderSchedule, updateUpcomingFilterButtonsUI, renderDashboardUpcoming
 };
+
+" and I would like to make the following changes to the selection: "now i'm not seeign the login screen again, error from console attached"
 
