@@ -1,22 +1,22 @@
 import { initializeAppWithConfig } from './firebase.js';
 import { initLoginListeners } from './events.js';
-import { initDom } from './dom.js';
+import { initUI } from './ui.js';
 
 /**
- * This is the main entry point for the application.
+ * This is the main entry point for the application. It ensures
+ * scripts run in the correct order after the page is ready.
  */
 function startApp() {
-    // 1. Initialize our DOM element cache. This is crucial to ensure
-    //    that all scripts have access to the elements they need.
-    initDom();
-
-    // 2. Set up the listeners for the login screen.
+    // Step 1: Find and cache the core HTML elements. This MUST run first.
+    initUI();
+    
+    // Step 2: Set up the listeners for the login screen.
     initLoginListeners();
 
-    // 3. Initialize Firebase to handle authentication.
+    // Step 3: Initialize Firebase to handle authentication.
     initializeAppWithConfig();
 }
 
-// Wait for the HTML document to be fully parsed before running any scripts.
+// Wait for the HTML document to be fully loaded before running the app.
 document.addEventListener('DOMContentLoaded', startApp);
 
