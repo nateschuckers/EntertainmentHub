@@ -2078,7 +2078,7 @@
                 const newItemsForToList = itemsToMove.filter(item => !toListCompositeKeys.has(`${item.media_type}:${item.id}`));
                 state[toListKey].push(...newItemsForToList);
 
-                state[fromListKey] = state[fromListKey].filter(item => !idsToMove.includes(item.id));
+                state[fromListKey] = state[fromListKey].filter(item => !(idsToMove.includes(item.id) && item.media_type === itemType));
 
                 saveDataToFirestore();
             }
