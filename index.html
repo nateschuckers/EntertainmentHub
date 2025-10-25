@@ -1629,12 +1629,13 @@
                 showLoading();
                 try {
                     dashboardUserName.textContent = state.userName || 'You';
-                    const trendingPromise = apiFetch(`trending/all/day`);
-                    const upcomingPromise = apiFetch(`movie/upcoming`);
-                    const [trendingData, upcomingData] = await Promise.all([trendingPromise, upcomingPromise, fetchScheduleData(true)]);
+                    const trendingPromise = apiFetch('trending/all/day');
+                    const upcomingPromise = apiFetch('movie/upcoming');
+                    const nowPlayingPromise = apiFetch('movie/now_playing');
+                    const [trendingData, upcomingData, nowPlayingData] = await Promise.all([trendingPromise, upcomingPromise, nowPlayingPromise, fetchScheduleData(true)]);
                     
                     renderDashboardTrending(trendingData.results);
-                    renderDashboardUpcomingMovies(upcomingData.results);
+                    renderDashboardUpcomingMovies(upcomingData.results, nowPlayingData.results);
                     renderDashboardUpcoming();
                     await renderSpotlight(upcomingData.results);
                     await renderRecommendations();
@@ -1660,21 +1661,34 @@
                 });
             }
 
-            function renderDashboardUpcomingMovies(items = []) {
+            function renderDashboardUpcomingMovies(upcomingItems = [], nowPlayingItems = []) {
                 upcomingMoviesContainer.innerHTML = '';
-                if (items.length === 0) { return; }
+
+                const watchlistMovieIds = new Set(state.watchlist.filter(item => item.media_type === 'movie').map(item => item.id));
+                const nowPlayingWatchlistMovies = nowPlayingItems.filter(item => watchlistMovieIds.has(item.id));
+                const combinedMovies = [...upcomingItems, ...nowPlayingWatchlistMovies];
+
+                const uniqueMoviesMap = new Map();
+                combinedMovies.forEach(movie => {
+                    if (!uniqueMoviesMap.has(movie.id)) {
+                        uniqueMoviesMap.set(movie.id, movie);
+                    }
+                });
+                const uniqueMovies = Array.from(uniqueMoviesMap.values());
+
+                if (uniqueMovies.length === 0) { return; }
 
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 7);
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(today.getDate() - 30);
                 const fourteenDaysHence = new Date(today);
                 fourteenDaysHence.setDate(today.getDate() + 14);
 
-                const filteredAndSortedMovies = items
+                const filteredAndSortedMovies = uniqueMovies
                     .filter(item => {
                         const releaseDate = parseLocalDate(item.release_date);
-                        return item.poster_path && releaseDate && releaseDate >= sevenDaysAgo && releaseDate <= fourteenDaysHence;
+                        return item.poster_path && releaseDate && releaseDate >= thirtyDaysAgo && releaseDate <= fourteenDaysHence;
                     })
                     .sort((a, b) => parseLocalDate(a.release_date) - parseLocalDate(b.release_date));
 
@@ -2060,11 +2074,11 @@
                 const itemsToMove = state[fromListKey].filter(item => idsToMove.includes(item.id) && item.media_type === itemType);
                 if (itemsToMove.length === 0) return;
 
-                const toListCompositeKeys = new Set(state[toListKey].map(item => `${item.media_type}:${item.id}`));
-                const newItemsForToList = itemsToMove.filter(item => !toListCompositeKeys.has(`${item.media_type}:${item.id}`));
+                const toListIds = new Set(state[toListKey].map(item => item.id));
+                const newItemsForToList = itemsToMove.filter(item => !toListIds.has(item.id));
                 state[toListKey].push(...newItemsForToList);
 
-                state[fromListKey] = state[fromListKey].filter(item => !(idsToMove.includes(item.id) && item.media_type === itemType));
+                state[fromListKey] = state[fromListKey].filter(item => !(item.media_type === itemType && idsToMove.includes(item.id)));
 
                 saveDataToFirestore();
             }
