@@ -522,8 +522,8 @@
                             <div id="movie-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
                                 <div id="movie-favorites-view-controls" class="flex items-center space-x-4">
                                     <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn movie-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
-                                        <button class="fav-view-btn movie-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
+                                        <button class="fav-view-btn movie-favorites-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
+                                        <button class="fav-view-btn movie-favorites-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
                                     </div>
                                     <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                                 </div>
@@ -531,7 +531,8 @@
                              <div id="movie-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="movieFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToWatchlistMoviesBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">To Watchlist</button>
+                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -551,8 +552,8 @@
                             <div id="tv-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
                                 <div id="tv-favorites-view-controls" class="flex items-center space-x-4">
                                     <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn tv-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
-                                        <button class="fav-view-btn tv-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
+                                        <button class="fav-view-btn tv-favorites-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
+                                        <button class="fav-view-btn tv-favorites-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
                                     </div>
                                     <button id="manageTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                                 </div>
@@ -560,7 +561,8 @@
                              <div id="tv-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="tvFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToWatchlistTvsBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">To Watchlist</button>
+                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -593,7 +595,8 @@
                              <div id="movie-watchlist-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="movieWatchlistSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedWatchlistMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToFavoritesMoviesBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">To Favorites</button>
+                                     <button id="deleteSelectedWatchlistMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllWatchlistMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageWatchlistMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -622,7 +625,8 @@
                              <div id="tv-watchlist-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="tvWatchlistSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedWatchlistTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToFavoritesTvsBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">To Favorites</button>
+                                     <button id="deleteSelectedWatchlistTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllWatchlistTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageWatchlistTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -1350,34 +1354,37 @@
                     : (itemType === 'movie' ? state.movieWatchlistView : state.tvWatchlistView);
                 
                 const header = $(`${itemType}-${listType}-header`);
-                const viewControls = $(`${itemType}-${listType}-view-controls`);
                 const manageControls = $(`${itemType}-${listType}-manage-controls`);
                 const messageEl = $(messageSelector);
                 const gridContainer = $(containerSelector);
-                const listContainer = $(`${containerSelector}ListContainer`);
+                const listContainer = $(`${itemType}${listType.charAt(0).toUpperCase() + listType.slice(1)}ListContainer`);
 
                 if (header) header.classList.toggle('hidden', isManaging);
                 if (manageControls) manageControls.classList.toggle('hidden', !isManaging);
                 
-                messageEl.classList.toggle('hidden', items.length > 0);
+                if (messageEl) messageEl.classList.toggle('hidden', items.length > 0);
                 if (items.length === 0) {
-                    gridContainer.innerHTML = '';
-                    listContainer.innerHTML = '';
-                    messageEl.textContent = `You have no ${itemType === 'movie' ? 'movies' : 'TV shows'} in your ${listType}.`;
+                    if(gridContainer) gridContainer.innerHTML = '';
+                    if(listContainer) listContainer.innerHTML = '';
+                    if(messageEl) messageEl.textContent = `You have no ${itemType === 'movie' ? 'movies' : 'TV shows'} in your ${listType}.`;
                     return;
                 }
                 
                 const sortedItems = [...items].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
 
                 if (view === 'grid') {
-                    gridContainer.classList.remove('hidden');
-                    listContainer.classList.add('hidden');
-                    gridContainer.innerHTML = '';
-                    sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
+                    if(gridContainer) gridContainer.classList.remove('hidden');
+                    if(listContainer) listContainer.classList.add('hidden');
+                    if(gridContainer) {
+                        gridContainer.innerHTML = '';
+                        sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
+                    }
                 } else {
-                    gridContainer.classList.add('hidden');
-                    listContainer.classList.remove('hidden');
-                    await renderDetailedList(sortedItems, listContainer);
+                    if(gridContainer) gridContainer.classList.add('hidden');
+                    if(listContainer) {
+                        listContainer.classList.remove('hidden');
+                        await renderDetailedList(sortedItems, listContainer);
+                    }
                 }
                 updateSelectedCount(itemType, listType);
             }
@@ -1428,8 +1435,9 @@
             }
 
             function updateSelectedCount(type, listType) {
-                const container = $(`${type}${listType.charAt(0).toUpperCase() + listType.slice(1)}Container`);
-                const countEl = $(`${type}${listType.charAt(0).toUpperCase() + listType.slice(1)}SelectedCount`);
+                const listPrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
+                const container = $(`${type}${listPrefix}Container`);
+                const countEl = $(`${type}${listPrefix}SelectedCount`);
                 if (!container || !countEl) return;
                 const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
                 countEl.textContent = `${selected.length} selected`;
@@ -2040,19 +2048,22 @@
             }
 
             function setupSectionControls(listType) {
-                const typePrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
+                const listPrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
                 
                 ['movie', 'tv'].forEach(itemType => {
+                    const idPrefix = listType === 'watchlist' ? 'Watchlist' : '';
+                    const itemTypePlural = itemType === 'movie' ? 'Movies' : 'Tvs';
+                    
                     const viewBtns = document.querySelectorAll(`.${itemType}-${listType}-view-btn`);
-                    const manageBtn = $(`manage${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                    const cancelManageBtn = $(`cancelManage${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                    const deleteAllBtn = $(`deleteAll${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                    const deleteSelectedBtn = $(`deleteSelected${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                    const container = $(`${itemType}${typePrefix}Container`);
+                    const manageBtn = $(`manage${idPrefix}${itemTypePlural}Btn`);
+                    const cancelManageBtn = $(`cancelManage${idPrefix}${itemTypePlural}Btn`);
+                    const deleteAllBtn = $(`deleteAll${idPrefix}${itemTypePlural}Btn`);
+                    const deleteSelectedBtn = $(`deleteSelected${idPrefix}${itemTypePlural}Btn`);
+                    const container = $(`${itemType}${listPrefix}Container`);
                     const renderFunc = listType === 'favorites' ? renderFavorites : renderWatchlist;
 
                     viewBtns.forEach(btn => btn.addEventListener('click', () => {
-                        state[`${itemType}${typePrefix}View`] = btn.dataset.view;
+                        state[`${itemType}${listPrefix}View`] = btn.dataset.view;
 
                         viewBtns.forEach(b => {
                             b.classList.toggle('bg-zinc-900', b === btn);
@@ -2063,12 +2074,12 @@
                     }));
 
                     if(manageBtn) manageBtn.addEventListener('click', () => {
-                        state[`isManaging${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}`] = true;
+                        state[`isManaging${listPrefix}${itemTypePlural}`] = true;
                         renderFunc();
                     });
 
                     if(cancelManageBtn) cancelManageBtn.addEventListener('click', () => {
-                        state[`isManaging${typePrefix}${itemType === 'movie' ? 'Movies' : 'Tvs'}`] = false;
+                        state[`isManaging${listPrefix}${itemTypePlural}`] = false;
                         renderFunc();
                     });
                     
@@ -2087,6 +2098,46 @@
                         state[listType] = state[listType].filter(item => !idsToDelete.includes(item.id));
                         saveDataToFirestore();
                     });
+
+                    if (listType === 'favorites') {
+                        const moveToWatchlistBtn = $(`moveToWatchlist${itemTypePlural}Btn`);
+                        if (moveToWatchlistBtn) {
+                            moveToWatchlistBtn.addEventListener('click', () => {
+                                if (!container) return;
+                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                                if (selected.length === 0) return;
+                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
+
+                                const itemsToMove = state.favorites.filter(item => idsToMove.includes(item.id));
+                                state.favorites = state.favorites.filter(item => !idsToMove.includes(item.id));
+
+                                const watchlistIds = new Set(state.watchlist.map(item => item.id));
+                                const newWatchlistItems = itemsToMove.filter(item => !watchlistIds.has(item.id));
+                                state.watchlist.push(...newWatchlistItems);
+
+                                saveDataToFirestore();
+                            });
+                        }
+                    } else if (listType === 'watchlist') {
+                        const moveToFavoritesBtn = $(`moveToFavorites${itemTypePlural}Btn`);
+                        if (moveToFavoritesBtn) {
+                            moveToFavoritesBtn.addEventListener('click', () => {
+                                if (!container) return;
+                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                                if (selected.length === 0) return;
+                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
+
+                                const itemsToMove = state.watchlist.filter(item => idsToMove.includes(item.id));
+                                state.watchlist = state.watchlist.filter(item => !idsToMove.includes(item.id));
+
+                                const favoriteIds = new Set(state.favorites.map(item => item.id));
+                                const newFavoriteItems = itemsToMove.filter(item => !favoriteIds.has(item.id));
+                                state.favorites.push(...newFavoriteItems);
+
+                                saveDataToFirestore();
+                            });
+                        }
+                    }
                 });
             }
 
@@ -2142,8 +2193,6 @@
                     e.preventDefault();
                     const suggestion = $('suggestionText').value;
                     if(suggestion.trim()) {
-                        // This is a simple mailto link, which may not work if the user has no mail client configured.
-                        // For a real-world app, a backend endpoint to receive feedback would be better.
                         window.location.href = `mailto:feedback@example.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
                         $('suggestionText').value = '';
                         closeSuggestionModal();
