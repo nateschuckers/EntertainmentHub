@@ -2046,14 +2046,36 @@
                     searchMedia(searchInput.value.trim(), true);
                 }, 300);
             }
+            
+            function moveSelectedItems(itemType, fromListKey, toListKey) {
+                const fromListPrefix = fromListKey.charAt(0).toUpperCase() + fromListKey.slice(1);
+                const container = $(`${itemType}${fromListPrefix}Container`);
+                if (!container) return;
+
+                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                if (selected.length === 0) return;
+                
+                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
+
+                const itemsToMove = state[fromListKey].filter(item => idsToMove.includes(item.id) && item.media_type === itemType);
+                if (itemsToMove.length === 0) return;
+
+                const toListCompositeKeys = new Set(state[toListKey].map(item => `${item.media_type}:${item.id}`));
+                const newItemsForToList = itemsToMove.filter(item => !toListCompositeKeys.has(`${item.media_type}:${item.id}`));
+                state[toListKey].push(...newItemsForToList);
+
+                state[fromListKey] = state[fromListKey].filter(item => !(idsToMove.includes(item.id) && item.media_type === itemType));
+
+                saveDataToFirestore();
+            }
 
             function setupSectionControls(listType) {
                 const listPrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
                 
                 ['movie', 'tv'].forEach(itemType => {
-                    const idPrefix = listType === 'watchlist' ? 'Watchlist' : '';
                     const itemTypePlural = itemType === 'movie' ? 'Movies' : 'Tvs';
-                    
+                    const idPrefix = listType === 'watchlist' ? 'Watchlist' : '';
+
                     const viewBtns = document.querySelectorAll(`.${itemType}-${listType}-view-btn`);
                     const manageBtn = $(`manage${idPrefix}${itemTypePlural}Btn`);
                     const cancelManageBtn = $(`cancelManage${idPrefix}${itemTypePlural}Btn`);
@@ -2064,7 +2086,6 @@
 
                     viewBtns.forEach(btn => btn.addEventListener('click', () => {
                         state[`${itemType}${listPrefix}View`] = btn.dataset.view;
-
                         viewBtns.forEach(b => {
                             b.classList.toggle('bg-zinc-900', b === btn);
                             b.classList.toggle('text-white', b === btn);
@@ -2102,40 +2123,12 @@
                     if (listType === 'favorites') {
                         const moveToWatchlistBtn = $(`moveToWatchlist${itemTypePlural}Btn`);
                         if (moveToWatchlistBtn) {
-                            moveToWatchlistBtn.addEventListener('click', () => {
-                                if (!container) return;
-                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
-                                if (selected.length === 0) return;
-                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
-
-                                const itemsToMove = state.favorites.filter(item => idsToMove.includes(item.id));
-                                state.favorites = state.favorites.filter(item => !idsToMove.includes(item.id));
-
-                                const watchlistIds = new Set(state.watchlist.map(item => item.id));
-                                const newWatchlistItems = itemsToMove.filter(item => !watchlistIds.has(item.id));
-                                state.watchlist.push(...newWatchlistItems);
-
-                                saveDataToFirestore();
-                            });
+                            moveToWatchlistBtn.addEventListener('click', () => moveSelectedItems(itemType, 'favorites', 'watchlist'));
                         }
                     } else if (listType === 'watchlist') {
                         const moveToFavoritesBtn = $(`moveToFavorites${itemTypePlural}Btn`);
                         if (moveToFavoritesBtn) {
-                            moveToFavoritesBtn.addEventListener('click', () => {
-                                if (!container) return;
-                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
-                                if (selected.length === 0) return;
-                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
-
-                                const itemsToMove = state.watchlist.filter(item => idsToMove.includes(item.id));
-                                state.watchlist = state.watchlist.filter(item => !idsToMove.includes(item.id));
-
-                                const favoriteIds = new Set(state.favorites.map(item => item.id));
-                                const newFavoriteItems = itemsToMove.filter(item => !favoriteIds.has(item.id));
-                                state.favorites.push(...newFavoriteItems);
-
-                                saveDataToFirestore();
-                            });
+                           moveToFavoritesBtn.addEventListener('click', () => moveSelectedItems(itemType, 'watchlist', 'favorites'));
                         }
                     }
                 });
