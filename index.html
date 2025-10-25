@@ -2060,8 +2060,8 @@
                 const itemsToMove = state[fromListKey].filter(item => idsToMove.includes(item.id) && item.media_type === itemType);
                 if (itemsToMove.length === 0) return;
 
-                const toListIds = new Set(state[toListKey].map(item => item.id));
-                const newItemsForToList = itemsToMove.filter(item => !toListIds.has(item.id));
+                const toListCompositeKeys = new Set(state[toListKey].map(item => `${item.media_type}:${item.id}`));
+                const newItemsForToList = itemsToMove.filter(item => !toListCompositeKeys.has(`${item.media_type}:${item.id}`));
                 state[toListKey].push(...newItemsForToList);
 
                 state[fromListKey] = state[fromListKey].filter(item => !idsToMove.includes(item.id));
