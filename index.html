@@ -2074,11 +2074,11 @@
                 const itemsToMove = state[fromListKey].filter(item => idsToMove.includes(item.id) && item.media_type === itemType);
                 if (itemsToMove.length === 0) return;
 
-                const toListCompositeKeys = new Set(state[toListKey].map(item => `${item.media_type}:${item.id}`));
-                const newItemsForToList = itemsToMove.filter(item => !toListCompositeKeys.has(`${item.media_type}:${item.id}`));
+                const toListIds = new Set(state[toListKey].map(item => item.id));
+                const newItemsForToList = itemsToMove.filter(item => !toListIds.has(item.id));
                 state[toListKey].push(...newItemsForToList);
 
-                state[fromListKey] = state[fromListKey].filter(item => !(idsToMove.includes(item.id) && item.media_type === itemType));
+                state[fromListKey] = state[fromListKey].filter(item => !(item.media_type === itemType && idsToMove.includes(item.id)));
 
                 saveDataToFirestore();
             }
