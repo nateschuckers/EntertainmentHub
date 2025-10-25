@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,7 +52,7 @@
         .config-error-box h1 { font-size: 1.5rem; font-weight: bold; color: #ef4444; margin-bottom: 1rem; }
         .config-error-box p { color: #d4d4d8; margin-bottom: 1.5rem; font-family: monospace; font-size: 0.875rem; text-align: left; background-color: #3f3f46; padding: 1rem; border-radius: 0.25rem;}
         
-        .favorite-card-manage-overlay {
+        .media-card-manage-overlay {
             position: absolute;
             top: 0; right: 0; bottom: 0; left: 0;
             background-color: rgba(0,0,0,0.5);
@@ -62,7 +63,7 @@
             align-items: center;
             justify-content: center;
         }
-        .favorite-card-manage-checkbox {
+        .media-card-manage-checkbox {
             position: absolute;
             top: 0;
             left: 0;
@@ -77,13 +78,13 @@
             height: 4rem;
             color: white;
         }
-        .favorite-card.selected .favorite-card-manage-overlay {
+        .media-card.selected .media-card-manage-overlay {
             background-color: rgba(39, 39, 42, 0.7);
         }
-        .favorite-card.selected .x-mark-svg {
+        .media-card.selected .x-mark-svg {
             display: block;
         }
-        .favorite-card.selected img {
+        .media-card.selected img {
             filter: grayscale(80%) brightness(50%);
         }
 
@@ -135,11 +136,11 @@
             border-color: #3b82f6; /* blue-500 */
             color: #3b82f6;
         }
-        .upcoming-filter-btn, .fav-view-btn, .schedule-view-btn, .theme-btn {
+        .upcoming-filter-btn, .fav-view-btn, .watchlist-view-btn, .schedule-view-btn, .theme-btn {
             background-color: #fafafa;
             color: #27272a;
         }
-        .upcoming-filter-btn.bg-zinc-900, .fav-view-btn.bg-zinc-900, .schedule-view-btn.bg-zinc-900, .theme-btn.bg-zinc-900 {
+        .upcoming-filter-btn.bg-zinc-900, .fav-view-btn.bg-zinc-900, .watchlist-view-btn.bg-zinc-900, .schedule-view-btn.bg-zinc-900, .theme-btn.bg-zinc-900 {
             background-color: #3b82f6; /* blue-500 */
             color: #fafafa;
         }
@@ -201,6 +202,7 @@
         }
         .theme-horror .upcoming-filter-btn,
         .theme-horror .fav-view-btn,
+        .theme-horror .watchlist-view-btn,
         .theme-horror .schedule-view-btn,
         .theme-horror .theme-btn,
         .theme-horror #subscriptionList div {
@@ -211,6 +213,7 @@
         .theme-horror #saveUserNameButton,
         .theme-horror .upcoming-filter-btn.bg-zinc-900,
         .theme-horror .fav-view-btn.bg-zinc-900,
+        .theme-horror .watchlist-view-btn.bg-zinc-900,
         .theme-horror .schedule-view-btn.bg-zinc-900,
         .theme-horror .theme-btn.bg-zinc-900,
         .theme-horror #subscriptionList div.bg-zinc-900 {
@@ -285,6 +288,7 @@
         }
         .theme-scifi .upcoming-filter-btn,
         .theme-scifi .fav-view-btn,
+        .theme-scifi .watchlist-view-btn,
         .theme-scifi .schedule-view-btn,
         .theme-scifi .theme-btn,
         .theme-scifi #subscriptionList div {
@@ -294,6 +298,7 @@
         .theme-scifi #saveUserNameButton,
         .theme-scifi .upcoming-filter-btn.bg-zinc-900,
         .theme-scifi .fav-view-btn.bg-zinc-900,
+        .theme-scifi .watchlist-view-btn.bg-zinc-900,
         .theme-scifi .schedule-view-btn.bg-zinc-900,
         .theme-scifi .theme-btn.bg-zinc-900,
         .theme-scifi #subscriptionList div.bg-zinc-900 {
@@ -352,6 +357,7 @@
         }
         .theme-clean .upcoming-filter-btn,
         .theme-clean .fav-view-btn,
+        .theme-clean .watchlist-view-btn,
         .theme-clean .schedule-view-btn,
         .theme-clean .theme-btn,
         .theme-clean #subscriptionList div {
@@ -361,6 +367,7 @@
         .theme-clean #saveUserNameButton,
         .theme-clean .upcoming-filter-btn.bg-zinc-900,
         .theme-clean .fav-view-btn.bg-zinc-900,
+        .theme-clean .watchlist-view-btn.bg-zinc-900,
         .theme-clean .schedule-view-btn.bg-zinc-900,
         .theme-clean .theme-btn.bg-zinc-900,
         .theme-clean #subscriptionList div.bg-zinc-900 {
@@ -432,12 +439,16 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     <span class="hidden md:inline">Favorites</span>
                 </button>
+                 <button data-tab="watchlist" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <span class="hidden md:inline">Watchlist</span>
+                </button>
                 <button data-tab="schedule" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     <span class="hidden md:inline">Schedule</span>
                 </button>
                 <button data-tab="settings" class="tab-button flex items-center justify-center gap-2 py-3 px-4 md:px-4 border-b-2 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                     <span class="hidden md:inline">Settings</span>
                 </button>
             </div>
@@ -511,8 +522,8 @@
                             <div id="movie-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
                                 <div id="movie-favorites-view-controls" class="flex items-center space-x-4">
                                     <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn movie-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
-                                        <button class="fav-view-btn movie-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
+                                        <button class="fav-view-btn movie-favorites-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
+                                        <button class="fav-view-btn movie-favorites-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
                                     </div>
                                     <button id="manageMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                                 </div>
@@ -520,7 +531,8 @@
                              <div id="movie-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="movieFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToWatchlistMoviesBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">To Watchlist</button>
+                                     <button id="deleteSelectedMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -540,8 +552,8 @@
                             <div id="tv-favorites-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
                                 <div id="tv-favorites-view-controls" class="flex items-center space-x-4">
                                     <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
-                                        <button class="fav-view-btn tv-fav-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
-                                        <button class="fav-view-btn tv-fav-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
+                                        <button class="fav-view-btn tv-favorites-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
+                                        <button class="fav-view-btn tv-favorites-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
                                     </div>
                                     <button id="manageTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
                                 </div>
@@ -549,7 +561,8 @@
                              <div id="tv-favorites-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
                                 <span id="tvFavoritesSelectedCount" class="text-sm font-medium">0 selected</span>
                                 <div class="flex space-x-2">
-                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete Selected</button>
+                                     <button id="moveToWatchlistTvsBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">To Watchlist</button>
+                                     <button id="deleteSelectedTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
                                      <button id="deleteAllTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
                                      <button id="cancelManageTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
                                 </div>
@@ -557,6 +570,70 @@
                              <p id="tvFavoritesMessage" class="text-center text-zinc-500"></p>
                             <div id="tvFavoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
                             <div id="tvFavoritesListContainer" class="hidden space-y-3"></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div id="watchlist" class="tab-content hidden">
+                <div class="max-w-5xl mx-auto">
+                    <details class="mb-8 group" open>
+                        <summary class="list-none flex items-center justify-between cursor-pointer">
+                            <h2 class="text-2xl font-bold">Watchlist Movies</h2>
+                            <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="mt-4">
+                            <div id="movie-watchlist-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
+                                <div id="movie-watchlist-view-controls" class="flex items-center space-x-4">
+                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                        <button class="watchlist-view-btn movie-watchlist-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="movie">Grid</button>
+                                        <button class="watchlist-view-btn movie-watchlist-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="movie">List</button>
+                                    </div>
+                                    <button id="manageWatchlistMoviesBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                                </div>
+                            </div>
+                             <div id="movie-watchlist-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
+                                <span id="movieWatchlistSelectedCount" class="text-sm font-medium">0 selected</span>
+                                <div class="flex space-x-2">
+                                     <button id="moveToFavoritesMoviesBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">To Favorites</button>
+                                     <button id="deleteSelectedWatchlistMoviesBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
+                                     <button id="deleteAllWatchlistMoviesBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                                     <button id="cancelManageWatchlistMoviesBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
+                                </div>
+                            </div>
+                            <p id="movieWatchlistMessage" class="text-center text-zinc-500"></p>
+                            <div id="movieWatchlistContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                            <div id="movieWatchlistListContainer" class="hidden space-y-3"></div>
+                        </div>
+                    </details>
+                    
+                    <details class="group" open>
+                        <summary class="list-none flex items-center justify-between cursor-pointer">
+                            <h2 class="text-2xl font-bold">Watchlist TV Shows</h2>
+                             <svg class="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                         <div class="mt-4">
+                            <div id="tv-watchlist-header" class="flex flex-col sm:flex-row justify-end sm:items-center mb-4">
+                                <div id="tv-watchlist-view-controls" class="flex items-center space-x-4">
+                                    <div class="flex space-x-1 bg-zinc-700 p-1 rounded-lg">
+                                        <button class="watchlist-view-btn tv-watchlist-view-btn bg-zinc-900 text-white px-3 py-1 rounded-md text-sm font-medium" data-view="grid" data-type="tv">Grid</button>
+                                        <button class="watchlist-view-btn tv-watchlist-view-btn text-zinc-300 px-3 py-1 rounded-md text-sm font-medium" data-view="list" data-type="tv">List</button>
+                                    </div>
+                                    <button id="manageWatchlistTvsBtn" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Manage</button>
+                                </div>
+                            </div>
+                             <div id="tv-watchlist-manage-controls" class="hidden flex justify-between items-center mb-4 bg-zinc-700 p-2 rounded-lg">
+                                <span id="tvWatchlistSelectedCount" class="text-sm font-medium">0 selected</span>
+                                <div class="flex space-x-2">
+                                     <button id="moveToFavoritesTvsBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">To Favorites</button>
+                                     <button id="deleteSelectedWatchlistTvsBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Delete</button>
+                                     <button id="deleteAllWatchlistTvsBtn" class="bg-red-800 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm">Remove All</button>
+                                     <button id="cancelManageWatchlistTvsBtn" class="bg-zinc-500 hover:bg-zinc-400 text-white font-bold py-1 px-3 rounded text-sm">Done</button>
+                                </div>
+                            </div>
+                             <p id="tvWatchlistMessage" class="text-center text-zinc-500"></p>
+                            <div id="tvWatchlistContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                            <div id="tvWatchlistListContainer" class="hidden space-y-3"></div>
                         </div>
                     </details>
                 </div>
@@ -745,13 +822,18 @@
                 activeTab: 'dashboard',
                 movieFavoritesView: 'grid',
                 tvFavoritesView: 'grid',
+                movieWatchlistView: 'grid',
+                tvWatchlistView: 'grid',
                 scheduleView: 'agenda',
                 dashboardScheduleFilter: 'today',
                 isManagingMovies: false,
                 isManagingTvs: false,
+                isManagingWatchlistMovies: false,
+                isManagingWatchlistTvs: false,
                 currentDate: new Date(),
                 subscriptions: [],
                 favorites: [],
+                watchlist: [],
                 scheduledEpisodes: [],
                 streamingServices: [
                     { id: 528, name: 'AMC+', logo: 'l4g1BT502p1H42a3j1s2lG9nK.jpg' },
@@ -777,6 +859,8 @@
             searchResultsMessage = $('searchResultsMessage'), 
             movieFavoritesContainer = $('movieFavoritesContainer'), movieFavoritesListContainer = $('movieFavoritesListContainer'), movieFavoritesMessage = $('movieFavoritesMessage'),
             tvFavoritesContainer = $('tvFavoritesContainer'), tvFavoritesListContainer = $('tvFavoritesListContainer'), tvFavoritesMessage = $('tvFavoritesMessage'),
+            movieWatchlistContainer = $('movieWatchlistContainer'), movieWatchlistListContainer = $('movieWatchlistListContainer'), movieWatchlistMessage = $('movieWatchlistMessage'),
+            tvWatchlistContainer = $('tvWatchlistContainer'), tvWatchlistListContainer = $('tvWatchlistListContainer'), tvWatchlistMessage = $('tvWatchlistMessage'),
             scheduleContent = $('scheduleContent'), scheduleMessage = $('scheduleMessage'), subscriptionList = $('subscriptionList'), userNameInput = $('userNameInput'), 
             saveUserNameButton = $('saveUserNameButton'), userNameMessage = $('userNameMessage'), dashboardUserName = $('dashboardUserName'), upcomingContainer = $('upcomingContainer'),
             trendingContainer = $('trendingContainer'), upcomingMoviesContainer = $('upcomingMoviesContainer'), scrollLeftBtn = $('scrollLeftBtn'), scrollRightBtn = $('scrollRightBtn'),
@@ -829,6 +913,7 @@
                     mainApp.classList.add('hidden');
                     suggestionAvatarBtn.classList.add('hidden');
                     state.favorites = [];
+                    state.watchlist = [];
                     state.subscriptions = [];
                     state.userName = null;
                 }
@@ -888,6 +973,7 @@
                     userName: state.userName,
                     subscriptions: state.subscriptions,
                     favorites: state.favorites,
+                    watchlist: state.watchlist,
                     theme: state.theme,
                     dashboardScheduleFilter: state.dashboardScheduleFilter
                 };
@@ -902,6 +988,7 @@
                 state.userName = data.userName || null;
                 state.subscriptions = data.subscriptions || [];
                 state.favorites = data.favorites || [];
+                state.watchlist = data.watchlist || [];
                 state.theme = data.theme || 'default';
                 state.dashboardScheduleFilter = data.dashboardScheduleFilter || 'today';
                 if (userNameInput && state.userName) userNameInput.value = state.userName;
@@ -969,6 +1056,27 @@
                 saveDataToFirestore();
                 renderModal(mediaItem);
             }
+
+            function toggleWatchlist(mediaItem) {
+                if (!userId) { promptForLogin('saving to watchlist'); return; }
+                const index = state.watchlist.findIndex(item => item.id === mediaItem.id);
+                if (index > -1) {
+                    state.watchlist.splice(index, 1);
+                } else {
+                    state.watchlist.push({
+                        id: mediaItem.id,
+                        name: mediaItem.name || null,
+                        title: mediaItem.title || null,
+                        poster_path: mediaItem.poster_path, 
+                        first_air_date: mediaItem.first_air_date || null,
+                        release_date: mediaItem.release_date || null, 
+                        media_type: mediaItem.title ? 'movie' : 'tv',
+                        manualTime: null 
+                    });
+                }
+                saveDataToFirestore();
+                renderModal(mediaItem);
+            }
             
             async function switchTab(tabName) {
                 state.activeTab = tabName;
@@ -987,12 +1095,13 @@
 
                 if (tabName === 'dashboard') await fetchDashboardData();
                 if (tabName === 'favorites') await renderFavorites();
+                if (tabName === 'watchlist') await renderWatchlist();
                 if (tabName === 'schedule') { await fetchScheduleData(); renderSchedule(); }
             }
 
             function createMediaCard(item, isManageMode = false) {
                 const cardWrapper = document.createElement('div');
-                cardWrapper.className = 'relative favorite-card';
+                cardWrapper.className = 'relative media-card';
 
                 const card = document.createElement('div');
                 card.className = 'bg-zinc-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300 h-full';
@@ -1006,7 +1115,7 @@
                 
                 if (isManageMode) {
                     const overlay = document.createElement('div');
-                    overlay.className = 'favorite-card-manage-overlay';
+                    overlay.className = 'media-card-manage-overlay';
                     overlay.innerHTML = `
                         <svg class="x-mark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
                             <circle cx="26" cy="26" r="25" fill="rgba(239, 68, 68, 0.7)"/>
@@ -1015,7 +1124,7 @@
                     `;
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.className = 'favorite-card-manage-checkbox w-full h-full absolute top-0 left-0';
+                    checkbox.className = 'media-card-manage-checkbox w-full h-full absolute top-0 left-0';
                     checkbox.value = item.id;
                     overlay.appendChild(checkbox);
                     cardWrapper.appendChild(overlay);
@@ -1024,7 +1133,12 @@
                         e.preventDefault();
                         checkbox.checked = !checkbox.checked;
                         cardWrapper.classList.toggle('selected');
-                        updateSelectedCount(card.dataset.type);
+                        // Determine which list is being managed to update the correct count
+                        if (state.isManagingMovies || state.isManagingTvs) {
+                            updateSelectedCount(card.dataset.type, 'favorites');
+                        } else if (state.isManagingWatchlistMovies || state.isManagingWatchlistTvs) {
+                             updateSelectedCount(card.dataset.type, 'watchlist');
+                        }
                     });
                 } else {
                         card.classList.add('cursor-pointer');
@@ -1090,6 +1204,7 @@
                 const title = details.title || details.name, year = new Date(details.release_date || details.first_air_date).getFullYear() || 'N/A';
                 const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : 'https://placehold.co/500x750/374151/FFFFFF?text=No+Image';
                 const isFavorite = state.favorites.some(fav => fav.id === details.id);
+                const isOnWatchlist = state.watchlist.some(item => item.id === details.id);
                 const providers = details['watch/providers']?.results?.US?.flatrate || [];
                 const mediaType = details.title ? 'movie' : 'tv';
 
@@ -1127,24 +1242,24 @@
                 
                 let manualTimeHtml = '';
                 if (mediaType === 'tv') {
-                    const favorite = state.favorites.find(f => f.id === details.id);
-                    if (favorite) {
+                    const trackedItem = state.favorites.find(f => f.id === details.id) || state.watchlist.find(w => w.id === details.id);
+                    if (trackedItem) {
                         manualTimeHtml = `
                             <div class="mt-4 pt-4 border-t border-zinc-700">
                                 <h3 class="text-xl font-semibold mb-2">Manual Air Time</h3>
                                 <p class="text-zinc-400 text-sm mb-2">Set a time to help sort your schedule (e.g., "9:00 PM EST").</p>
                                 <div id="manualTimeContainer" class="flex items-center space-x-4">
-                                    <p id="manualTimeDisplay" class="text-zinc-300 flex-grow">${favorite.manualTime || 'Not set'}</p>
+                                    <p id="manualTimeDisplay" class="text-zinc-300 flex-grow">${trackedItem.manualTime || 'Not set'}</p>
                                     <button id="editTimeButton" class="bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-1 px-3 rounded text-sm">Edit</button>
                                 </div>
                             </div>`;
                     }
                 }
                 
-                modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p>${scoreHtml}<div class="flex gap-4 mb-6"><button id="favoriteButton" class="w-full ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button><a href="https://www.themoviedb.org/${mediaType}/${details.id}" target="_blank" rel="noopener noreferrer" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition text-center">See More</a></div><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
+                modalContent.innerHTML = `<button id="closeModal" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-3xl leading-none">&times;</button><div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/3 flex-shrink-0"><img src="${posterUrl}" alt="${title}" class="w-full rounded-lg shadow-md"></div><div class="md:w-2/3"><h2 class="text-3xl font-bold mb-2">${title} (${year})</h2><p class="text-zinc-400 mb-4 text-sm">${details.overview || 'No overview.'}</p>${scoreHtml}<div class="flex flex-col sm:flex-row gap-4 mb-6"><button id="favoriteButton" class="w-full ${isFavorite ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isFavorite ? 'Un-favorite' : 'Add to Favorites'}</button><button id="watchlistButton" class="w-full ${isOnWatchlist ? 'bg-blue-600 hover:bg-blue-700' : 'bg-zinc-700 hover:bg-zinc-600'} text-white font-bold py-2 px-4 rounded transition">${isOnWatchlist ? 'On Watchlist' : 'Add to Watchlist'}</button></div><a href="https://www.themoviedb.org/${mediaType}/${details.id}" target="_blank" rel="noopener noreferrer" class="block w-full bg-zinc-600 hover:bg-zinc-500 text-white font-bold py-2 px-4 rounded transition text-center mb-6">See More on TMDB</a><h3 class="text-xl font-semibold mb-2">Watch On:</h3><div class="flex flex-wrap gap-2 mb-6">${providersHtml}</div>${manualTimeHtml}</div></div>`;
                 
-                const favoriteButton = $('favoriteButton');
-                if(favoriteButton) favoriteButton.addEventListener('click', () => toggleFavorite(details));
+                $('favoriteButton').addEventListener('click', () => toggleFavorite(details));
+                $('watchlistButton').addEventListener('click', () => toggleWatchlist(details));
                 
                 const editTimeButton = $('editTimeButton');
                 if(editTimeButton) editTimeButton.addEventListener('click', () => editManualTime(details));
@@ -1155,13 +1270,15 @@
             }
 
             function editManualTime(details) {
-                const favorite = state.favorites.find(f => f.id === details.id);
-                if (!favorite) return;
+                const favIndex = state.favorites.findIndex(f => f.id === details.id);
+                const watchIndex = state.watchlist.findIndex(w => w.id === details.id);
+                const trackedItem = favIndex > -1 ? state.favorites[favIndex] : state.watchlist[watchIndex];
+                if (!trackedItem) return;
 
                 const container = $('manualTimeContainer');
                 container.innerHTML = `
                     <div class="flex-grow">
-                        <input type="text" id="timeInput" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-1 px-2 text-white" value="${favorite.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
+                        <input type="text" id="timeInput" class="w-full bg-zinc-700 border border-zinc-600 rounded-md py-1 px-2 text-white" value="${trackedItem.manualTime || ''}" placeholder="e.g., 9:00 PM EST">
                     </div>
                     <div class="flex space-x-2">
                         <button id="saveTimeButton" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1 px-3 rounded text-sm">Save</button>
@@ -1171,10 +1288,8 @@
 
                 $('saveTimeButton').addEventListener('click', () => {
                     const newTime = $('timeInput').value.trim();
-                    const favIndex = state.favorites.findIndex(f => f.id === details.id);
-                    if (favIndex > -1) {
-                        state.favorites[favIndex].manualTime = newTime;
-                    }
+                    if (favIndex > -1) state.favorites[favIndex].manualTime = newTime;
+                    if (watchIndex > -1) state.watchlist[watchIndex].manualTime = newTime;
                     saveDataToFirestore();
                     renderModal(details); 
                 });
@@ -1230,61 +1345,70 @@
                 }
             }
 
-            async function renderFavorites() {
-                const movieFavorites = state.favorites.filter(f => f.media_type === 'movie');
-                const tvFavorites = state.favorites.filter(f => f.media_type === 'tv');
-
-                await renderFavoriteSection('movie', movieFavorites);
-                await renderFavoriteSection('tv', tvFavorites);
-            }
-
-            async function renderFavoriteSection(type, items) {
-                const isManaging = type === 'movie' ? state.isManagingMovies : state.isManagingTvs;
-                const view = type === 'movie' ? state.movieFavoritesView : state.tvFavoritesView;
+            async function renderList(containerSelector, messageSelector, items, listType, itemType) {
+                const isManaging = listType === 'favorites' 
+                    ? (itemType === 'movie' ? state.isManagingMovies : state.isManagingTvs)
+                    : (itemType === 'movie' ? state.isManagingWatchlistMovies : state.isManagingWatchlistTvs);
+                const view = listType === 'favorites'
+                    ? (itemType === 'movie' ? state.movieFavoritesView : state.tvFavoritesView)
+                    : (itemType === 'movie' ? state.movieWatchlistView : state.tvWatchlistView);
                 
-                const viewControls = $(`${type}-favorites-view-controls`);
-                const manageControls = $(`${type}-favorites-manage-controls`);
-                const messageEl = $(`${type}FavoritesMessage`);
-                const gridContainer = $(`${type}FavoritesContainer`);
-                const listContainer = $(`${type}FavoritesListContainer`);
+                const header = $(`${itemType}-${listType}-header`);
+                const manageControls = $(`${itemType}-${listType}-manage-controls`);
+                const messageEl = $(messageSelector);
+                const gridContainer = $(containerSelector);
+                const listContainer = $(`${itemType}${listType.charAt(0).toUpperCase() + listType.slice(1)}ListContainer`);
 
-                viewControls.parentElement.classList.toggle('hidden', isManaging);
-                manageControls.classList.toggle('hidden', !isManaging);
+                if (header) header.classList.toggle('hidden', isManaging);
+                if (manageControls) manageControls.classList.toggle('hidden', !isManaging);
                 
-                messageEl.classList.toggle('hidden', items.length > 0);
+                if (messageEl) messageEl.classList.toggle('hidden', items.length > 0);
                 if (items.length === 0) {
-                    gridContainer.innerHTML = '';
-                    listContainer.innerHTML = '';
-                    messageEl.textContent = `You have no favorite ${type === 'movie' ? 'movies' : 'TV shows'}.`;
+                    if(gridContainer) gridContainer.innerHTML = '';
+                    if(listContainer) listContainer.innerHTML = '';
+                    if(messageEl) messageEl.textContent = `You have no ${itemType === 'movie' ? 'movies' : 'TV shows'} in your ${listType}.`;
                     return;
                 }
                 
                 const sortedItems = [...items].sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
 
                 if (view === 'grid') {
-                    gridContainer.classList.remove('hidden');
-                    listContainer.classList.add('hidden');
-                    gridContainer.innerHTML = '';
-                    sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
+                    if(gridContainer) gridContainer.classList.remove('hidden');
+                    if(listContainer) listContainer.classList.add('hidden');
+                    if(gridContainer) {
+                        gridContainer.innerHTML = '';
+                        sortedItems.forEach(item => gridContainer.appendChild(createMediaCard(item, isManaging)));
+                    }
                 } else {
-                    gridContainer.classList.add('hidden');
-                    listContainer.classList.remove('hidden');
-                    // Manage mode is not supported for list view; it will always show the regular list.
-                    await renderFavoritesList(sortedItems, listContainer);
+                    if(gridContainer) gridContainer.classList.add('hidden');
+                    if(listContainer) {
+                        listContainer.classList.remove('hidden');
+                        await renderDetailedList(sortedItems, listContainer);
+                    }
                 }
-                updateSelectedCount(type);
+                updateSelectedCount(itemType, listType);
+            }
+
+            async function renderFavorites() {
+                await renderList('movieFavoritesContainer', 'movieFavoritesMessage', state.favorites.filter(f => f.media_type === 'movie'), 'favorites', 'movie');
+                await renderList('tvFavoritesContainer', 'tvFavoritesMessage', state.favorites.filter(f => f.media_type === 'tv'), 'favorites', 'tv');
+            }
+
+            async function renderWatchlist() {
+                await renderList('movieWatchlistContainer', 'movieWatchlistMessage', state.watchlist.filter(w => w.media_type === 'movie'), 'watchlist', 'movie');
+                await renderList('tvWatchlistContainer', 'tvWatchlistMessage', state.watchlist.filter(w => w.media_type === 'tv'), 'watchlist', 'tv');
             }
             
-            async function renderFavoritesList(sortedFavorites, container) {
+            async function renderDetailedList(sortedItems, container) {
                 container.innerHTML = '';
-                if(sortedFavorites.length === 0) return;
+                if(sortedItems.length === 0) return;
 
                 showLoading();
                 try {
-                    const providerPromises = sortedFavorites.map(fav => apiFetch(`${fav.media_type}/${fav.id}?append_to_response=watch/providers`));
-                    const favoritesWithDetails = await Promise.all(providerPromises);
+                    const providerPromises = sortedItems.map(item => apiFetch(`${item.media_type}/${item.id}?append_to_response=watch/providers`));
+                    const itemsWithDetails = await Promise.all(providerPromises);
 
-                    favoritesWithDetails.forEach(details => {
+                    itemsWithDetails.forEach(details => {
                         const title = details.title || details.name;
                         const posterUrl = details.poster_path ? `https://image.tmdb.org/t/p/w92${details.poster_path}` : 'https://placehold.co/92x138/374151/FFFFFF?text=N/A';
                         const providers = details['watch/providers']?.results?.US?.flatrate || [];
@@ -1303,18 +1427,19 @@
                         container.appendChild(listItem);
                     });
                 } catch (error) {
-                    console.error("Error fetching favorites details:", error);
+                    console.error("Error fetching list details:", error);
                     container.innerHTML = `<p class="text-center text-red-400">Could not load details.</p>`;
                 } finally {
                     hideLoading();
                 }
             }
 
-            function updateSelectedCount(type) {
-                const container = $(`${type}FavoritesContainer`);
-                const countEl = $(`${type}FavoritesSelectedCount`);
+            function updateSelectedCount(type, listType) {
+                const listPrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
+                const container = $(`${type}${listPrefix}Container`);
+                const countEl = $(`${type}${listPrefix}SelectedCount`);
                 if (!container || !countEl) return;
-                const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
+                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
                 countEl.textContent = `${selected.length} selected`;
             }
 
@@ -1331,15 +1456,16 @@
                 const sevenDaysHence = new Date(today);
                 sevenDaysHence.setDate(today.getDate() + 7);
 
-                const favoriteMovieIds = new Set(state.favorites.filter(f => f.media_type === 'movie').map(f => f.id));
-                const upcomingFavoriteMovies = upcomingMovies.filter(movie => {
+                const allTrackedItems = [...state.favorites, ...state.watchlist];
+                const trackedMovieIds = new Set(allTrackedItems.filter(f => f.media_type === 'movie').map(f => f.id));
+                const upcomingTrackedMovies = upcomingMovies.filter(movie => {
                     const releaseDate = parseLocalDate(movie.release_date);
-                    return favoriteMovieIds.has(movie.id) && releaseDate >= sevenDaysAgo && releaseDate <= sevenDaysHence;
+                    return trackedMovieIds.has(movie.id) && releaseDate >= sevenDaysAgo && releaseDate <= sevenDaysHence;
                 }).map(m => ({...m, media_type: 'movie'}));
 
-                const favoriteShowIds = new Set(state.favorites.filter(f => f.media_type === 'tv').map(f => f.id));
+                const trackedShowIds = new Set(allTrackedItems.filter(f => f.media_type === 'tv').map(f => f.id));
                 const groupedEpisodes = state.scheduledEpisodes.reduce((acc, ep) => {
-                    if (!favoriteShowIds.has(ep.showId)) return acc;
+                    if (!trackedShowIds.has(ep.showId)) return acc;
                     const key = `${ep.showId}-${ep.air_date}`;
                     if (!acc[key]) {
                         acc[key] = { ...ep };
@@ -1347,7 +1473,7 @@
                     return acc;
                 }, {});
 
-                const upcomingFavoriteShows = Object.values(groupedEpisodes).filter(show => {
+                const upcomingTrackedShows = Object.values(groupedEpisodes).filter(show => {
                     const airDate = parseLocalDate(show.air_date);
                     return airDate >= sevenDaysAgo && airDate <= sevenDaysHence;
                 }).map(s => ({
@@ -1358,7 +1484,7 @@
                     media_type: 'tv'
                 }));
 
-                const potentialHighlights = [...upcomingFavoriteMovies, ...upcomingFavoriteShows];
+                const potentialHighlights = [...upcomingTrackedMovies, ...upcomingTrackedShows];
 
                 if (potentialHighlights.length === 0) {
                     return;
@@ -1424,28 +1550,27 @@
 
                 recommendationsSection.classList.add('hidden');
                 recommendationsContainer.innerHTML = '';
-
-                if (state.favorites.length < 3) { // Require a few favorites for a good profile
+                
+                const trackedItems = [...state.favorites, ...state.watchlist];
+                if (trackedItems.length < 3) {
                     return; 
                 }
 
                 try {
-                    // Step 1: Fetch details for all favorites to get genres and keywords
-                    const detailPromises = state.favorites.map(fav => 
-                        apiFetch(`${fav.media_type}/${fav.id}?append_to_response=keywords`)
+                    const detailPromises = trackedItems.map(item => 
+                        apiFetch(`${item.media_type}/${item.id}?append_to_response=keywords`)
                     );
                     const detailResults = await Promise.allSettled(detailPromises);
-                    const favoriteDetails = detailResults
+                    const trackedDetails = detailResults
                         .filter(result => result.status === 'fulfilled')
                         .map(result => result.value);
 
-                    if (favoriteDetails.length === 0) return;
+                    if (trackedDetails.length === 0) return;
 
-                    // Step 2: Create a taste profile
                     const genreCounts = new Map();
                     const keywordCounts = new Map();
 
-                    favoriteDetails.forEach(detail => {
+                    trackedDetails.forEach(detail => {
                         (detail.genres || []).forEach(genre => {
                             genreCounts.set(genre.id, (genreCounts.get(genre.id) || 0) + 1);
                         });
@@ -1455,7 +1580,6 @@
                         });
                     });
 
-                    // Step 3: Identify top genres and keywords
                     const sortedGenres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]);
                     const sortedKeywords = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]);
 
@@ -1464,7 +1588,6 @@
 
                     if (!topGenreIds && !topKeywordIds) return;
 
-                    // Step 4: Fetch recommendations based on the profile
                     let movieRecommendations = [];
                     let tvRecommendations = [];
 
@@ -1478,12 +1601,11 @@
                         if (tvResults.status === 'fulfilled') tvRecommendations = tvResults.value.results;
                     }
                    
-                    // Step 5: Filter and combine results
-                    const favoriteIds = new Set(state.favorites.map(f => f.id));
+                    const trackedIds = new Set(trackedItems.map(f => f.id));
                     const combined = [...movieRecommendations, ...tvRecommendations]
-                        .filter(item => item.poster_path && !favoriteIds.has(item.id)) // Filter out existing favorites and items without posters
-                        .sort((a, b) => b.popularity - a.popularity) // Sort by popularity
-                        .slice(0, 20); // Limit to 20 results
+                        .filter(item => item.poster_path && !trackedIds.has(item.id)) 
+                        .sort((a, b) => b.popularity - a.popularity) 
+                        .slice(0, 20); 
 
                     if (combined.length > 0) {
                         recommendationsTitle.textContent = `Recommended for You`;
@@ -1576,17 +1698,26 @@
             }
             
             async function fetchScheduleData(isDashboard = false) {
-                const favoriteTvShows = state.favorites.filter(fav => fav.media_type === 'tv');
+                const allTrackedItems = [...state.favorites, ...state.watchlist];
+                const uniqueShowIds = new Set();
+                const uniqueTrackedTvShows = allTrackedItems.filter(item => {
+                    if (item.media_type === 'tv' && !uniqueShowIds.has(item.id)) {
+                        uniqueShowIds.add(item.id);
+                        return true;
+                    }
+                    return false;
+                });
+
                 if (!isDashboard) scheduleMessage.classList.add('hidden');
                 
-                if (favoriteTvShows.length === 0) {
+                if (uniqueTrackedTvShows.length === 0) {
                     state.scheduledEpisodes = [];
                     return;
                 }
 
                 if (!isDashboard) showLoading();
                 try {
-                    const showDetailPromises = favoriteTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
+                    const showDetailPromises = uniqueTrackedTvShows.map(show => apiFetch(`tv/${show.id}?append_to_response=watch/providers`));
                     
                     const showDetailResults = await Promise.allSettled(showDetailPromises);
                     const showDetailsList = showDetailResults
@@ -1596,7 +1727,6 @@
                     const seasonPromises = [];
                     for (const showDetail of showDetailsList) {
                         if (showDetail.seasons && Array.isArray(showDetail.seasons)) {
-                            // Find the most recent season with a future air date, or the latest overall season
                             const futureSeasons = showDetail.seasons.filter(s => s.air_date && new Date(s.air_date) > new Date());
                             let seasonToFetch = futureSeasons.sort((a,b) => new Date(a.air_date) - new Date(b.air_date))[0];
                             if(!seasonToFetch) {
@@ -1648,8 +1778,8 @@
 
                  const upcoming = state.scheduledEpisodes
                      .map(ep => {
-                         const favorite = state.favorites.find(f => f.id === ep.showId);
-                         return { ...ep, manualTime: favorite ? favorite.manualTime : null };
+                         const trackedItem = state.favorites.find(f => f.id === ep.showId) || state.watchlist.find(w => w.id === ep.showId);
+                         return { ...ep, manualTime: trackedItem ? trackedItem.manualTime : null };
                      })
                        .filter(ep => { const airDate = parseLocalDate(ep.air_date); return airDate >= today && airDate <= endDate; })
                        .sort((a,b) => {
@@ -1663,7 +1793,7 @@
                     const key = `${ep.showId}-${ep.air_date}`;
                     if (!acc[key]) {
                         acc[key] = {
-                            ...ep, // Copy details from the first episode
+                            ...ep, 
                             episodes: []
                         };
                     }
@@ -1678,7 +1808,7 @@
                 const upcomingItems = Object.values(groupedUpcoming);
 
                  if (upcomingItems.length === 0) {
-                         upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your favorites in this period.</p>`;
+                         upcomingContainer.innerHTML = `<p class="text-zinc-500 text-sm">No episodes scheduled for your tracked shows in this period.</p>`;
                          return;
                  }
                 
@@ -1724,7 +1854,7 @@
             function renderSchedule() {
                 scheduleMessage.classList.add('hidden');
                 if (state.scheduledEpisodes.length === 0) {
-                    scheduleMessage.textContent = "No upcoming episodes for your favorite shows.";
+                    scheduleMessage.textContent = "No upcoming episodes for your tracked shows.";
                     scheduleMessage.classList.remove('hidden');
                     scheduleContent.innerHTML = '';
                     return;
@@ -1763,8 +1893,8 @@
             function renderAgenda() {
                 const sortedEpisodes = [...state.scheduledEpisodes]
                     .map(ep => {
-                        const favorite = state.favorites.find(f => f.id === ep.showId);
-                        return { ...ep, manualTime: favorite ? favorite.manualTime : null };
+                        const trackedItem = state.favorites.find(f => f.id === ep.showId) || state.watchlist.find(w => w.id === ep.showId);
+                        return { ...ep, manualTime: trackedItem ? trackedItem.manualTime : null };
                     })
                     .sort((a,b) => {
                         const dateA = parseLocalDate(a.air_date);
@@ -1778,10 +1908,7 @@
                 const groupedEpisodes = sortedEpisodes.reduce((acc, ep) => {
                     const key = `${ep.showId}-${ep.air_date}`;
                     if (!acc[key]) {
-                        acc[key] = {
-                            ...ep, // Copy details from the first episode
-                            episodes: []
-                        };
+                        acc[key] = { ...ep, episodes: [] };
                     }
                     acc[key].episodes.push({
                         id: ep.id,
@@ -1845,19 +1972,17 @@
             }
 
             async function refreshCurrentView() {
-                // This function is called whenever data changes in Firestore
                 updateAccountSection();
                 renderSubscriptions();
-                updateUpcomingFilterButtonsUI(); // Refresh button state
+                updateUpcomingFilterButtonsUI(); 
                 dashboardUserName.textContent = state.userName || 'You';
                 
                 if (state.activeTab === 'dashboard') {
-                    await fetchDashboardData(true);
+                    await fetchScheduleData(true);
                     renderDashboardUpcoming();
                 }
-                if (state.activeTab === 'favorites') {
-                    await renderFavorites();
-                }
+                if (state.activeTab === 'favorites') await renderFavorites();
+                if (state.activeTab === 'watchlist') await renderWatchlist();
                 if (state.activeTab === 'schedule') { 
                     await fetchScheduleData(); 
                     renderSchedule(); 
@@ -1873,8 +1998,7 @@
             function openSuggestionModal() {
                 const title = $('suggestionModalTitle');
                 const subtitle = $('suggestionModalSubtitle');
-                const textarea = $('suggestionText');
-
+                
                 if (state.theme === 'horror') {
                     title.textContent = "We Have Such Sights to Show You";
                     subtitle.textContent = "What is your pleasure, sir? Let us know what features you desire.";
@@ -1891,7 +2015,6 @@
                 suggestionModal.classList.remove('hidden');
             }
 
-            // A new helper function to manage the UI of the filter buttons
             function updateUpcomingFilterButtonsUI() {
                 upcomingFilterBtns.forEach(b => {
                     const isSelected = b.dataset.filter === state.dashboardScheduleFilter;
@@ -1905,7 +2028,7 @@
                 if (!isDataLoaded) return;
                 updateAccountSection();
                 renderSubscriptions();
-                updateUpcomingFilterButtonsUI(); // Set the initial state of the buttons
+                updateUpcomingFilterButtonsUI();
                 await switchTab('dashboard');
             }
 
@@ -1924,53 +2047,100 @@
                 }, 300);
             }
 
-            function setupFavoriteSectionControls(type) {
-                const viewBtns = document.querySelectorAll(`.${type}-fav-view-btn`);
-                const manageBtn = $(`manage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const cancelManageBtn = $(`cancelManage${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const deleteAllBtn = $(`deleteAll${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const deleteSelectedBtn = $(`deleteSelected${type === 'movie' ? 'Movies' : 'Tvs'}Btn`);
-                const container = $(`${type}FavoritesContainer`);
-
-                viewBtns.forEach(btn => btn.addEventListener('click', () => {
-                    if (type === 'movie') state.movieFavoritesView = btn.dataset.view;
-                    else state.tvFavoritesView = btn.dataset.view;
-
-                    viewBtns.forEach(b => {
-                        b.classList.toggle('bg-zinc-900', b === btn);
-                        b.classList.toggle('text-white', b === btn);
-                        b.classList.toggle('text-zinc-300', b !== btn);
-                    });
-                    renderFavorites();
-                }));
-
-                manageBtn.addEventListener('click', () => {
-                    if (type === 'movie') state.isManagingMovies = true;
-                    else state.isManagingTvs = true;
-                    renderFavorites();
-                });
-
-                cancelManageBtn.addEventListener('click', () => {
-                    if (type === 'movie') state.isManagingMovies = false;
-                    else state.isManagingTvs = false;
-                    renderFavorites();
-                });
+            function setupSectionControls(listType) {
+                const listPrefix = listType.charAt(0).toUpperCase() + listType.slice(1);
                 
-                deleteAllBtn.addEventListener('click', () => {
-                    showConfirmationModal(`Are you sure you want to remove all favorite ${type === 'movie' ? 'movies' : 'TV shows'}?`, () => {
-                        state.favorites = state.favorites.filter(fav => fav.media_type !== type);
+                ['movie', 'tv'].forEach(itemType => {
+                    const idPrefix = listType === 'watchlist' ? 'Watchlist' : '';
+                    const itemTypePlural = itemType === 'movie' ? 'Movies' : 'Tvs';
+                    
+                    const viewBtns = document.querySelectorAll(`.${itemType}-${listType}-view-btn`);
+                    const manageBtn = $(`manage${idPrefix}${itemTypePlural}Btn`);
+                    const cancelManageBtn = $(`cancelManage${idPrefix}${itemTypePlural}Btn`);
+                    const deleteAllBtn = $(`deleteAll${idPrefix}${itemTypePlural}Btn`);
+                    const deleteSelectedBtn = $(`deleteSelected${idPrefix}${itemTypePlural}Btn`);
+                    const container = $(`${itemType}${listPrefix}Container`);
+                    const renderFunc = listType === 'favorites' ? renderFavorites : renderWatchlist;
+
+                    viewBtns.forEach(btn => btn.addEventListener('click', () => {
+                        state[`${itemType}${listPrefix}View`] = btn.dataset.view;
+
+                        viewBtns.forEach(b => {
+                            b.classList.toggle('bg-zinc-900', b === btn);
+                            b.classList.toggle('text-white', b === btn);
+                            b.classList.toggle('text-zinc-300', b !== btn);
+                        });
+                        renderFunc();
+                    }));
+
+                    if(manageBtn) manageBtn.addEventListener('click', () => {
+                        state[`isManaging${listPrefix}${itemTypePlural}`] = true;
+                        renderFunc();
+                    });
+
+                    if(cancelManageBtn) cancelManageBtn.addEventListener('click', () => {
+                        state[`isManaging${listPrefix}${itemTypePlural}`] = false;
+                        renderFunc();
+                    });
+                    
+                    if(deleteAllBtn) deleteAllBtn.addEventListener('click', () => {
+                        showConfirmationModal(`Are you sure you want to remove all ${itemType === 'movie' ? 'movies' : 'TV shows'} from your ${listType}?`, () => {
+                            state[listType] = state[listType].filter(item => item.media_type !== itemType);
+                            saveDataToFirestore();
+                        });
+                    });
+
+                    if(deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', () => {
+                        if (!container) return;
+                        const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                        if (selected.length === 0) return;
+                        const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
+                        state[listType] = state[listType].filter(item => !idsToDelete.includes(item.id));
                         saveDataToFirestore();
                     });
-                });
 
-                deleteSelectedBtn.addEventListener('click', () => {
-                    const selected = container.querySelectorAll('.favorite-card-manage-checkbox:checked');
-                    if (selected.length === 0) return;
-                    const idsToDelete = Array.from(selected).map(el => parseInt(el.value, 10));
-                    state.favorites = state.favorites.filter(fav => !idsToDelete.includes(fav.id));
-                    saveDataToFirestore();
+                    if (listType === 'favorites') {
+                        const moveToWatchlistBtn = $(`moveToWatchlist${itemTypePlural}Btn`);
+                        if (moveToWatchlistBtn) {
+                            moveToWatchlistBtn.addEventListener('click', () => {
+                                if (!container) return;
+                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                                if (selected.length === 0) return;
+                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
+
+                                const itemsToMove = state.favorites.filter(item => idsToMove.includes(item.id));
+                                state.favorites = state.favorites.filter(item => !idsToMove.includes(item.id));
+
+                                const watchlistIds = new Set(state.watchlist.map(item => item.id));
+                                const newWatchlistItems = itemsToMove.filter(item => !watchlistIds.has(item.id));
+                                state.watchlist.push(...newWatchlistItems);
+
+                                saveDataToFirestore();
+                            });
+                        }
+                    } else if (listType === 'watchlist') {
+                        const moveToFavoritesBtn = $(`moveToFavorites${itemTypePlural}Btn`);
+                        if (moveToFavoritesBtn) {
+                            moveToFavoritesBtn.addEventListener('click', () => {
+                                if (!container) return;
+                                const selected = container.querySelectorAll('.media-card-manage-checkbox:checked');
+                                if (selected.length === 0) return;
+                                const idsToMove = Array.from(selected).map(el => parseInt(el.value, 10));
+
+                                const itemsToMove = state.watchlist.filter(item => idsToMove.includes(item.id));
+                                state.watchlist = state.watchlist.filter(item => !idsToMove.includes(item.id));
+
+                                const favoriteIds = new Set(state.favorites.map(item => item.id));
+                                const newFavoriteItems = itemsToMove.filter(item => !favoriteIds.has(item.id));
+                                state.favorites.push(...newFavoriteItems);
+
+                                saveDataToFirestore();
+                            });
+                        }
+                    }
                 });
             }
+
 
             function initEventListeners() {
                 $('signInWithGoogleButton').addEventListener('click', handleGoogleSignIn);
@@ -1993,8 +2163,8 @@
 
                 upcomingFilterBtns.forEach(btn => btn.addEventListener('click', () => {
                     state.dashboardScheduleFilter = btn.dataset.filter;
-                    updateUpcomingFilterButtonsUI(); // Update button visuals
-                    saveDataToFirestore(); // Save the new preference
+                    updateUpcomingFilterButtonsUI();
+                    saveDataToFirestore();
                     renderDashboardUpcoming();
                 }));
 
@@ -2023,15 +2193,14 @@
                     e.preventDefault();
                     const suggestion = $('suggestionText').value;
                     if(suggestion.trim()) {
-                        window.location.href = `mailto:nateschuckers@gmail.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
+                        window.location.href = `mailto:feedback@example.com?subject=App Suggestion&body=${encodeURIComponent(suggestion)}`;
                         $('suggestionText').value = '';
                         closeSuggestionModal();
                     }
                 });
 
-                // Setup Favorites Management for both sections
-                setupFavoriteSectionControls('movie');
-                setupFavoriteSectionControls('tv');
+                setupSectionControls('favorites');
+                setupSectionControls('watchlist');
 
                 scrollLeftBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: -300, behavior: 'smooth' }); });
                 scrollRightBtn.addEventListener('click', () => { trendingContainer.scrollBy({ left: 300, behavior: 'smooth' }); });
@@ -2041,7 +2210,6 @@
                 $('spotlightScrollRightBtn').addEventListener('click', () => { $('spotlightContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
                 $('recommendationsScrollLeftBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: -300, behavior: 'smooth' }); });
                 $('recommendationsScrollRightBtn').addEventListener('click', () => { $('recommendationsContainer').scrollBy({ left: 300, behavior: 'smooth' }); });
-
 
                 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             }
@@ -2053,4 +2221,3 @@
     </script>
 </body>
 </html>
-
